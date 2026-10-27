@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Haomin Yang — Résumé</title>
+<meta name="description" content="Haomin Yang — applied ML, systems engineering, and open-source tooling.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%23123f4d'/><text x='50' y='70' font-size='58' text-anchor='middle' fill='%23f7f5f1' font-family='Georgia,serif'>Y</text></svg>">
+<style>
+  :root{
+    --paper:#f7f5f1;
+    --ink:#16181a;
+    --ink-2:#4a4f55;
+    --ink-3:#8a8f96;
+    --rule:#d9d4c9;
+    --accent:#123f4d;
+    --live:#0f8a5f;
+    --serif:"Charter","Iowan Old Style","Palatino Linotype",Palatino,"Source Serif Pro",Georgia,serif;
+    --sans:"Helvetica Neue",Helvetica,"Segoe UI",system-ui,-apple-system,sans-serif;
+    --mono:ui-monospace,"SF Mono","Cascadia Mono",Consolas,"Liberation Mono",monospace;
+    --rail:130px;
+    --measure:920px;
+  }
+  *{box-sizing:border-box}
+  html{-webkit-text-size-adjust:100%}
+  body{
+    margin:0;background:var(--paper);color:var(--ink);
+    font-family:var(--sans);
+    font-size:15px;line-height:1.72;letter-spacing:.005em;
+    -webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;
+  }
+  body::before{
+    content:"";position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.32;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)' opacity='.05'/%3E%3C/svg%3E");
+  }
+  .page{position:relative;z-index:1;max-width:var(--measure);margin:0 auto;padding:76px 44px 120px}
+  a{color:inherit;text-decoration:none;border-bottom:1px solid var(--rule);padding-bottom:1px;transition:border-color .18s,color .18s}
+  a:hover{color:var(--accent);border-color:var(--accent)}
+
+  /* ---------- masthead ---------- */
+  .masthead{border-bottom:2px solid var(--ink);padding-bottom:24px}
+  .masthead h1{font-family:var(--serif);font-size:56px;line-height:1.02;letter-spacing:-.015em;margin:0 0 10px;font-weight:600}
+  .masthead h1 .cn{font-size:26px;letter-spacing:.18em;color:var(--ink-3);margin-left:14px;vertical-align:.28em;font-weight:400}
+  .latin{font-family:var(--mono);font-size:10.5px;letter-spacing:.28em;text-transform:uppercase;color:var(--ink-3);margin:0 0 22px}
+  .summary{font-family:var(--serif);font-size:17px;line-height:1.62;color:var(--ink-2);max-width:64ch;margin:0 0 20px}
+  .contact{display:flex;flex-wrap:wrap;gap:5px 24px;margin:0;padding:0;list-style:none;font-size:13.5px;color:var(--ink-2)}
+  .contact li{display:flex;align-items:baseline;gap:7px}
+  .contact .k{font-family:var(--mono);font-size:9.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-3)}
+
+  /* ---------- live strip ---------- */
+  .live{display:grid;grid-template-columns:repeat(3,1fr);border-bottom:1px solid var(--rule)}
+  .live__cell{padding:18px 0 16px;border-left:1px solid var(--rule);padding-left:22px}
+  .live__cell:first-child{border-left:0;padding-left:0}
+  .live__num{font-family:var(--mono);font-variant-numeric:tabular-nums;font-size:25px;line-height:1.1;letter-spacing:-.03em;display:block}
+  .live__k{font-size:11px;color:var(--ink-3);letter-spacing:.09em;text-transform:uppercase;display:block;margin-top:6px}
+  .live__k a{border-bottom:0}
+  .live__num sup{font-size:11px;color:var(--ink-3);vertical-align:super;letter-spacing:0}
+  .live__meta{display:flex;align-items:center;gap:10px;font-family:var(--mono);font-size:10px;letter-spacing:.12em;color:var(--ink-3);text-transform:uppercase;padding:12px 0 0}
+  .dot{width:5px;height:5px;border-radius:50%;background:var(--live);box-shadow:0 0 0 3px rgba(15,138,95,.14);animation:pulse 2.6s ease-in-out infinite}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.32}}
+
+  /* ---------- sections ---------- */
+  .sec{display:grid;grid-template-columns:var(--rail) 1fr;padding:36px 0 4px;border-top:1px solid var(--rule)}
+  .sec:first-of-type{border-top:0}
+  .sec__no{font-family:var(--mono);font-size:10.5px;letter-spacing:.2em;color:var(--ink-3);padding-top:7px}
+  .sec__title{font-family:var(--serif);font-size:23px;letter-spacing:.02em;margin:0;font-weight:600}
+  .sec__lede{font-size:11.5px;color:var(--ink-3);letter-spacing:.1em;text-transform:uppercase;margin:4px 0 20px;font-family:var(--mono)}
+
+  /* ---------- entries ---------- */
+  .entry{padding:0 0 24px}
+  .entry:last-child{padding-bottom:4px}
+  .entry__head{display:flex;justify-content:space-between;align-items:baseline;gap:20px}
+  .entry__org{font-family:var(--serif);font-size:18px;font-weight:600;letter-spacing:.005em}
+  .entry__org .sub{font-family:var(--sans);font-weight:400;color:var(--ink-2);font-size:13.5px;margin-left:12px;letter-spacing:.02em}
+  .entry__date{font-family:var(--mono);font-size:11px;letter-spacing:.08em;color:var(--ink-3);white-space:nowrap;font-variant-numeric:tabular-nums}
+  .entry__role{font-size:12.5px;color:var(--ink-3);letter-spacing:.06em;text-transform:uppercase;font-family:var(--mono);margin:5px 0 12px}
+  ul.bul{margin:0;padding:0;list-style:none}
+  ul.bul li{position:relative;padding-left:19px;margin-bottom:8px;font-size:14.4px;color:var(--ink-2)}
+  ul.bul li::before{content:"";position:absolute;left:1px;top:.82em;width:7px;height:1px;background:var(--ink-3)}
+  .hl{color:var(--ink);font-weight:600}
+  .stack{font-family:var(--mono);font-size:11px;color:var(--ink-3);margin-top:8px;letter-spacing:.01em}
+
+  .skills,.honors{margin:0}
+  .skills > div,.honors > div{display:grid;grid-template-columns:158px 1fr;gap:0 22px;border-top:1px solid var(--rule)}
+  .skills > div:first-child,.honors > div:first-child{border-top:0}
+  .skills dt,.honors dt{font-weight:600;font-size:13.5px;letter-spacing:.04em;padding:9px 0}
+  .skills dd,.honors dd{margin:0;color:var(--ink-2);font-size:14.2px;padding:9px 0}
+
+  footer{margin-top:48px;padding-top:16px;border-top:2px solid var(--ink);font-family:var(--mono);font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-3);display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
+
+  .rise{opacity:0;transform:translateY(10px);animation:rise .72s cubic-bezier(.2,.7,.3,1) forwards;animation-delay:calc(var(--i,0)*65ms)}
+  @keyframes rise{to{opacity:1;transform:none}}
+  @media (prefers-reduced-motion:reduce){.rise{animation:none;opacity:1;transform:none}.dot{animation:none}}
+
+  @media (max-width:780px){
+    :root{--rail:0px}
+    .page{padding:46px 20px 72px}
+    .masthead h1{font-size:38px}
+    .masthead h1 .cn{font-size:18px;margin-left:8px}
+    .live{grid-template-columns:1fr 1fr}
+    .live__cell:nth-child(odd){border-left:0;padding-left:0}
+    .live__cell:nth-child(n+3){border-top:1px solid var(--rule);margin-top:2px}
+    .live__cell:nth-child(3n+1){padding-left:0}
+    .sec{grid-template-columns:1fr;padding-top:28px}
+    .sec__no{display:none}
+    .entry__head{flex-direction:column;gap:3px}
+    .skills,.honors{grid-template-columns:1fr}
+    .skills > div,.honors > div{grid-template-columns:1fr;gap:0}
+    .skills dt,.honors dt{padding-bottom:1px}
+    .skills dd,.honors dd{padding-top:0;padding-bottom:10px}
+  }
+
+  @media print{
+    :root{--paper:#fff}
+    body{background:#fff;font-size:10pt;line-height:1.55}
+    body::before{display:none}
+    .page{max-width:none;padding:0}
+    .live,footer .js-only,.dot{display:none}
+    .masthead h1{font-size:28pt}
+    .sec{padding-top:10pt}
+    .entry{break-inside:avoid}
+    a{border-bottom:0}
+    .rise{animation:none;opacity:1;transform:none}
+  }
+</style>
+</head>
+<body>
+<main class="page">
+
+  <header class="masthead rise" style="--i:0">
+    <h1>Haomin Yang</h1>
+    <p class="latin">Applied ML · Systems · Open Source</p>
+    <p class="summary">
+      Master's in Information &amp; Communication Engineering from Beijing Institute of Technology.
+      I build tools that remove repetitive work — from generative models and risk classifiers to
+      desktop extensions that make AI agents easier to live with. Mostly self-taught across
+      five languages, and I write about the maths behind the code.
+    </p>
+    <ul class="contact">
+      <li><span class="k">mail</span><span>aspen1382020 at gmail dot com</span></li>
+      
+      
+      <li><span class="k">code</span><a href="https://github.com/yhm138" target="_blank" rel="noreferrer">github.com/yhm138</a></li>
+      <li><span class="k">blog</span><a href="https://cnblogs.com/yhm138" target="_blank" rel="noreferrer">cnblogs.com/yhm138</a></li>
+    </ul>
+  </header>
+
+  <section class="live rise" style="--i:1" aria-label="Live metrics">
+    <div class="live__cell">
+      <span class="live__num" id="m-repos">50</span>
+      <span class="live__k">Public repositories</span>
+    </div>
+    <div class="live__cell">
+      <span class="live__num" id="m-gf">11.4k</span>
+      <span class="live__k">GreasyFork installs</span>
+    </div>
+    <div class="live__cell">
+      <span class="live__num" id="m-se">11.5k</span>
+      <span class="live__k">Stack Exchange rep</span>
+    </div>
+    <div class="live__cell">
+      <span class="live__num" id="m-rosetta">1.5k</span>
+      <span class="live__k">RosettaCode edits</span>
+    </div>
+    <div class="live__cell">
+      <span class="live__num" id="m-pypi">3.9k</span>
+      <span class="live__k">PyPI downloads</span>
+    </div>
+    <div class="live__cell">
+      <span class="live__num">526</span>
+      <span class="live__k"><a href="https://chrome-stats.com/a/Q2hyb21lV2ViU3RvcmVEZXY" target="_blank" rel="noreferrer">Chrome ext. users</a></span>
+    </div>
+    <div class="live__meta" style="grid-column:1/-1">
+      <span class="dot" aria-hidden="true"></span>
+      <span class="js-only">Monthly snapshot via GitHub Actions · <span id="stamp">—</span> · <a href="https://github.com/yhm138/resume/commits/main/metrics.json" target="_blank" rel="noreferrer">history</a></span>
+    </div>
+  </section>
+
+  <!-- 01 -->
+  <section class="sec rise" style="--i:2">
+    <div class="sec__no">01</div>
+    <div>
+      <h2 class="sec__title">Experience</h2>
+      <p class="sec__lede">Industry internships · 2021 – 2023</p>
+
+      <article class="entry">
+        <div class="entry__head">
+          <div class="entry__org">Xiaomi<span class="sub">Search &amp; Recommendation · Growth Platform</span></div>
+          <div class="entry__date">2022.10 — 2023.06</div>
+        </div>
+        <p class="entry__role">Software / Algorithm Engineer Intern · Beijing</p>
+        <ul class="bul">
+          <li><span class="hl">LLM fine-tuning</span> — Fine-tuned GPT-3.5 to generate push-notification headlines for the news feed, replacing part of the editorial workflow and lifting headline quality. Reproduced <em>zero_nlp</em>'s ChatGLM-6B ModelParallel P-Tuning and ran the P-Tuning path end to end; know the trade-offs between P-Tuning, LoRA, Adapters, BitFit and full fine-tuning, and where Faiss / LangChain / vector stores actually help.</li>
+          <li><span class="hl">Risk modelling</span> — Phone-SIM usage classification against police-flagged accounts. Led dataset construction, EDA, feature engineering, training and evaluation: LightGBM / XGBoost / CatBoost / AdaBoost ensemble, SMOTEENN &amp; SMOTETomek resampling, Stacking and Voting combiners. <span class="hl">AUC 0.92</span> on 45 features.</li>
+          <li><span class="hl">Analytics &amp; dashboards</span> — Authored the 2022 operations annual report (SQL, audience analytics over <span class="hl">5M+</span> subscribers, ARPU and LTV); built MIS dashboards on the erupt / amis low-code stack with ECharts.</li>
+          <li><span class="hl">Streaming risk &amp; knowledge</span> — Researched Flink dynamic CEP for a real-time risk rule engine; wrote onboarding docs and development SOPs, turning personal notes into team assets.</li>
+        </ul>
+      </article>
+
+      <article class="entry">
+        <div class="entry__head">
+          <div class="entry__org">Quality Engineering<span class="sub">NetEase Youdao · Kuaishou · Jietong Huasheng</span></div>
+          <div class="entry__date">2021.06 — 2022.03</div>
+        </div>
+        <p class="entry__role">Software Test Engineer Intern · Beijing</p>
+        <ul class="bul">
+          <li>BLEU-SBP quality evaluation for Youdao's translation API on a blind test set, with a written comparison against the production model.</li>
+          <li>Automation for Kuaishou's overseas apps (Kwai, SnackVideo) in the base-service feature team.</li>
+          <li>Deployed a full AI capability platform on CentOS 7 (ZooKeeper, MySQL, MinIO, Consul, ELK, TICK) and closed <span class="hl">35</span> defects end to end.</li>
+        </ul>
+      </article>
+    </div>
+  </section>
+
+  <!-- 02 -->
+  <section class="sec rise" style="--i:4">
+    <div class="sec__no">02</div>
+    <div>
+      <h2 class="sec__title">Education</h2>
+      <p class="sec__lede">Beijing Institute of Technology · School of Information &amp; Electronics</p>
+
+      <article class="entry">
+        <div class="entry__head">
+          <div class="entry__org">MSc, Information &amp; Communication Engineering</div>
+          <div class="entry__date">2022.09 — 2025.06</div>
+        </div>
+        <ul class="bul">
+          <li>Admitted by recommendation (top-of-class track). Academic Excellence Scholarship (Special) ×1, First-class ×1, Second-class ×1.</li>
+        </ul>
+      </article>
+
+      <article class="entry">
+        <div class="entry__head">
+          <div class="entry__org">BEng, Electronic Information Engineering</div>
+          <div class="entry__date">2018.09 — 2022.06</div>
+        </div>
+        <ul class="bul">
+          <li>Scholarships ×5, discipline-competition scholarship, Outstanding Student 2020–2021.</li>
+          <li>Coursework: University Physics AII (100), Linear Algebra A (98), Computer Principles &amp; Applications B (97), Digital Communication Principles B (91).</li>
+        </ul>
+      </article>
+    </div>
+  </section>
+
+  <!-- 03 -->
+  <section class="sec rise" style="--i:5">
+    <div class="sec__no">03</div>
+    <div>
+      <h2 class="sec__title">Awards</h2>
+      <p class="sec__lede">Finance · Programming · Mathematics</p>
+      <dl class="honors">
+        <div><dt>Finance competitions</dt><dd>CMB 9th Digital Finance Bootcamp, data track — #128. Industrial Bank Touch CIB technology challenge — finalist camp. China Minsheng Bank "民生<i>π</i>" elite challenge, data-algorithm track — #22.</dd></div>
+        <div><dt>Programming</dt><dd>Blue Bridge Cup, Python — provincial first prize ×3 (2022–2024), national second prize 2023.</dd></div>
+        <div><dt>Mathematics</dt><dd>National College Mathematics Competition — first prize ×2 (2019, 2020). Regional Physics Competition — second prize.</dd></div>
+      </dl>
+    </div>
+  </section>
+
+  <!-- 04 -->
+  <section class="sec rise" style="--i:6">
+    <div class="sec__no">04</div>
+    <div>
+      <h2 class="sec__title">Skills</h2>
+      <p class="sec__lede">Engineering · Models · Mathematics · Finance</p>
+      <dl class="skills">
+        <div><dt>Languages</dt><dd>Python, C++, C#, Java, JavaScript. SQL across HiveSQL, Presto/Trino-style engines and GaussDB. Reading knowledge of Lua / Perl / Tcl and Haskell / Elixir / Erlang.</dd></div>
+        <div><dt>ML &amp; AI</dt><dd>P-Tuning hands-on; LoRA, Adapters, BitFit and full fine-tuning trade-offs; RAG concepts (Faiss, Chroma, LangChain); multimodal and reasoning models applied to document review; Huawei AgentArts orchestration.</dd></div>
+        <div><dt>Data &amp; modelling</dt><dd>Gradient boosting (LightGBM, XGBoost, CatBoost, AdaBoost), imbalanced learning, Playwright / Selenium automation and traffic capture, market-data APIs.</dd></div>
+        <div><dt>Maths &amp; statistics</dt><dd>Statistical inference and hypothesis testing; distribution theory (Fisher–Snedecor, sub-Gaussian tails); enumerative combinatorics and generating functions; spatial point processes and stochastic geometry; special functions (MeijerG, FoxH). R.</dd></div>
+        <div><dt>Engineering</dt><dd>Vue 2 + Spring Boot + Activiti/Ruoyi, Element UI, .NET WinForms, Linux C++, Axure / Visio / Mermaid.</dd></div>
+        <div><dt>Finance</dt><dd>Credit lifecycle, RAROC and risk-adjusted return, rating and internal-control frameworks, regulatory reporting conventions.</dd></div>
+        <div><dt>Certificates</dt><dd>China Software Proficiency (intermediate), CET-6, Mandarin Grade 2B.</dd></div>
+      </dl>
+    </div>
+  </section>
+
+  <!-- 05 -->
+  <section class="sec rise" style="--i:7">
+    <div class="sec__no">05</div>
+    <div>
+      <h2 class="sec__title">Open Source &amp; Writing</h2>
+      <p class="sec__lede">The part you can verify</p>
+
+      <article class="entry">
+        <div class="entry__head">
+          <div class="entry__org"><a href="https://github.com/yhm138/workbuddy-toolkit" target="_blank" rel="noreferrer">workbuddy-toolkit</a><span class="sub">session bridge · copy session ID · cloud sessions</span></div>
+          <div class="entry__date">2026</div>
+        </div>
+        <ul class="bul">
+          <li><span class="hl">Built session-level features for the WorkBuddy client</span>: copy-session-ID, cross-agent-client session messaging, and multi-session context within one client; ported the DeepSeek Harness skill pack and workflow into WorkBuddy.</li>
+          <li>Three extensions maintained as one repository. No host files modified, read-only, data stays local; CI runs on both Windows and Linux.</li>
+        </ul>
+      </article>
+
+      <article class="entry">
+        <div class="entry__head"><div class="entry__org">Open source</div></div>
+        <ul class="bul">
+          <li><a href="https://pepy.tech/projects/bisc-algorithm" target="_blank" rel="noreferrer">bisc-algorithm</a> on PyPI (<span class="hl">3.9k</span> downloads); <span class="hl">70+</span> userscripts on <a href="https://greasyfork.org/en/users/1177387-138-aspen" target="_blank" rel="noreferrer">GreasyFork</a> (<span class="hl">10k+</span> installs); <span class="hl">6</span> <a href="https://chrome-stats.com/a/Q2hyb21lV2ViU3RvcmVEZXY" target="_blank" rel="noreferrer">Chrome extensions</a> (<span class="hl">526</span> users at peak); <span class="hl">30+</span> new and <span class="hl">460+</span> contributed entries on <a href="https://rosettacode.miraheze.org/wiki/Special:Contributions/Aspen138" target="_blank" rel="noreferrer">RosettaCode</a>.</li>
+        </ul>
+      </article>
+
+      <article class="entry">
+        <div class="entry__head"><div class="entry__org">Writing</div></div>
+        <ul class="bul">
+          <li><span class="hl">160k+</span> reads on <a href="https://cnblogs.com/yhm138" target="_blank" rel="noreferrer">Cnblogs</a>; <span class="hl">900+</span> upvotes and <span class="hl">1.7k</span> saves on <a href="https://www.zhihu.com/people/yong-hu-ming-32" target="_blank" rel="noreferrer">Zhihu</a>; <span class="hl">7200+</span> Code Golf, <span class="hl">2400+</span> Mathematica and <span class="hl">1500+</span> Mathematics reputation across <a href="https://stackexchange.com/users/21083779/138-aspen?tab=accounts" target="_blank" rel="noreferrer">Stack Exchange</a>.</li>
+        </ul>
+      </article>
+    </div>
+  </section>
+
+  <footer class="rise" style="--i:8">
+    <span>Haomin Yang · Résumé</span>
+    <span class="js-only">Metrics committed monthly to git; everything else is a static snapshot</span>
+  </footer>
+</main>
+
+<script>
+(function () {
+  var GH_USER = 'yhm138';
+  var GF_UID  = '1177387';
+
+  function fmt(n) {
+    if (n === null || n === undefined) return '—';
+    if (n >= 100000) return Math.round(n / 1000) + 'k';
+    if (n >= 10000) return (Math.round(n / 100) / 10) + 'k';
+    if (n >= 1000) return (Math.round(n / 100) / 10).toString().replace(/\.0$/, '') + 'k';
+    return String(n);
+  }
+  function set(id, text) {
+    var el = document.getElementById(id);
+    if (el && text !== '—') el.textContent = text;
+  }
+  function getJSON(url) {
+    return fetch(url, { headers: { Accept: 'application/json' } }).then(function (r) {
+      if (!r.ok) throw new Error(url + ' → ' + r.status);
+      return r.json();
+    });
+  }
+
+  // 1) 先用夜间爬虫产出的快照，保证任何浏览器都能看到数字
+  fetch('metrics.json', { cache: 'no-store' })
+    .then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); })
+    .then(function (m) {
+      set('m-repos', fmt(m.github_repos));
+      set('m-gf', fmt(m.greasyfork_installs));
+      set('m-se', fmt(m.stackexchange_rep));
+      set('m-rosetta', fmt(m.rosetta_edits));
+      set('m-pypi', fmt(m.pypi_total));
+      var stamp = document.getElementById('stamp');
+      if (stamp && m.generated_at) {
+        stamp.textContent = m.generated_at.slice(0, 16).replace('T', ' ') + ' UTC';
+      }
+    })
+    .catch(function () { /* 静态兜底值留在 DOM 里 */ });
+
+  // 2) 再用支持 CORS 的公开接口覆盖一次，拿到当天的最新值
+  Promise.allSettled([
+    getJSON('https://api.github.com/users/' + GH_USER).then(function (u) {
+      set('m-repos', fmt(u.public_repos));
+    }),
+    getJSON('https://api.greasyfork.org/users/' + GF_UID + '.json').then(function (u) {
+      var total = (u.scripts || []).reduce(function (s, x) { return s + (x.total_installs || 0); }, 0);
+      set('m-gf', fmt(total));
+    })
+  ]);
+})();
+</script>
+</body>
+</html>

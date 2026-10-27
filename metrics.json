@@ -1,0 +1,15 @@
+{
+  "generated_at": "2026-10-27T08:55:33Z",
+  "github_repos": 50,
+  "greasyfork_installs": 11423,
+  "greasyfork_scripts": 82,
+  "pypi_total": 3950,
+  "rosetta_edits": 1484,
+  "stackexchange_by_site": {
+    "codegolf": 7347,
+    "math": 1588,
+    "mathematica": 2434,
+    "stackoverflow": 171
+  },
+  "stackexchange_rep": 11540
+}
