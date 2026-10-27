@@ -21,7 +21,10 @@ jobs:
           python-version: "3.12"
 
       # Stack Exchange 全站声誉、RosettaCode 贡献页、chrome-stats 都需要真实浏览器上下文。
-      - name: Install Playwright
+      # 浏览器只是加分项：装不上就用不了 SE 全站与 chrome-stats，其余四项照常出数。
+      - name: Install Playwright (best effort)
+        continue-on-error: true
+        timeout-minutes: 4
         run: |
           python -m pip install --quiet playwright
           python -m playwright install --with-deps --only-shell chromium
