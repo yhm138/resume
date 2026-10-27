@@ -176,7 +176,7 @@
     </div>
     <div class="live__meta" style="grid-column:1/-1">
       <span class="dot" aria-hidden="true"></span>
-      <span class="js-only">● live per visit: GitHub, GreasyFork, SE per-site　○ refreshed by CI — see the timestamp: SE total, RosettaCode, PyPI, Chrome · <span id="stamp">—</span> · <a href="https://github.com/yhm138/resume/commits/main/metrics.json" target="_blank" rel="noreferrer">history</a></span>
+      <span class="js-only">● live: GitHub, GreasyFork, SE per-site　○ Worker cache (10 min): PyPI, RosettaCode　○ static: SE total, Chrome · <span id="stamp">—</span> · <a href="https://github.com/yhm138/resume/commits/main/metrics.json" target="_blank" rel="noreferrer">history</a></span>
     </div>
   </section>
 
@@ -342,27 +342,36 @@
     });
   }
 
-  // 1) 先用夜间爬虫产出的快照，保证任何浏览器都能看到数字
-  fetch('metrics.json', { cache: 'no-store' })
-    .then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); })
-    .then(function (m) {
-      set('m-repos', fmt(m.github_repos));
-      set('m-gf', fmt(m.greasyfork_installs));
-      set('m-se', fmt(m.stackexchange_rep));
-      set('m-rosetta', fmt(m.rosetta_tasks));
-      set('ros-tasks', fmt(m.rosetta_tasks));
-      if (m.rosetta_new) set('ros-new', String(m.rosetta_new));
-      if (m.chrome_users) set('m-chrome', fmt(m.chrome_users));
-      set('m-pypi', fmt(m.pypi_total));
-      set('pypi-body', fmt(m.pypi_total));
-      var stamp = document.getElementById('stamp');
-      if (stamp && m.generated_at) {
-        // metrics.py 写的是 UTC，这里固定换算到 UTC+8（Asia/Shanghai），不随访客时区变
-        var t8 = new Date(new Date(m.generated_at).getTime() + 8 * 3600 * 1000);
-        stamp.textContent = t8.toISOString().slice(0, 16).replace('T', ' ') + ' (UTC+8)';
-      }
-    })
-    .catch(function () { /* 静态兜底值留在 DOM 里 */ });
+  // 1) 先问 Cloudflare Worker（10 分钟缓存，带 CORS），失败再退回仓库里的快照
+  var WORKER = 'https://autumn-thunder-2ee6.aspen1382020.workers.dev/metrics';
+
+  function apply(m) {
+    set('m-repos', fmt(m.github_repos));
+    set('m-gf', fmt(m.greasyfork_installs));
+    set('gf-installs', fmt(m.greasyfork_installs));
+    if (m.greasyfork_scripts) set('gf-scripts', String(m.greasyfork_scripts));
+    set('m-se', fmt(m.stackexchange_rep));
+    set('m-rosetta', fmt(m.rosetta_tasks));
+    set('ros-tasks', fmt(m.rosetta_tasks));
+    if (m.rosetta_new) set('ros-new', String(m.rosetta_new));
+    if (m.chrome_users) set('m-chrome', fmt(m.chrome_users));
+    set('m-pypi', fmt(m.pypi_total));
+    set('pypi-body', fmt(m.pypi_total));
+    var stamp = document.getElementById('stamp');
+    if (stamp && m.generated_at) {
+      var t8 = new Date(new Date(m.generated_at).getTime() + 8 * 3600 * 1000);
+      stamp.textContent = t8.toISOString().slice(0, 16).replace('T', ' ') + ' (UTC+8)';
+    }
+  }
+
+  getJSON(WORKER)
+    .then(apply)
+    .catch(function () {
+      return fetch('metrics.json', { cache: 'no-store' })
+        .then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); })
+        .then(apply)
+        .catch(function () { /* DOM 里的静态值兜底 */ });
+    });
 
   // 2) 再用支持 CORS 的公开接口覆盖一次，拿到当天的最新值
   //    Stack Exchange 官方 API 带 Access-Control-Allow-Origin: *，所以分站声誉也能实时取；
