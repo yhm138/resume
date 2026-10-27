@@ -173,7 +173,9 @@ SOURCES = [
     ("chrome", chrome, None),
 ]
 
-MANUAL = {"chrome"}          # known-blocked; never raises an alert
+MANUAL = {"chrome"}              # permanently blocked by Cloudflare; never alerts
+IP_BLOCKED = {"rosetta"}         # works locally, 403 from datacenter IPs — only alerts off-CI
+CI = os.environ.get("GITHUB_ACTIONS") == "true"
 
 
 def main():
