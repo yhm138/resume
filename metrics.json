@@ -1,7 +1,9 @@
 {
   "chrome_users": 680,
-  "fail_streak": {},
-  "generated_at": "2026-10-27T13:45:28Z",
+  "fail_streak": {
+    "rosetta": 1
+  },
+  "generated_at": "2026-10-27T13:51:17Z",
   "github_repos": 50,
   "greasyfork_installs": 11421,
   "greasyfork_scripts": 81,
@@ -18,5 +20,7 @@
   },
   "stackexchange_rep": 24651,
   "stackexchange_sites": 118,
-  "stale": []
+  "stale": [
+    "rosetta"
+  ]
 }
