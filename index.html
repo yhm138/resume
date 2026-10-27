@@ -176,7 +176,7 @@
     </div>
     <div class="live__meta" style="grid-column:1/-1">
       <span class="dot" aria-hidden="true"></span>
-      <span class="js-only">● live: GitHub, GreasyFork　○ monthly snapshot: the rest · <span id="stamp">—</span> · <a href="https://github.com/yhm138/resume/commits/main/metrics.json" target="_blank" rel="noreferrer">history</a></span>
+      <span class="js-only">● live: GitHub, GreasyFork, SE per-site　○ monthly snapshot: SE total, RosettaCode, PyPI, Chrome · <span id="stamp">—</span> · <a href="https://github.com/yhm138/resume/commits/main/metrics.json" target="_blank" rel="noreferrer">history</a></span>
     </div>
   </section>
 
@@ -327,7 +327,8 @@
     if (n === null || n === undefined) return '—';
     if (n >= 100000) return Math.round(n / 1000) + 'k';
     if (n >= 10000) return (Math.round(n / 100) / 10) + 'k';
-    if (n >= 1000) return (Math.round(n / 100) / 10).toString().replace(/\.0$/, '') + 'k';
+    if (n >= 10000) return (Math.round(n / 100) / 10).toString().replace(/\.0$/, '') + 'k';
+    if (n >= 1000) return n.toLocaleString('en-US');
     return String(n);
   }
   function set(id, text) {
