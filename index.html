@@ -354,7 +354,9 @@
       set('m-pypi', fmt(m.pypi_total));
       var stamp = document.getElementById('stamp');
       if (stamp && m.generated_at) {
-        stamp.textContent = m.generated_at.slice(0, 16).replace('T', ' ') + ' UTC';
+        // metrics.py 写的是 UTC，这里固定换算到 UTC+8（Asia/Shanghai），不随访客时区变
+        var t8 = new Date(new Date(m.generated_at).getTime() + 8 * 3600 * 1000);
+        stamp.textContent = t8.toISOString().slice(0, 16).replace('T', ' ') + ' (UTC+8)';
       }
     })
     .catch(function () { /* 静态兜底值留在 DOM 里 */ });
