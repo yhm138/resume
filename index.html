@@ -155,19 +155,19 @@
       <span class="live__k">GreasyFork installs</span>
     </div>
     <div class="live__cell">
-      <span class="live__num" id="m-se">11.5k</span>
+      <span class="live__num" id="m-se">24.7k</span>
       <span class="live__k">Stack Exchange rep</span>
     </div>
     <div class="live__cell">
-      <span class="live__num" id="m-rosetta">1.5k</span>
-      <span class="live__k">RosettaCode edits</span>
+      <span class="live__num" id="m-rosetta">465</span>
+      <span class="live__k">RosettaCode tasks</span>
     </div>
     <div class="live__cell">
       <span class="live__num" id="m-pypi">3.9k</span>
       <span class="live__k">PyPI downloads</span>
     </div>
     <div class="live__cell">
-      <span class="live__num">526</span>
+      <span class="live__num" id="m-chrome">526</span>
       <span class="live__k"><a href="https://chrome-stats.com/a/Q2hyb21lV2ViU3RvcmVEZXY" target="_blank" rel="noreferrer">Chrome ext. users</a></span>
     </div>
     <div class="live__meta" style="grid-column:1/-1">
@@ -295,7 +295,7 @@
       <article class="entry">
         <div class="entry__head"><div class="entry__org">Open source</div></div>
         <ul class="bul">
-          <li><a href="https://pepy.tech/projects/bisc-algorithm" target="_blank" rel="noreferrer">bisc-algorithm</a> on PyPI (<span class="hl">3.9k</span> downloads); <span class="hl">70+</span> userscripts on <a href="https://greasyfork.org/en/users/1177387-138-aspen" target="_blank" rel="noreferrer">GreasyFork</a> (<span class="hl">10k+</span> installs); <span class="hl">6</span> <a href="https://chrome-stats.com/a/Q2hyb21lV2ViU3RvcmVEZXY" target="_blank" rel="noreferrer">Chrome extensions</a> (<span class="hl">526</span> users at peak); <span class="hl">30+</span> new and <span class="hl">460+</span> contributed entries on <a href="https://rosettacode.miraheze.org/wiki/Special:Contributions/Aspen138" target="_blank" rel="noreferrer">RosettaCode</a>.</li>
+          <li><a href="https://pepy.tech/projects/bisc-algorithm" target="_blank" rel="noreferrer">bisc-algorithm</a> on PyPI (<span class="hl">3.9k</span> downloads); <span class="hl">70+</span> userscripts on <a href="https://greasyfork.org/en/users/1177387-138-aspen" target="_blank" rel="noreferrer">GreasyFork</a> (<span class="hl">10k+</span> installs); <span class="hl">6</span> <a href="https://chrome-stats.com/a/Q2hyb21lV2ViU3RvcmVEZXY" target="_blank" rel="noreferrer">Chrome extensions</a> (<span class="hl">526</span> users at peak); <span class="hl">30+</span> new and <span class="hl">460+</span> contributed task pages on <a href="https://rosettacode.miraheze.org/wiki/Special:Contributions/Aspen138" target="_blank" rel="noreferrer">RosettaCode</a>.</li>
         </ul>
       </article>
 
@@ -344,7 +344,8 @@
       set('m-repos', fmt(m.github_repos));
       set('m-gf', fmt(m.greasyfork_installs));
       set('m-se', fmt(m.stackexchange_rep));
-      set('m-rosetta', fmt(m.rosetta_edits));
+      set('m-rosetta', fmt(m.rosetta_tasks));
+      if (m.chrome_users) set('m-chrome', fmt(m.chrome_users));
       set('m-pypi', fmt(m.pypi_total));
       var stamp = document.getElementById('stamp');
       if (stamp && m.generated_at) {

@@ -18,8 +18,12 @@ jobs:
         with:
           python-version: "3.12"
 
-      # 四个来源都是普通 HTTPS，不需要浏览器，也不需要第三方依赖：
-      # GitHub API / GreasyFork API / pypistats / RosettaCode MediaWiki API。
+      # Stack Exchange 全站声誉、RosettaCode 贡献页、chrome-stats 都需要真实浏览器上下文。
+      - name: Install Playwright
+        run: |
+          python -m pip install --quiet playwright
+          python -m playwright install --with-deps chromium
+
       - name: Scrape
         run: python metrics.py --out metrics.json
 
