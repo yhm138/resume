@@ -306,7 +306,7 @@
       <article class="entry">
         <div class="entry__head"><div class="entry__org">Writing</div></div>
         <ul class="bul">
-          <li><span class="hl">160k+</span> reads on <a href="https://cnblogs.com/yhm138" target="_blank" rel="noreferrer">Cnblogs</a>; <span class="hl">620</span> upvotes and <span class="hl">1.8k</span> saves on <a href="https://www.zhihu.com/people/yong-hu-ming-32" target="_blank" rel="noreferrer">Zhihu</a>; <span class="hl">7200+</span> Code Golf, <span class="hl">2400+</span> Mathematica and <span class="hl">1500+</span> Mathematics reputation across <a href="https://stackexchange.com/users/21083779/138-aspen?tab=accounts" target="_blank" rel="noreferrer">Stack Exchange</a>.</li>
+          <li><span class="hl">160k+</span> reads on <a href="https://cnblogs.com/yhm138" target="_blank" rel="noreferrer">Cnblogs</a>; <span class="hl">620</span> upvotes and <span class="hl">1.8k</span> saves on <a href="https://www.zhihu.com/people/yong-hu-ming-32" target="_blank" rel="noreferrer">Zhihu</a>; <span class="hl" id="se-cg">7.3k</span> Code Golf, <span class="hl" id="se-mm">2.4k</span> Mathematica and <span class="hl" id="se-math">1.6k</span> Mathematics reputation across <a href="https://stackexchange.com/users/21083779/138-aspen?tab=accounts" target="_blank" rel="noreferrer">Stack Exchange</a>.</li>
         </ul>
       </article>
     </div>
@@ -359,6 +359,13 @@
     .catch(function () { /* 静态兜底值留在 DOM 里 */ });
 
   // 2) 再用支持 CORS 的公开接口覆盖一次，拿到当天的最新值
+  //    Stack Exchange 官方 API 带 Access-Control-Allow-Origin: *，所以分站声誉也能实时取；
+  //    全站合计要读账号页（无 CORS），只能留在月度快照里。
+  var SE_SITES = [
+    ['se-cg', 'codegolf', 110802],
+    ['se-mm', 'mathematica', 79318],
+    ['se-math', 'math', 909868]
+  ];
   Promise.allSettled([
     getJSON('https://api.github.com/users/' + GH_USER).then(function (u) {
       set('m-repos', fmt(u.public_repos));
@@ -367,7 +374,13 @@
       var total = (u.scripts || []).reduce(function (s, x) { return s + (x.total_installs || 0); }, 0);
       set('m-gf', fmt(total));
     })
-  ]);
+  ].concat(SE_SITES.map(function (s) {
+    return getJSON('https://api.stackexchange.com/2.3/users/' + s[2] +
+                   '?site=' + s[1] + '&filter=default').then(function (d) {
+      var rep = ((d.items || [])[0] || {}).reputation;
+      if (rep) set(s[0], fmt(rep));
+    });
+  })));
 })();
 </script>
 </body>
