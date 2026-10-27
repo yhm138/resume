@@ -18,7 +18,10 @@ Run:  python metrics.py [--out metrics.json]
 """
 import argparse, datetime, json, os, re, sys, urllib.request
 
-from playwright.sync_api import sync_playwright
+try:
+    from playwright.sync_api import sync_playwright
+except ImportError:                       # CI may skip the browser install; degrade, do not crash
+    sync_playwright = None
 
 UA = "resume-metrics/1.0 (+https://github.com/yhm138/resume)"
 BROWSER_UA = ("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
