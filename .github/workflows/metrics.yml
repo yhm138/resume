@@ -7,6 +7,7 @@ on:
 
 permissions:
   contents: write
+  issues: write
 
 jobs:
   scrape:
@@ -24,6 +25,7 @@ jobs:
           python -m pip install --quiet playwright
           python -m playwright install --with-deps chromium
 
+      # 每个源都有 primary 与可选的 fallback；两个都失败时保留上一次的值并累加 fail_streak。
       - name: Scrape
         run: python metrics.py --out metrics.json
 
@@ -37,4 +39,39 @@ jobs:
           else
             git commit -m "chore: refresh metrics"
             git push
+          fi
+
+      # L1：连续 3 次抓取失败的源，开一条 issue 并持续追加，失败恢复后自动关闭。
+      - name: Alert on repeated failures
+        if: always()
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+          TITLE="metrics: a data source is failing"
+
+          over=$(jq -r '(.fail_streak // {}) | to_entries[]
+                        | select(.value >= 3)
+                        | "- `\(.key)` — \(.value) consecutive failures"' metrics.json || true)
+
+          existing=$(gh issue list --repo "$REPO" --state open \
+                       --search "in:title \"$TITLE\"" --json number \
+                       --jq '.[0].number // empty')
+
+          if [ -z "$over" ]; then
+            if [ -n "$existing" ]; then
+              gh issue close "$existing" --repo "$REPO" \
+                --comment "All sources are reaching their upstream again. Closing."
+            fi
+            echo "no failing sources"
+            exit 0
+          fi
+
+          BODY=$(printf 'These sources failed three runs in a row. The page keeps showing the last good value, so nothing breaks — but the number is now stale.\n\n%s\n\nCheck `sources` and `fail_streak` in `metrics.json`; the fallback path (if any) already ran before this alert fired.\n' "$over")
+
+          if [ -n "$existing" ]; then
+            gh issue comment "$existing" --repo "$REPO" --body "$BODY"
+          else
+            gh issue create --repo "$REPO" --title "$TITLE" --body "$BODY"
           fi
