@@ -53,6 +53,9 @@
   .live__cell:nth-child(3n+1){border-left:0;padding-left:0}
   .live__cell:nth-child(n+4){border-top:1px solid var(--rule)}
   .live__num{font-family:var(--mono);font-variant-numeric:tabular-nums;font-size:25px;line-height:1.1;letter-spacing:-.03em;display:block}
+  .tag{display:inline-block;width:5px;height:5px;border-radius:50%;margin-right:6px;vertical-align:middle}
+  .tag--live{background:var(--live)}
+  .tag--snap{border:1px solid var(--ink-3)}
   .live__k{font-size:11px;color:var(--ink-3);letter-spacing:.09em;text-transform:uppercase;display:block;margin-top:6px}
   .live__k a{border-bottom:0}
   .live__num sup{font-size:11px;color:var(--ink-3);vertical-align:super;letter-spacing:0}
@@ -149,31 +152,31 @@
   <section class="live rise" style="--i:1" aria-label="Live metrics">
     <div class="live__cell">
       <span class="live__num" id="m-repos">50</span>
-      <span class="live__k">Public repositories</span>
+      <span class="live__k"><i class="tag tag--live"></i>Public repositories</span>
     </div>
     <div class="live__cell">
       <span class="live__num" id="m-gf">11.4k</span>
-      <span class="live__k">GreasyFork installs</span>
+      <span class="live__k"><i class="tag tag--live"></i>GreasyFork installs</span>
     </div>
     <div class="live__cell">
       <span class="live__num" id="m-se">24.7k</span>
-      <span class="live__k">Stack Exchange rep</span>
+      <span class="live__k"><i class="tag tag--snap"></i>Stack Exchange rep</span>
     </div>
     <div class="live__cell">
       <span class="live__num" id="m-rosetta">465</span>
-      <span class="live__k">RosettaCode tasks</span>
+      <span class="live__k"><i class="tag tag--snap"></i>RosettaCode tasks</span>
     </div>
     <div class="live__cell">
       <span class="live__num" id="m-pypi">3.9k</span>
-      <span class="live__k">PyPI downloads</span>
+      <span class="live__k"><i class="tag tag--snap"></i>PyPI downloads</span>
     </div>
     <div class="live__cell">
       <span class="live__num" id="m-chrome">680</span>
-      <span class="live__k"><a href="https://chrome-stats.com/a/Q2hyb21lV2ViU3RvcmVEZXY" target="_blank" rel="noreferrer">Chrome ext. users</a></span>
+      <span class="live__k"><i class="tag tag--snap"></i><a href="https://chrome-stats.com/a/Q2hyb21lV2ViU3RvcmVEZXY" target="_blank" rel="noreferrer">Chrome ext. users</a></span>
     </div>
     <div class="live__meta" style="grid-column:1/-1">
       <span class="dot" aria-hidden="true"></span>
-      <span class="js-only">Monthly snapshot via GitHub Actions · <span id="stamp">—</span> · <a href="https://github.com/yhm138/resume/commits/main/metrics.json" target="_blank" rel="noreferrer">history</a></span>
+      <span class="js-only">● live: GitHub, GreasyFork　○ monthly snapshot: the rest · <span id="stamp">—</span> · <a href="https://github.com/yhm138/resume/commits/main/metrics.json" target="_blank" rel="noreferrer">history</a></span>
     </div>
   </section>
 
@@ -303,7 +306,7 @@
       <article class="entry">
         <div class="entry__head"><div class="entry__org">Writing</div></div>
         <ul class="bul">
-          <li><span class="hl">160k+</span> reads on <a href="https://cnblogs.com/yhm138" target="_blank" rel="noreferrer">Cnblogs</a>; <span class="hl">900+</span> upvotes and <span class="hl">1.7k</span> saves on <a href="https://www.zhihu.com/people/yong-hu-ming-32" target="_blank" rel="noreferrer">Zhihu</a>; <span class="hl">7200+</span> Code Golf, <span class="hl">2400+</span> Mathematica and <span class="hl">1500+</span> Mathematics reputation across <a href="https://stackexchange.com/users/21083779/138-aspen?tab=accounts" target="_blank" rel="noreferrer">Stack Exchange</a>.</li>
+          <li><span class="hl">160k+</span> reads on <a href="https://cnblogs.com/yhm138" target="_blank" rel="noreferrer">Cnblogs</a>; <span class="hl">620</span> upvotes and <span class="hl">1.8k</span> saves on <a href="https://www.zhihu.com/people/yong-hu-ming-32" target="_blank" rel="noreferrer">Zhihu</a>; <span class="hl">7200+</span> Code Golf, <span class="hl">2400+</span> Mathematica and <span class="hl">1500+</span> Mathematics reputation across <a href="https://stackexchange.com/users/21083779/138-aspen?tab=accounts" target="_blank" rel="noreferrer">Stack Exchange</a>.</li>
         </ul>
       </article>
     </div>
