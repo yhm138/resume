@@ -299,7 +299,7 @@
       <article class="entry">
         <div class="entry__head"><div class="entry__org">Open source</div></div>
         <ul class="bul">
-          <li><a href="https://pepy.tech/projects/bisc-algorithm" target="_blank" rel="noreferrer">bisc-algorithm</a> on PyPI (<span class="hl">3.9k</span> downloads); <span class="hl">70+</span> userscripts on <a href="https://greasyfork.org/en/users/1177387-138-aspen" target="_blank" rel="noreferrer">GreasyFork</a> (<span class="hl">10k+</span> installs); <span class="hl">6</span> <a href="https://chrome-stats.com/a/Q2hyb21lV2ViU3RvcmVEZXY" target="_blank" rel="noreferrer">Chrome extensions</a> (<span class="hl">680</span> users across 6 extensions); <span class="hl">30+</span> new and <span class="hl">460+</span> contributed task pages on <a href="https://rosettacode.miraheze.org/wiki/Special:Contributions/Aspen138" target="_blank" rel="noreferrer">RosettaCode</a>.</li>
+          <li><a href="https://pepy.tech/projects/bisc-algorithm" target="_blank" rel="noreferrer">bisc-algorithm</a> on PyPI (<span class="hl" id="pypi-body">3.9k</span> downloads); <span class="hl" id="gf-scripts">82</span> userscripts on <a href="https://greasyfork.org/en/users/1177387-138-aspen" target="_blank" rel="noreferrer">GreasyFork</a> (<span class="hl" id="gf-installs">11.4k</span> installs); <span class="hl">6</span> <a href="https://chrome-stats.com/a/Q2hyb21lV2ViU3RvcmVEZXY" target="_blank" rel="noreferrer">Chrome extensions</a> (<span class="hl">680</span> users across 6 extensions); <span class="hl">30+</span> new and <span class="hl">460+</span> contributed task pages on <a href="https://rosettacode.miraheze.org/wiki/Special:Contributions/Aspen138" target="_blank" rel="noreferrer">RosettaCode</a>.</li>
         </ul>
       </article>
 
@@ -352,6 +352,7 @@
       set('m-rosetta', fmt(m.rosetta_tasks));
       if (m.chrome_users) set('m-chrome', fmt(m.chrome_users));
       set('m-pypi', fmt(m.pypi_total));
+      set('pypi-body', fmt(m.pypi_total));
       var stamp = document.getElementById('stamp');
       if (stamp && m.generated_at) {
         // metrics.py 写的是 UTC，这里固定换算到 UTC+8（Asia/Shanghai），不随访客时区变
@@ -374,8 +375,11 @@
       set('m-repos', fmt(u.public_repos));
     }),
     getJSON('https://api.greasyfork.org/users/' + GF_UID + '.json').then(function (u) {
-      var total = (u.scripts || []).reduce(function (s, x) { return s + (x.total_installs || 0); }, 0);
+      var list = u.scripts || [];
+      var total = list.reduce(function (s, x) { return s + (x.total_installs || 0); }, 0);
       set('m-gf', fmt(total));
+      set('gf-installs', fmt(total));
+      set('gf-scripts', String(list.length));
     })
   ].concat(SE_SITES.map(function (s) {
     return getJSON('https://api.stackexchange.com/2.3/users/' + s[2] +
