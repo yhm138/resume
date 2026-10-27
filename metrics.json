@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-10-27T09:24:24Z",
+  "generated_at": "2026-10-27T09:25:57Z",
   "github_repos": 50,
   "greasyfork_installs": 11423,
   "greasyfork_scripts": 82,
@@ -8,6 +8,7 @@
   "stackexchange_rep": 24651,
   "stackexchange_sites": 118,
   "stale": [
+    "rosetta",
     "chrome"
   ]
 }
