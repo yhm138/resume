@@ -64,36 +64,35 @@
 - `GET /` → 状态页，逐项显示数值与来源通道（`primary` / `fallback` / `unavailable`）
 - 缓存 10 分钟；代码不在本仓库，在 Cloudflare 控制台维护
 
-Worker 负责“浏览器取不到”的那几项：这些站点要么不发 CORS 头，要么需要服务端请求。目前它跑九个源：GreasyFork、PyPI、Stack Exchange、RosettaCode、博客园、Bilibili、抖音、LeetCode、HackerRank。
+Worker 负责“浏览器取不到”的那几项：这些站点要么不发 CORS 头，要么需要服务端请求。目前它跑 11 个源：GreasyFork、PyPI、Stack Exchange、RosettaCode、博客园、Bilibili、抖音、LeetCode（国内站）、LeetCode（国际站）、HackerRank、Codewars。
 
 ## 哪些没法自动，为什么
 
 **知乎的公开接口拒绝机房 IP。** `https://www.zhihu.com/api/v4/members/...` 在住宅网络下直接返回精确数字，从 Cloudflare 出口取则被挡。所以知乎两个数改由本机每周跑脚本发布成 `web-stats.json`。
 
-**抖音的网页端是 JS 反爬，但旧版分享接口还活着。** `douyin.com/user/...`、`iesdouyin.com/share/user/...`、`m.douyin.com/...` 三个地址返回的都是同一份 72 KB 的 `_$jsvmprt` 混淆脚本，正文为空；而 `https://www.iesdouyin.com/web/api/v2/user/info/?sec_uid=...` 仍返回 JSON。注意它对未登录访客把 `follower_count` 置为 `null`（用浏览器渲染确认过：页面上“关注/粉丝/获赞”三个标签都在，数字是空的）。
+**抖音的网页端是 JS 反爬，但旧版分享接口还活着。** `douyin.com/user/...`、`iesdouyin.com/share/user/...`、`m.douyin.com/...` 三个地址返回的都是同一份 72 KB 的 `_$jsvmprt` 混淆脚本，正文为空；而 `https://www.iesdouyin.com/web/api/v2/user/info/?sec_uid=...` 仍返回 JSON。
 
-**LeetCode 的做题数只能走 GraphQL。** 个人主页是 Next.js 渲染的，但 https://leetcode.cn/graphql/ 允许匿名 POST 查询 userProfileUserQuestionProgress，一次拿到三档难度的通过题数与站点排名——2026-10 实测：简单 701、中等 936、困难 316，合计 1,953，排名 1,612。
+**LeetCode 的做题数只能走 GraphQL。** 个人主页是 Next.js 渲染的，但 `https://leetcode.cn/graphql/` 允许匿名 POST 查询 `userProfileUserQuestionProgress`，一次拿到三档难度的通过题数与站点排名。
 
-**HackerRank 用的是旧版 REST 接口。** 
-est/hackers/<user>/badges 与 .../scores 仍返回 JSON，页面本身是 React 渲染的。
+**Codewars 有完全公开的 JSON API。** `https://www.codewars.com/api/v1/users/aspen138` 直接返回 honor、kata 完成数与段位。
 
-**Codewars 有完全公开的 JSON API。** pi/v1/users/aspen138 直接返回 honor、kumite/kata 完成数、段位（5 kyu）。
+**HackerRank 用的是旧版 REST 接口。** `https://www.hackerrank.com/rest/hackers/aspen1382020/badges` 与 `.../scores` 仍返回 JSON，页面本身是 React 渲染的。
 
-**leetcode.com 与 leetcode.cn 是两个独立的账号体系。** 国际站走 leetcode.com/graphql 的 submitStatsGlobal，国内站走 leetcode.cn/graphql 的 userProfileUserQuestionProgress，同一个 slugs 不同，数字也不通用（国内 1,953，国际 14）。
+**leetcode.com 与 leetcode.cn 是两个独立的账号体系。** 国际站走 `leetcode.com/graphql` 的 `submitStatsGlobal`，国内站走 `leetcode.cn/graphql` 的 `userProfileUserQuestionProgress`，数字不通用（国内 1,953，国际 14）。
 
-**LintCode 没有公开的用户统计接口。** 个人页是 SPA，piv1.lintcode.com/new/api/accounts/profile/ 只返回当前会话的账号；带用户 ID 的变体全部 404。
+**LintCode 没有公开的用户统计接口。** 个人页是 SPA，`https://apiv1.lintcode.com/new/api/accounts/profile/` 只返回当前会话的账号；带用户 ID 的变体全部 404。
 
-**51CTO 被 WAF 挡住。** log.51cto.com/u_15247503 无论直连还是浏览器都返回腾讯云 EdgeOne 的拦截页（“请求已被站点安全策略拦截”），拿不到任何数据。
+**51CTO 被 WAF 挡住。** `https://blog.51cto.com/u_15247503` 无论直连还是真实浏览器都返回腾讯云 EdgeOne 的拦截页（“请求已被站点安全策略拦截”），拿不到任何数据。
 
 **LinkedIn 完全取不到。** 任何非登录请求都返回 HTTP 999（LinkedIn 的反爬状态码），且抓取违反其条款。页面上只保留链接。
 
-**牛客没有公开的统计数据。** gw-c.nowcoder.com/api/sparta/user/profile/<id> 能拿到昵称、学历、身份标签，但刷题数、排名都不对外，所以没有可展示的数字。
+**牛客没有公开的统计数据。** `https://gw-c.nowcoder.com/api/sparta/user/profile/<id>` 能拿到昵称、学历、身份标签，但刷题数、排名都不对外。
 
-**Bilibili 的播放量需要 wbi 签名。** `x/relation/stat`（粉丝/关注）和 `x/space/navnum`（视频/文章数）都免签名，但 `x/space/arc/search` 返回 412，要 wbi 签名才能取播放量，因此只展示粉丝与视频数。
+**Bilibili 的播放量需要 wbi 签名。** `x/relation/stat`（粉丝/关注）和 `x/web-interface/card`（粉丝/投稿/获赞）都免签名，但播放总数只在创作中心可见，`x/space/wbi/arc/search` 返回 412。
 
-**Chrome Web Store 拒绝机房 IP。** Cloudflare Worker 和 GitHub Actions 的出口 IP 都被 Google 挡（403 或返回没有用户数的落地页），`r.jina.ai` 代理能取到页面但拿不到统计（它只渲染非 JS 版本）。只有住宅网络能直连，所以改成本机每周跑一次脚本，把结果提交成 `chrome-users.json`。
+**Chrome Web Store 拒绝机房 IP。** Cloudflare Worker 和 GitHub Actions 的出口 IP 都被 Google 挡（403 或返回没有用户数的落地页），`r.jina.ai` 代理能取到页面但拿不到统计。只有住宅网络能直连，所以改成本机每周跑一次脚本，把结果提交成 `chrome-users.json`。
 
-**博客园没有“总阅读数”的正文字段，只有一个 AJAX 片段。** `https://www.cnblogs.com/yhm138/ajax/blog-stats` 返回 242 字节的 HTML 片段，里面有 `title="总阅读数: 164729"` ——悬停博客侧边栏“阅读 - 16万”看到的就是它。注意这个数和“逐篇文章阅读数之和”不是一个口径（后者约 11 万），因为它包含首页与分类页的浏览。
+**博客园没有“总阅读数”的正文字段，只有一个 AJAX 片段。** `https://www.cnblogs.com/yhm138/ajax/blog-stats` 返回 242 字节的 HTML 片段，里面有 `title="总阅读数: 164729"`。注意这个数和“逐篇文章阅读数之和”不是一个口径（后者约 11 万），因为它包含首页与分类页的浏览。
 
 **GitHub Actions 的 `schedule` 在这个账号上不触发。** 用一个独立的、只有 5 分钟 cron 的空仓库验证过：连续多次触发点均为 0 次运行，且 `workflow_dispatch` 正常，平台状态当时无故障。因此本仓库不含任何定时 workflow。
 
