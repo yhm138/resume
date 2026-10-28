@@ -21,6 +21,8 @@
 | 抖音获赞 / 作品数（71 / 2） | Cloudflare Worker | 10 分钟 |
 | LeetCode 通过题数（1,953，站点排名 1,612） | Cloudflare Worker | 10 分钟 |
 | HackerRank 徽章（5 个 / 65 题） | Cloudflare Worker | 10 分钟 |
+| Codewars（38 kata / 5 kyu） | Cloudflare Worker | 10 分钟 |
+| leetcode.com 通过题数（14） | Cloudflare Worker | 10 分钟 |
 | 知乎赞同 / 收藏（937 / 1,833） | 本机计划任务 → `web-stats.json` | 每周一（开机则更新） |
 | Chrome 扩展用户（671 / 6 个） | 本机计划任务 → `chrome-users.json` | 每周一（开机则更新） |
 
@@ -74,6 +76,14 @@ Worker 负责“浏览器取不到”的那几项：这些站点要么不发 COR
 
 **HackerRank 用的是旧版 REST 接口。** 
 est/hackers/<user>/badges 与 .../scores 仍返回 JSON，页面本身是 React 渲染的。
+
+**Codewars 有完全公开的 JSON API。** pi/v1/users/aspen138 直接返回 honor、kumite/kata 完成数、段位（5 kyu）。
+
+**leetcode.com 与 leetcode.cn 是两个独立的账号体系。** 国际站走 leetcode.com/graphql 的 submitStatsGlobal，国内站走 leetcode.cn/graphql 的 userProfileUserQuestionProgress，同一个 slugs 不同，数字也不通用（国内 1,953，国际 14）。
+
+**LintCode 没有公开的用户统计接口。** 个人页是 SPA，piv1.lintcode.com/new/api/accounts/profile/ 只返回当前会话的账号；带用户 ID 的变体全部 404。
+
+**51CTO 被 WAF 挡住。** log.51cto.com/u_15247503 无论直连还是浏览器都返回腾讯云 EdgeOne 的拦截页（“请求已被站点安全策略拦截”），拿不到任何数据。
 
 **LinkedIn 完全取不到。** 任何非登录请求都返回 HTTP 999（LinkedIn 的反爬状态码），且抓取违反其条款。页面上只保留链接。
 
