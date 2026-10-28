@@ -353,6 +353,13 @@
       </article>
 
       <article class="entry">
+        <div class="entry__head"><div class="entry__org">Problem solving</div></div>
+        <ul class="bul">
+          <li><span class="hl" id="cw-katas">38</span> kata on <a href="https://www.codewars.com/users/aspen138" target="_blank" rel="noreferrer">Codewars</a> (<span class="hl" id="cw-kyu">5 kyu</span>, <span class="hl" id="cw-honor">399</span> honor); <span class="hl" id="lc-global">14</span> problems on <a href="https://leetcode.com/u/aspen1382020/" target="_blank" rel="noreferrer">leetcode.com</a> — daily practice happens on the China site, where the count is 1,953.</li>
+        </ul>
+      </article>
+
+      <article class="entry">
         <div class="entry__head"><div class="entry__org">Writing</div></div>
         <ul class="bul">
           <li><span class="stat" id="cb-reads">164,729</span> reads on <a href="https://cnblogs.com/yhm138" target="_blank" rel="noreferrer">Cnblogs</a>; <span class="hl" id="zh-voteup">937</span> upvotes and <span class="hl" id="zh-fav">1.8k</span> saves on <a href="https://www.zhihu.com/people/yong-hu-ming-32" target="_blank" rel="noreferrer">Zhihu</a>; <span class="stat" id="se-total">24,651</span> reputation across <span class="hl" id="se-sites">118</span> <a href="https://stackexchange.com/users/21083779/138-aspen?tab=accounts" target="_blank" rel="noreferrer">Stack Exchange</a> sites, including <span class="hl" id="se-cg">7.3k</span> on Code Golf, <span class="hl" id="se-mm">2.4k</span> on Mathematica and <span class="hl" id="se-math">1.6k</span> on Mathematics.</li>
@@ -462,6 +469,10 @@
       if (m.douyin_likes != null) set('m-douyin', fmt(m.douyin_likes));
       if (m.leetcode_solved != null) set('m-leetcode', Number(m.leetcode_solved).toLocaleString('en-US'));
       if (m.hackerrank_badges != null) set('m-hackerrank', fmt(m.hackerrank_badges));
+      if (m.codewars_katas != null) set('cw-katas', String(m.codewars_katas));
+      if (m.codewars_kyu) set('cw-kyu', m.codewars_kyu);
+      if (m.codewars_honor != null) set('cw-honor', String(m.codewars_honor));
+      if (m.leetcode_global_solved != null) set('lc-global', String(m.leetcode_global_solved));
       })
       .catch(function () { /* 静态值兜底 */ });
   }
