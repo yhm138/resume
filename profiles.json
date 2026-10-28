@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-10-28T13:35:12Z",
+  "generated_at": "2026-10-28T13:59:46Z",
   "stale": [],
   "oeis": {
     "sequences": 3,
@@ -13,5 +13,9 @@
     "problems": 1,
     "points": 250,
     "longest_streak": 1
+  },
+  "hackerrank": {
+    "badges": 2,
+    "certificates": 11
   }
 }
