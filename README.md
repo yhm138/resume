@@ -25,6 +25,9 @@
 | leetcode.com 通过题数（14） | Cloudflare Worker | 10 分钟 |
 | 知乎赞同 / 收藏（937 / 1,833） | 本机计划任务 → `web-stats.json` | 每周一（开机则更新） |
 | Chrome 扩展用户（671 / 6 个） | 本机计划任务 → `chrome-users.json` | 每周一（开机则更新） |
+| OEIS（3 个序列 / 8 次修订） | 本机计划任务 → `profiles.json` | 每小时（开机则更新） |
+| Observable（1 个 notebook） | 本机计划任务 → `profiles.json` | 每小时（开机则更新） |
+| Code360（1 题通过 / 250 分） | 本机计划任务 → `profiles.json` | 每小时（开机则更新） |
 
 页面上用两种圆点区分：实心 = 每次访问实时取；空心 = 定时缓存或本地刷新。数据条共 10 格，桌面 5 列、移动 2 列。
 
@@ -44,7 +47,7 @@
 
 任何一层挂掉，页面显示的是旧数字，不会空白，也不会跳变。这是刻意设计的：外部依赖失败时，最坏结果是“不新鲜”，不是“打不开”。
 
-`web-stats.json` 和 `chrome-users.json` 走的是第四种模式——它们是本机发布的文件，页面直接读，不经 Worker。
+`web-stats.json`、`chrome-users.json` 和 `profiles.json` 走的是第四种模式——它们是本机发布的文件，页面直接读，不经 Worker。
 
 ## 文件
 
@@ -56,6 +59,8 @@
 | `chrome-ids.json` | 6 个扩展到 Chrome Web Store ID，Worker 读取它 |
 | `chrome-users.json` | 扩展用户数合计与逐项明细，由本机计划任务发布 |
 | `web-stats.json` | 知乎赞同/收藏与博客园总阅读，由本机计划任务发布 |
+| `profiles.json` | OEIS / Observable / Code360 三个计数器，由本机计划任务发布 |
+| `update-profiles.py` | 采集上面三个平台并自行 commit + push 的脚本 |
 
 ## Cloudflare Worker
 
@@ -96,6 +101,12 @@ Worker 负责“浏览器取不到”的那几项：这些站点要么不发 COR
 
 **GitHub Actions 的 `schedule` 在这个账号上不触发。** 用一个独立的、只有 5 分钟 cron 的空仓库验证过：连续多次触发点均为 0 次运行，且 `workflow_dispatch` 正常，平台状态当时无故障。因此本仓库不含任何定时 workflow。
 
+**OEIS、Observable、Code360 三家都不发 CORS 头。** 页面无法直连读取，只能由本机脚本取。OEIS 翻 `/history?user=` 的分页数修订行；Observable 读 `https://api.observablehq.com/user/@aspen1382020/documents`（要求带 `Referer`）；Code360 读 `/code360/api/v3/public_section/profile/user_details?uuid=...&request_differentiator=...&app_context=publicsection&naukri_request=true`，少了后几个参数会被 Akamai 拦。
+
+**Code360 还拒绝机房 IP。** 用 `r.jina.ai` 和 `api.allorigins.win` 各试一次，返回的都是 403 Access Denied，所以 Cloudflare Worker 也取不到它，这条只能靠住宅网络。同一份 API 带上 `Referer` / `Origin` 从本机直连返回 200。
+
+**Observable 会对空 UA 或连续请求返回 429。** 抓取时带浏览器 UA，且每小时只取一次；调试时不要连续打同一个 profile 页。
+
 ## 响应式
 
 三档断点，逐档验证过无横向溢出（量 `documentElement.scrollWidth` 并扫描元素右边界）：
@@ -131,6 +142,14 @@ TaskName : \resume chrome users
 日志     : C:\Users\Yangh\resume-metrics\run.log
 ```
 
+**刷新三个平台计数器**：在仓库根目录运行 `python update-profiles.py`。数字没变就不写文件，也不提交；有变化才 `git commit` + `push`。计划任务：
+
+```
+TaskName : \resume profile stats
+命令     : cmd /c cd /d D:\yhm138Project\resume-site && python update-profiles.py
+日志     : %LOCALAPPDATA%\resume-profile-task.log
+```
+
 ## 依赖
 
-`metrics.py` 中 Chrome 那一段需要 `playwright` + Chromium；其余数据源只用标准库。`update-chrome-users.py` 与 `update-web-stats.py` 只依赖标准库和 `gh` CLI。
+`metrics.py` 中 Chrome 那一段需要 `playwright` + Chromium；其余数据源只用标准库。`update-profiles.py` 也只用标准库，但它要能 `git push`（依赖本机已登录的 git 凭据）。`update-chrome-users.py` 与 `update-web-stats.py` 只依赖标准库和 `gh` CLI。

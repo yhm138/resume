@@ -397,6 +397,13 @@
           <li><span class="stat" id="cb-reads">164,729</span> reads on <a href="https://cnblogs.com/yhm138" target="_blank" rel="noreferrer">Cnblogs</a>; <span class="hl" id="zh-voteup">937</span> upvotes and <span class="hl" id="zh-fav">1.8k</span> saves on <a href="https://www.zhihu.com/people/yong-hu-ming-32" target="_blank" rel="noreferrer">Zhihu</a>; <span class="stat" id="se-total">24,651</span> reputation across <span class="hl" id="se-sites">118</span> <a href="https://stackexchange.com/users/21083779/138-aspen?tab=accounts" target="_blank" rel="noreferrer">Stack Exchange</a> sites, including <span class="hl" id="se-cg">7.3k</span> on Code Golf, <span class="hl" id="se-mm">2.4k</span> on Mathematica and <span class="hl" id="se-math">1.6k</span> on Mathematics.</li>
         </ul>
       </article>
+
+      <article class="entry">
+        <div class="entry__head"><div class="entry__org">Elsewhere</div></div>
+        <ul class="bul">
+          <li><a href="https://oeis.org/history?user=Haomin%20Yang" target="_blank" rel="noreferrer">OEIS</a> — <span class="hl" id="oeis-seqs">3</span> sequences edited across <span class="hl" id="oeis-revs">8</span> revisions; <a href="https://observablehq.com/@aspen1382020" target="_blank" rel="noreferrer">Observable</a> — <span class="hl" id="obs-notebooks">1</span> notebook; <a href="https://www.naukri.com/code360/profile/8d5253e5-771f-4039-9fa0-cd51de2b0639" target="_blank" rel="noreferrer">Code360</a> — <span class="hl" id="c360-problems">1</span> problem solved.</li>
+        </ul>
+      </article>
     </div>
   </section>
 
@@ -496,14 +503,14 @@
   ];
   Promise.allSettled([
     getJSON('https://api.github.com/users/' + GH_USER).then(function (u) {
-      set('m-repos', fmt(u.public_repos));
+      setFrom('m-repos', fmt(u.public_repos), R_WORKER);
     }),
     getJSON('https://api.greasyfork.org/users/' + GF_UID + '.json').then(function (u) {
       var list = u.scripts || [];
       var total = list.reduce(function (s, x) { return s + (x.total_installs || 0); }, 0);
-      set('m-gf', fmt(total));
-      set('gf-installs', fmt(total));
-      set('gf-scripts', String(list.length));
+      setFrom('m-gf', fmt(total), R_WORKER);
+      setFrom('gf-installs', fmt(total), R_WORKER);
+      setFrom('gf-scripts', String(list.length), R_WORKER);
     })
   ].concat(SE_SITES.map(function (s) {
     return getJSON('https://api.stackexchange.com/2.3/users/' + s[2] +
@@ -538,6 +545,21 @@
       }
     })
     .catch(function () { /* 静态 671 兜底 */ });
+
+  // 4) OEIS / Observable / Code360：三条通道都不发 CORS 头，Code360 还拒绝机房 IP，
+  //    浏览器直连必然失败，改由本机 update-profiles.py 发布 profiles.json（见 README）
+  getJSON('https://raw.githubusercontent.com/yhm138/resume/main/profiles.json?t=' + Date.now())
+    .then(function (p) {
+      if (p.oeis) {
+        if (p.oeis.sequences != null) setFrom('oeis-seqs', String(p.oeis.sequences), R_SNAPSHOT);
+        if (p.oeis.revisions != null) setFrom('oeis-revs', String(p.oeis.revisions), R_SNAPSHOT);
+      }
+      if (p.observable && p.observable.notebooks != null)
+        setFrom('obs-notebooks', String(p.observable.notebooks), R_SNAPSHOT);
+      if (p.code360 && p.code360.problems != null)
+        setFrom('c360-problems', String(p.code360.problems), R_SNAPSHOT);
+    })
+    .catch(function () { /* 静态值兜底 */ });
 })();
 </script>
 </body>
