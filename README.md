@@ -53,6 +53,8 @@ Worker 负责“浏览器取不到”的那几项：这些站点要么不发 COR
 
 ## 哪些没法自动，为什么
 
+**知乎的公开接口拒绝机房 IP。** pi/v4/members/... 在住宅网络下返回精确数字，从 Cloudflare 出口取则被挡。所以知乎两个数改由本机每周跑脚本发布成 web-stats.json。
+
 **Chrome Web Store 拒绝机房 IP。** Cloudflare Worker 和 GitHub Actions 的出口 IP 都被 Google 挡（403 或返回没有用户数的落地页），`r.jina.ai` 代理能取到页面但拿不到统计。只有住宅网络能直连，所以改成本机每周跑一次脚本，把结果提交成 `chrome-users.json`。
 
 **GitHub Actions 的 `schedule` 在这个账号上不触发。** 用一个独立的、只有 5 分钟 cron 的空仓库验证过：连续多次触发点均为 0 次运行，且 `workflow_dispatch` 正常。平台状态当时无故障。因此本仓库不含任何定时 workflow。
