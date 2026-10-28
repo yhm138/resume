@@ -311,7 +311,7 @@
       <article class="entry">
         <div class="entry__head"><div class="entry__org">Writing</div></div>
         <ul class="bul">
-          <li><span class="hl">160k+</span> reads on <a href="https://cnblogs.com/yhm138" target="_blank" rel="noreferrer">Cnblogs</a>; <span class="hl" id="zh-voteup">937</span> upvotes and <span class="hl" id="zh-fav">1.8k</span> saves on <a href="https://www.zhihu.com/people/yong-hu-ming-32" target="_blank" rel="noreferrer">Zhihu</a>; <span class="hl" id="se-cg">7.3k</span> Code Golf, <span class="hl" id="se-mm">2.4k</span> Mathematica and <span class="hl" id="se-math">1.6k</span> Mathematics reputation across <a href="https://stackexchange.com/users/21083779/138-aspen?tab=accounts" target="_blank" rel="noreferrer">Stack Exchange</a>.</li>
+          <li><span class="hl" id="cb-reads">164,729</span> reads on <a href="https://cnblogs.com/yhm138" target="_blank" rel="noreferrer">Cnblogs</a>; <span class="hl" id="zh-voteup">937</span> upvotes and <span class="hl" id="zh-fav">1.8k</span> saves on <a href="https://www.zhihu.com/people/yong-hu-ming-32" target="_blank" rel="noreferrer">Zhihu</a>; <span class="hl" id="se-cg">7.3k</span> Code Golf, <span class="hl" id="se-mm">2.4k</span> Mathematica and <span class="hl" id="se-math">1.6k</span> Mathematics reputation across <a href="https://stackexchange.com/users/21083779/138-aspen?tab=accounts" target="_blank" rel="noreferrer">Stack Exchange</a>.</li>
         </ul>
       </article>
     </div>
@@ -411,6 +411,7 @@
       .then(function (m) {
         if (m.zhihu_voteup) set('zh-voteup', fmt(m.zhihu_voteup));
         if (m.zhihu_favorited) set('zh-fav', fmt(m.zhihu_favorited));
+        if (m.cnblogs_reads) set('cb-reads', Number(m.cnblogs_reads).toLocaleString('en-US'));
       })
       .catch(function () { /* 静态值兜底 */ });
   }
