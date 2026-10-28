@@ -1,6 +1,12 @@
 {
-  "_comment": "Chrome Web Store extension IDs. The Worker reads this file first; editing it here is enough — no re-deploy. A delisted ID returns 404 and is skipped automatically, so only adding a new extension needs an edit.",
+  "_comment": "Chrome Web Store extension IDs. The Worker reads this file first, so editing here is enough — no re-deploy. A delisted ID returns 404 and is skipped automatically; only adding a new extension needs an edit.",
   "ids": [
-    "foohlpbhpbooidbkndkelonllmpobndm"
-  ]
+    "ffdmfndahgihbfinbicpelddhikphgma",
+    "boebkheclhddjhdgligonfkneafgjcjd",
+    "cabmbcjgepkpfdlbaipmaaabonmbhhge",
+    "ffdeppmjhjegdeeklmaegggafilphkoc",
+    "ajlgcagiaaehcjcflefnijfbmaocnfmb"
+  ],
+  "_pending": "Hide Bilibili Ads — the pasted id had 34 chars; waiting for the correct 32-char one",
+  "_verified_total": 628
 }
