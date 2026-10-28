@@ -20,7 +20,7 @@
 | Bilibili 粉丝 / 视频数（35 / 10） | Cloudflare Worker | 10 分钟 |
 | 抖音获赞 / 作品数（71 / 2） | Cloudflare Worker | 10 分钟 |
 | LeetCode 通过题数（1,953，站点排名 1,612） | Cloudflare Worker | 10 分钟 |
-| HackerRank 徽章（5 个 / 65 题） | Cloudflare Worker | 10 分钟 |
+| HackerRank 认证（11 张 / 2 枚徽章） | 本机计划任务 → `profiles.json` | 每小时（开机则更新） |
 | Codewars（38 kata / 5 kyu） | Cloudflare Worker | 10 分钟 |
 | leetcode.com 通过题数（14） | Cloudflare Worker | 10 分钟 |
 | 知乎赞同 / 收藏（937 / 1,833） | 本机计划任务 → `web-stats.json` | 每周一（开机则更新） |
@@ -59,7 +59,7 @@
 | `chrome-ids.json` | 6 个扩展到 Chrome Web Store ID，Worker 读取它 |
 | `chrome-users.json` | 扩展用户数合计与逐项明细，由本机计划任务发布 |
 | `web-stats.json` | 知乎赞同/收藏与博客园总阅读，由本机计划任务发布 |
-| `profiles.json` | OEIS / Observable / Code360 三个计数器，由本机计划任务发布 |
+| `profiles.json` | OEIS / Observable / Code360 / HackerRank 计数器，由本机计划任务发布 |
 | `update-profiles.py` | 采集上面三个平台并自行 commit + push 的脚本 |
 
 ## Cloudflare Worker
@@ -81,7 +81,7 @@ Worker 负责“浏览器取不到”的那几项：这些站点要么不发 COR
 
 **Codewars 有完全公开的 JSON API。** `https://www.codewars.com/api/v1/users/aspen138` 直接返回 honor、kata 完成数与段位。
 
-**HackerRank 用的是旧版 REST 接口。** `https://www.hackerrank.com/rest/hackers/aspen1382020/badges` 与 `.../scores` 仍返回 JSON，页面本身是 React 渲染的。
+**HackerRank 的旧 REST 接口数的是领域，不是徽章。** `https://www.hackerrank.com/rest/hackers/aspen1382020/badges` 返回 5 条（Problem Solving / Java / Python / SQL / Ruby，即账号有活动的领域），不是个人页「Badges」栏里的徽章（2 枚）。页面上那一格现在显示**认证数**：11 张（SQL Basic/Intermediate/Advanced、Python、Java、Go、JavaScript、Rest API、Problem Solving，另有一张 Software Engineer Intern 的 role 认证）。徽章与认证都可以直接从个人页 HTML 数 `class="hacker-badge"` 与 `certificate-link`——该页是服务器直出，不需要浏览器。Worker 里那一项仍在跑，但页面已不采用。
 
 **leetcode.com 与 leetcode.cn 是两个独立的账号体系。** 国际站走 `leetcode.com/graphql` 的 `submitStatsGlobal`，国内站走 `leetcode.cn/graphql` 的 `userProfileUserQuestionProgress`，数字不通用（国内 1,953，国际 14）。
 
@@ -142,7 +142,7 @@ TaskName : \resume chrome users
 日志     : C:\Users\Yangh\resume-metrics\run.log
 ```
 
-**刷新三个平台计数器**：在仓库根目录运行 `python update-profiles.py`。数字没变就不写文件，也不提交；有变化才 `git commit` + `push`。计划任务：
+**刷新平台计数器（OEIS / Observable / Code360 / HackerRank）**：在仓库根目录运行 `python update-profiles.py`。数字没变就不写文件，也不提交；有变化才 `git commit` + `push`。计划任务：
 
 ```
 TaskName : \resume profile stats

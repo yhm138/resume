@@ -85,6 +85,19 @@ def observable():
     return {"notebooks": len(notebooks), "likes": sum(d.get("likes") or 0 for d in notebooks)}
 
 
+def hackerrank():
+    """Profile page is server-rendered: count badge tiles and certificate links.
+
+    The legacy /rest/hackers/<user>/badges endpoint is not used: it lists the five
+    domains the account has touched (Problem Solving, Java, Python, SQL, Ruby),
+    which is not what the profile shows under Badges.
+    """
+    body = fetch("https://www.hackerrank.com/profile/aspen1382020",
+                 {"Accept": "text/html,application/xhtml+xml"})
+    return {"badges": body.count('class="hacker-badge"'),
+            "certificates": body.count("certificate-link")}
+
+
 def load_previous():
     if not os.path.exists(OUT):
         return {}
@@ -97,9 +110,10 @@ def load_previous():
 
 def main():
     prev = load_previous()
-    result = {"oeis": {}, "observable": {}, "code360": {}}
+    result = {"oeis": {}, "observable": {}, "code360": {}, "hackerrank": {}}
     stale = []
-    for key, fn in (("oeis", oeis), ("observable", observable), ("code360", code360)):
+    for key, fn in (("oeis", oeis), ("observable", observable), ("code360", code360),
+                    ("hackerrank", hackerrank)):
         try:
             result[key] = fn()
         except Exception as e:
@@ -122,13 +136,13 @@ def main():
     result["stale"] = stale
     ordered = {"generated_at": result["generated_at"], "stale": stale,
                "oeis": result["oeis"], "observable": result["observable"],
-               "code360": result["code360"]}
+               "code360": result["code360"], "hackerrank": result["hackerrank"]}
     tmp = OUT + ".tmp"
     with open(tmp, "w", encoding="utf-8", newline="\n") as f:
         json.dump(ordered, f, ensure_ascii=False, indent=2)
         f.write("\n")
     os.replace(tmp, OUT)
-    changed = [k for k in ("oeis", "observable", "code360")
+    changed = [k for k in ("oeis", "observable", "code360", "hackerrank")
                if prev.get(k) != result[k]]
     print("wrote profiles.json, changed:", ",".join(changed) or "metadata only")
 

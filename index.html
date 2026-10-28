@@ -220,12 +220,12 @@
       <span class="live__k"><i class="tag tag--snap"></i><a href="https://leetcode.cn/u/yhm138_/" target="_blank" rel="noreferrer">LeetCode solved</a></span>
     </div>
     <div class="live__cell">
-      <span class="live__num" id="m-hackerrank">5</span>
-      <span class="live__k"><i class="tag tag--snap"></i><a href="https://www.hackerrank.com/profile/aspen1382020" target="_blank" rel="noreferrer">HackerRank badges</a></span>
+      <span class="live__num" id="m-hackerrank">11</span>
+      <span class="live__k"><i class="tag tag--snap"></i><a href="https://www.hackerrank.com/profile/aspen1382020" target="_blank" rel="noreferrer">HackerRank certs</a></span>
     </div>    <div class="live__meta" style="grid-column:1/-1">
       <span class="js-only"><i class="tag tag--live"></i>live · GitHub, GreasyFork, SE per-site</span>
-      <span class="js-only"><i class="tag tag--snap"></i>cache · PyPI, SE, RosettaCode, Bilibili, Douyin, LeetCode, HackerRank</span>
-      <span class="js-only"><i class="tag tag--snap"></i>local · Chrome</span>
+      <span class="js-only"><i class="tag tag--snap"></i>cache · PyPI, SE, RosettaCode, Bilibili, Douyin, LeetCode</span>
+      <span class="js-only"><i class="tag tag--snap"></i>local · Chrome, HackerRank</span>
       <span class="js-only"><span id="stamp">—</span> · <a href="https://github.com/yhm138/resume/commits/main/metrics.json" target="_blank" rel="noreferrer">history</a></span>
     </div>
   </section>
@@ -475,7 +475,8 @@
     if (m.bilibili_followers != null) setFrom('m-bili', fmt(m.bilibili_followers), rank);
     if (m.douyin_likes != null) setFrom('m-douyin', fmt(m.douyin_likes), rank);
     if (m.leetcode_solved != null) setFrom('m-leetcode', num(m.leetcode_solved), rank);
-    if (m.hackerrank_badges != null) setFrom('m-hackerrank', fmt(m.hackerrank_badges), rank);
+    // HackerRank 那一格改由 profiles.json 的认证数提供：Worker 走的旧 REST /badges
+    // 返回的是 5 个有活动的领域，不是个人页上的徽章。
     if (m.codewars_katas != null) setFrom('cw-katas', String(m.codewars_katas), rank);
     if (m.codewars_kyu) setFrom('cw-kyu', m.codewars_kyu, rank);
     if (m.codewars_honor != null) setFrom('cw-honor', String(m.codewars_honor), rank);
@@ -559,6 +560,8 @@
         setFrom('obs-notebooks', String(p.observable.notebooks), R_SNAPSHOT);
       if (p.code360 && p.code360.problems != null)
         setFrom('c360-problems', String(p.code360.problems), R_SNAPSHOT);
+      if (p.hackerrank && p.hackerrank.certificates != null)
+        setFrom('m-hackerrank', String(p.hackerrank.certificates), R_SNAPSHOT);
     })
     .catch(function () { /* 静态值兜底 */ });
 })();
