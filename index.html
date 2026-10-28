@@ -136,6 +136,8 @@
     .live__meta{font-size:8.5px;letter-spacing:.07em;line-height:1.55;gap:4px 14px;padding-top:10px}
     .live__meta .tag{width:4px;height:4px;margin-right:4px}
     .live__cell{border-left:1px solid var(--rule);padding-left:16px}
+    /* 桌面那套 5n+1 规则会在 2 列布局里掐掉第 6、11 格的左竖线，先复位 */
+    .live__cell:nth-child(5n+1){border-left:1px solid var(--rule);padding-left:16px}
     .live__cell:nth-child(odd){border-left:0;padding-left:0}
     .live__cell:nth-child(n+3){border-top:1px solid var(--rule)}
     .sec{grid-template-columns:1fr;padding-top:28px}
