@@ -17,12 +17,14 @@
 | PyPI 累计下载（3,951） | Cloudflare Worker | 10 分钟 |
 | RosettaCode（465 任务页 / 43 新建） | Cloudflare Worker | 10 分钟 |
 | 博客园总阅读（164,729 / 139 篇） | Cloudflare Worker | 10 分钟 |
-| Bilibili 粉丝 / 视频数（35 / 9） | Cloudflare Worker | 10 分钟 |
+| Bilibili 粉丝 / 视频数（35 / 10） | Cloudflare Worker | 10 分钟 |
 | 抖音获赞 / 作品数（71 / 2） | Cloudflare Worker | 10 分钟 |
+| LeetCode 通过题数（1,953，站点排名 1,612） | Cloudflare Worker | 10 分钟 |
+| HackerRank 徽章（5 个 / 65 题） | Cloudflare Worker | 10 分钟 |
 | 知乎赞同 / 收藏（937 / 1,833） | 本机计划任务 → `web-stats.json` | 每周一（开机则更新） |
 | Chrome 扩展用户（671 / 6 个） | 本机计划任务 → `chrome-users.json` | 每周一（开机则更新） |
 
-页面上用两种圆点区分：实心 = 每次访问实时取；空心 = 定时缓存或本地刷新。数据条共 8 格，桌面 4 列、移动 2 列。
+页面上用两种圆点区分：实心 = 每次访问实时取；空心 = 定时缓存或本地刷新。数据条共 10 格，桌面 5 列、移动 2 列。
 
 > 知乎的三个数字容易混：`voteup_count` 是赞同（937），`favorited_count` 是收藏（1,833），`thanked_count` 是感谢（620）。简历正文里说的“620 次喜欢”指的是感谢数。
 
@@ -60,13 +62,22 @@
 - `GET /` → 状态页，逐项显示数值与来源通道（`primary` / `fallback` / `unavailable`）
 - 缓存 10 分钟；代码不在本仓库，在 Cloudflare 控制台维护
 
-Worker 负责“浏览器取不到”的那几项：这些站点要么不发 CORS 头，要么需要服务端请求。目前它跑七个源：GreasyFork、PyPI、Stack Exchange、RosettaCode、博客园、Bilibili、抖音。
+Worker 负责“浏览器取不到”的那几项：这些站点要么不发 CORS 头，要么需要服务端请求。目前它跑九个源：GreasyFork、PyPI、Stack Exchange、RosettaCode、博客园、Bilibili、抖音、LeetCode、HackerRank。
 
 ## 哪些没法自动，为什么
 
 **知乎的公开接口拒绝机房 IP。** `https://www.zhihu.com/api/v4/members/...` 在住宅网络下直接返回精确数字，从 Cloudflare 出口取则被挡。所以知乎两个数改由本机每周跑脚本发布成 `web-stats.json`。
 
 **抖音的网页端是 JS 反爬，但旧版分享接口还活着。** `douyin.com/user/...`、`iesdouyin.com/share/user/...`、`m.douyin.com/...` 三个地址返回的都是同一份 72 KB 的 `_$jsvmprt` 混淆脚本，正文为空；而 `https://www.iesdouyin.com/web/api/v2/user/info/?sec_uid=...` 仍返回 JSON。注意它对未登录访客把 `follower_count` 置为 `null`（用浏览器渲染确认过：页面上“关注/粉丝/获赞”三个标签都在，数字是空的）。
+
+**LeetCode 的做题数只能走 GraphQL。** 个人主页是 Next.js 渲染的，但 https://leetcode.cn/graphql/ 允许匿名 POST 查询 userProfileUserQuestionProgress，一次拿到三档难度的通过题数与站点排名——2026-10 实测：简单 701、中等 936、困难 316，合计 1,953，排名 1,612。
+
+**HackerRank 用的是旧版 REST 接口。** 
+est/hackers/<user>/badges 与 .../scores 仍返回 JSON，页面本身是 React 渲染的。
+
+**LinkedIn 完全取不到。** 任何非登录请求都返回 HTTP 999（LinkedIn 的反爬状态码），且抓取违反其条款。页面上只保留链接。
+
+**牛客没有公开的统计数据。** gw-c.nowcoder.com/api/sparta/user/profile/<id> 能拿到昵称、学历、身份标签，但刷题数、排名都不对外，所以没有可展示的数字。
 
 **Bilibili 的播放量需要 wbi 签名。** `x/relation/stat`（粉丝/关注）和 `x/space/navnum`（视频/文章数）都免签名，但 `x/space/arc/search` 返回 412，要 wbi 签名才能取播放量，因此只展示粉丝与视频数。
 
@@ -82,7 +93,7 @@ Worker 负责“浏览器取不到”的那几项：这些站点要么不发 COR
 
 | 宽度 | 布局 |
 | --- | --- |
-| > 780px | 左侧章节序号栏 + 右侧正文，数据条 4 列 |
+| > 780px | 左侧章节序号栏 + 右侧正文，数据条 5 列 |
 | 421–780px | 章节序号栏收起，数据条 2 列 |
 | ≤ 420px | 小屏字号档（姓名 34px、摘要 14.8px、正文 13.6px），数据条 2 列 |
 
