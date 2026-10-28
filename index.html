@@ -60,7 +60,7 @@
   .live__k a{border-bottom:0}
   .live__k a:hover{color:var(--accent);border-bottom:1px solid var(--accent-soft)}
   .live__num sup{font-size:11px;color:var(--ink-3);vertical-align:super;letter-spacing:0}
-  .live__meta{display:flex;align-items:center;gap:10px;font-family:var(--mono);font-size:10px;letter-spacing:.12em;color:var(--ink-3);text-transform:uppercase;padding:12px 0 0}
+  .live__meta{display:flex;align-items:center;flex-wrap:wrap;gap:6px 18px;font-family:var(--mono);font-size:10px;letter-spacing:.12em;color:var(--ink-3);text-transform:uppercase;padding:12px 0 0}
   .dot{width:5px;height:5px;border-radius:50%;background:var(--live);box-shadow:0 0 0 3px rgba(15,138,95,.14);animation:pulse 2.6s ease-in-out infinite}
   @keyframes pulse{0%,100%{opacity:1}50%{opacity:.32}}
 
@@ -106,7 +106,8 @@
     .live__num{font-size:19px}
     .live__k{font-size:9px;letter-spacing:.05em;margin-top:4px}
     .live__cell{padding:13px 0 12px 14px}
-    .live__meta{font-size:8.5px;letter-spacing:.07em;line-height:1.55;gap:6px;padding-top:10px}
+    .live__meta{font-size:8.5px;letter-spacing:.07em;line-height:1.55;gap:4px 14px;padding-top:10px}
+    .live__meta .tag{width:4px;height:4px;margin-right:4px}
     .live__cell{border-left:1px solid var(--rule);padding-left:16px}
     .live__cell:nth-child(odd){border-left:0;padding-left:0}
     .live__cell:nth-child(n+3){border-top:1px solid var(--rule)}
@@ -180,8 +181,10 @@
       <span class="live__k"><i class="tag tag--snap"></i><a href="https://chrome-stats.com/a/Q2hyb21lV2ViU3RvcmVEZXY" target="_blank" rel="noreferrer">Chrome ext. users</a></span>
     </div>
     <div class="live__meta" style="grid-column:1/-1">
-      <span class="dot" aria-hidden="true"></span>
-      <span class="js-only">● live: GitHub, GreasyFork, SE per-site　○ cache: PyPI, SE total, RosettaCode　○ local refresh: Chrome · <span id="stamp">—</span> · <a href="https://github.com/yhm138/resume/commits/main/metrics.json" target="_blank" rel="noreferrer">history</a></span>
+      <span class="js-only"><i class="tag tag--live"></i>live · GitHub, GreasyFork, SE per-site</span>
+      <span class="js-only"><i class="tag tag--snap"></i>cache · PyPI, SE total, RosettaCode</span>
+      <span class="js-only"><i class="tag tag--snap"></i>local · Chrome</span>
+      <span class="js-only"><span id="stamp">—</span> · <a href="https://github.com/yhm138/resume/commits/main/metrics.json" target="_blank" rel="noreferrer">history</a></span>
     </div>
   </section>
 
