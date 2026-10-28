@@ -107,6 +107,8 @@ Worker 负责“浏览器取不到”的那几项：这些站点要么不发 COR
 
 **Observable 会对空 UA 或连续请求返回 429。** 抓取时带浏览器 UA，且每小时只取一次；调试时不要连续打同一个 profile 页。
 
+**Lark wiki（AIME / Putnam 解法）对外可读，但目录接口要登录。** 直接请求 `https://adzu3lvjw4g.sg.larksuite.com/space/api/wiki/v2/tree/get_info/?...wiki_token=...` 返回 `{"code":5,"msg":"Login Required"}`，只有带网页会话的浏览器才拿得到完整目录树。所以页面上只放链接和静态计数（33 个 AIME 年份 / 68 篇 Putnam，共 101 页）：这批数字一年才动一次，没必要上自动化。
+
 ## 响应式
 
 三档断点，逐档验证过无横向溢出（量 `documentElement.scrollWidth` 并扫描元素右边界）：
