@@ -84,6 +84,10 @@
   ul.bul li{position:relative;padding-left:19px;margin-bottom:8px;font-size:14.4px;color:var(--ink-2)}
   ul.bul li::before{content:"";position:absolute;left:1px;top:.82em;width:7px;height:1px;background:var(--ink-3)}
   .hl{color:var(--ink);font-weight:600}
+  /* 正文里的“大数”：衬线 + 权重 + 一道淡淡的手写高亮，让三个关键数字先被看到 */
+  .stat{font-family:var(--serif);font-size:1.22em;font-weight:600;color:var(--ink);
+    font-variant-numeric:tabular-nums lining-nums;letter-spacing:-.01em;
+    background:linear-gradient(transparent 68%,rgba(18,63,77,.16) 0);padding:0 1px}
   .stack{font-family:var(--mono);font-size:11px;color:var(--ink-3);margin-top:8px;letter-spacing:.01em}
 
   .skills,.honors{margin:0}
@@ -336,14 +340,14 @@
       <article class="entry">
         <div class="entry__head"><div class="entry__org">Open source</div></div>
         <ul class="bul">
-          <li><a href="https://pepy.tech/projects/bisc-algorithm" target="_blank" rel="noreferrer">bisc-algorithm</a> on PyPI (<span class="hl" id="pypi-body">3.9k</span> downloads); <span class="hl" id="gf-scripts">82</span> userscripts on <a href="https://greasyfork.org/en/users/1177387-138-aspen" target="_blank" rel="noreferrer">GreasyFork</a> (<span class="hl" id="gf-installs">11.4k</span> installs); <span class="hl">6</span> <a href="https://chrome-stats.com/a/Q2hyb21lV2ViU3RvcmVEZXY" target="_blank" rel="noreferrer">Chrome extensions</a> (<span class="hl" id="chrome-body">671</span> users across 6 extensions); <span class="hl" id="ros-new">43</span> new and <span class="hl" id="ros-tasks">465</span> contributed task pages on <a href="https://rosettacode.miraheze.org/wiki/Special:Contributions/Aspen138" target="_blank" rel="noreferrer">RosettaCode</a>.</li>
+          <li><a href="https://pepy.tech/projects/bisc-algorithm" target="_blank" rel="noreferrer">bisc-algorithm</a> on PyPI (<span class="hl" id="pypi-body">3.9k</span> downloads); <span class="hl" id="gf-scripts">82</span> userscripts on <a href="https://greasyfork.org/en/users/1177387-138-aspen" target="_blank" rel="noreferrer">GreasyFork</a> (<span class="stat" id="gf-installs">11.4k</span> installs); <span class="hl">6</span> <a href="https://chrome-stats.com/a/Q2hyb21lV2ViU3RvcmVEZXY" target="_blank" rel="noreferrer">Chrome extensions</a> (<span class="hl" id="chrome-body">671</span> users across 6 extensions); <span class="hl" id="ros-new">43</span> new and <span class="hl" id="ros-tasks">465</span> contributed task pages on <a href="https://rosettacode.miraheze.org/wiki/Special:Contributions/Aspen138" target="_blank" rel="noreferrer">RosettaCode</a>.</li>
         </ul>
       </article>
 
       <article class="entry">
         <div class="entry__head"><div class="entry__org">Writing</div></div>
         <ul class="bul">
-          <li><span class="hl" id="cb-reads">164,729</span> reads on <a href="https://cnblogs.com/yhm138" target="_blank" rel="noreferrer">Cnblogs</a>; <span class="hl" id="zh-voteup">937</span> upvotes and <span class="hl" id="zh-fav">1.8k</span> saves on <a href="https://www.zhihu.com/people/yong-hu-ming-32" target="_blank" rel="noreferrer">Zhihu</a>; <span class="hl" id="se-cg">7.3k</span> Code Golf, <span class="hl" id="se-mm">2.4k</span> Mathematica and <span class="hl" id="se-math">1.6k</span> Mathematics reputation across <a href="https://stackexchange.com/users/21083779/138-aspen?tab=accounts" target="_blank" rel="noreferrer">Stack Exchange</a>.</li>
+          <li><span class="stat" id="cb-reads">164,729</span> reads on <a href="https://cnblogs.com/yhm138" target="_blank" rel="noreferrer">Cnblogs</a>; <span class="hl" id="zh-voteup">937</span> upvotes and <span class="hl" id="zh-fav">1.8k</span> saves on <a href="https://www.zhihu.com/people/yong-hu-ming-32" target="_blank" rel="noreferrer">Zhihu</a>; <span class="stat" id="se-total">24,651</span> reputation across <a href="https://stackexchange.com/users/21083779/138-aspen?tab=accounts" target="_blank" rel="noreferrer">Stack Exchange</a> sites <span class="hl" id="se-sites">118</span>, including <span class="hl" id="se-cg">7.3k</span> on Code Golf, <span class="hl" id="se-mm">2.4k</span> on Mathematica and <span class="hl" id="se-math">1.6k</span> on Mathematics.</li>
         </ul>
       </article>
     </div>
@@ -444,6 +448,8 @@
         if (m.zhihu_voteup) set('zh-voteup', fmt(m.zhihu_voteup));
         if (m.zhihu_favorited) set('zh-fav', fmt(m.zhihu_favorited));
         if (m.cnblogs_reads) set('cb-reads', Number(m.cnblogs_reads).toLocaleString('en-US'));
+      if (m.stackexchange_rep) set('se-total', fmt(m.stackexchange_rep));
+      if (m.stackexchange_sites) set('se-sites', String(m.stackexchange_sites));
       if (m.bilibili_followers != null) set('m-bili', fmt(m.bilibili_followers));
       if (m.douyin_likes != null) set('m-douyin', fmt(m.douyin_likes));
       })
