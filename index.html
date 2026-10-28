@@ -407,10 +407,18 @@
     if (n >= 1000) return n.toLocaleString('en-US');
     return String(n);
   }
-  function set(id, text) {
+  // 每个格子只认一个来源。同一个指标被两个源写过一次就够，后来的低优先级源不许覆盖。
+  var RANK = {};
+  var R_WORKER = 3, R_SNAPSHOT = 2;
+  function setFrom(id, text, rank) {
+    if (text === null || text === undefined || text === '—') return;
+    if ((RANK[id] || 0) > rank) return;
     var el = document.getElementById(id);
-    if (el && text !== '—') el.textContent = text;
+    if (!el) return;
+    el.textContent = text;
+    RANK[id] = rank;
   }
+  function num(n) { return Number(n).toLocaleString('en-US'); }
   function getJSON(url) {
     return fetch(url, { headers: { Accept: 'application/json' } }).then(function (r) {
       if (!r.ok) throw new Error(url + ' → ' + r.status);
@@ -421,31 +429,48 @@
   // 1) 先问 Cloudflare Worker（10 分钟缓存，带 CORS），失败再退回仓库里的快照
   var WORKER = 'https://autumn-thunder-2ee6.aspen1382020.workers.dev/metrics';
 
-  function apply(m) {
-    set('m-repos', fmt(m.github_repos));
-    set('m-gf', fmt(m.greasyfork_installs));
-    set('gf-installs', fmt(m.greasyfork_installs));
-    if (m.greasyfork_scripts) set('gf-scripts', String(m.greasyfork_scripts));
-    set('m-se', fmt(m.stackexchange_rep));
-    set('m-rosetta', fmt(m.rosetta_tasks));
-    set('ros-tasks', fmt(m.rosetta_tasks));
-    if (m.rosetta_new) set('ros-new', String(m.rosetta_new));
-    if (m.chrome_users) set('m-chrome', fmt(m.chrome_users));
-    set('m-pypi', fmt(m.pypi_total));
-    set('pypi-body', fmt(m.pypi_total));
-    var stamp = document.getElementById('stamp');
-    if (stamp && m.generated_at) {
-      var t8 = new Date(new Date(m.generated_at).getTime() + 8 * 3600 * 1000);
-      stamp.textContent = t8.toISOString().slice(0, 16).replace('T', ' ') + ' (UTC+8)';
+  function stampText(iso) {
+    var t8 = new Date(new Date(iso).getTime() + 8 * 3600 * 1000);
+    return t8.toISOString().slice(0, 16).replace('T', ' ') + ' (UTC+8)';
+  }
+
+  function apply(m, rank) {
+    setFrom('m-repos', fmt(m.github_repos), rank);
+    setFrom('m-gf', fmt(m.greasyfork_installs), rank);
+    setFrom('gf-installs', fmt(m.greasyfork_installs), rank);
+    if (m.greasyfork_scripts) setFrom('gf-scripts', String(m.greasyfork_scripts), rank);
+    setFrom('m-se', fmt(m.stackexchange_rep), rank);
+    if (m.stackexchange_rep != null) {
+      setFrom('se-total', num(m.stackexchange_rep), rank);
+      if (m.stackexchange_sites) setFrom('se-sites', String(m.stackexchange_sites), rank);
     }
+    setFrom('m-rosetta', fmt(m.rosetta_tasks), rank);
+    setFrom('ros-tasks', fmt(m.rosetta_tasks), rank);
+    if (m.rosetta_new) setFrom('ros-new', String(m.rosetta_new), rank);
+    setFrom('m-pypi', fmt(m.pypi_total), rank);
+    setFrom('pypi-body', fmt(m.pypi_total), rank);
+    if (m.cnblogs_reads != null) setFrom('cb-reads', num(m.cnblogs_reads), rank);
+    if (m.zhihu_voteup != null) setFrom('zh-voteup', fmt(m.zhihu_voteup), rank);
+    if (m.zhihu_favorited != null) setFrom('zh-fav', fmt(m.zhihu_favorited), rank);
+    if (m.bilibili_followers != null) setFrom('m-bili', fmt(m.bilibili_followers), rank);
+    if (m.douyin_likes != null) setFrom('m-douyin', fmt(m.douyin_likes), rank);
+    if (m.leetcode_solved != null) setFrom('m-leetcode', num(m.leetcode_solved), rank);
+    if (m.hackerrank_badges != null) setFrom('m-hackerrank', fmt(m.hackerrank_badges), rank);
+    if (m.codewars_katas != null) setFrom('cw-katas', String(m.codewars_katas), rank);
+    if (m.codewars_kyu) setFrom('cw-kyu', m.codewars_kyu, rank);
+    if (m.codewars_honor != null) setFrom('cw-honor', String(m.codewars_honor), rank);
+    if (m.leetcode_global_solved != null) setFrom('lc-global', String(m.leetcode_global_solved), rank);
+    // Chrome 用户数只由 chrome-users.json 写入：metrics.json 里那个 chrome_users 曾经
+    // 和数据条/正文抢着写，导致同一页出现 680 和 671 两个数。
+    if (m.generated_at) setFrom('stamp', stampText(m.generated_at), rank);
   }
 
   getJSON(WORKER)
-    .then(apply)
+    .then(function (m) { apply(m, R_WORKER); })
     .catch(function () {
       return fetch('metrics.json', { cache: 'no-store' })
         .then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); })
-        .then(apply)
+        .then(function (m) { apply(m, R_SNAPSHOT); })
         .catch(function () { /* DOM 里的静态值兜底 */ });
     });
 
@@ -472,38 +497,19 @@
     return getJSON('https://api.stackexchange.com/2.3/users/' + s[2] +
                    '?site=' + s[1] + '&filter=default').then(function (d) {
       var rep = ((d.items || [])[0] || {}).reputation;
-      if (rep) set(s[0], fmt(rep));
+      if (rep) setFrom(s[0], fmt(rep), R_WORKER);
     });
   })));
 
-  // 2b) 知乎：Worker 若能取到就用它，取不到保留静态值
-  function applyZhihu() {
-    getJSON('https://autumn-thunder-2ee6.aspen1382020.workers.dev/metrics')
-      .then(function (m) {
-        if (m.zhihu_voteup) set('zh-voteup', fmt(m.zhihu_voteup));
-        if (m.zhihu_favorited) set('zh-fav', fmt(m.zhihu_favorited));
-        if (m.cnblogs_reads) set('cb-reads', Number(m.cnblogs_reads).toLocaleString('en-US'));
-      if (m.stackexchange_rep) set('se-total', Number(m.stackexchange_rep).toLocaleString('en-US'));
-      if (m.stackexchange_sites) set('se-sites', String(m.stackexchange_sites));
-      if (m.bilibili_followers != null) set('m-bili', fmt(m.bilibili_followers));
-      if (m.douyin_likes != null) set('m-douyin', fmt(m.douyin_likes));
-      if (m.leetcode_solved != null) set('m-leetcode', Number(m.leetcode_solved).toLocaleString('en-US'));
-      if (m.hackerrank_badges != null) set('m-hackerrank', fmt(m.hackerrank_badges));
-      if (m.codewars_katas != null) set('cw-katas', String(m.codewars_katas));
-      if (m.codewars_kyu) set('cw-kyu', m.codewars_kyu);
-      if (m.codewars_honor != null) set('cw-honor', String(m.codewars_honor));
-      if (m.leetcode_global_solved != null) set('lc-global', String(m.leetcode_global_solved));
-      })
-      .catch(function () { /* 静态值兜底 */ });
-  }
-  applyZhihu();
+  // 2b) 上面那个请求已经把 Worker 的全部字段应用了，这里不再重复请一次。
+  //     Worker 上知乎被机房 IP 拦住，所以知乎走下面的本地快照。
 
-  // 2c) 知乎与博客园：Worker 里知乎被机房 IP 拦住，这里读本地脚本发布的快照
+  // 2c) 本地快照：知乎两个数只有这里有；博客园阅读数只在 Worker 没给值时用它补位
   getJSON('https://raw.githubusercontent.com/yhm138/resume/main/web-stats.json?v=1')
     .then(function (w) {
-      if (w.zhihu_voteup) set('zh-voteup', fmt(w.zhihu_voteup));
-      if (w.zhihu_favorited) set('zh-fav', fmt(w.zhihu_favorited));
-      if (w.cnblogs_reads) set('cb-reads', Number(w.cnblogs_reads).toLocaleString('en-US'));
+      if (w.zhihu_voteup != null) setFrom('zh-voteup', fmt(w.zhihu_voteup), R_SNAPSHOT);
+      if (w.zhihu_favorited != null) setFrom('zh-fav', fmt(w.zhihu_favorited), R_SNAPSHOT);
+      if (w.cnblogs_reads != null) setFrom('cb-reads', num(w.cnblogs_reads), R_SNAPSHOT);
     })
     .catch(function () { /* 静态值兜底 */ });
 
@@ -512,8 +518,9 @@
   getJSON('https://raw.githubusercontent.com/yhm138/resume/main/chrome-users.json?v=1')
     .then(function (c) {
       if (c && c.total) {
-        set('m-chrome', fmt(c.total));
-        set('chrome-body', fmt(c.total));
+        // 数据条与正文的 Chrome 数字只能来自这一个文件
+        setFrom('m-chrome', fmt(c.total), R_WORKER);
+        setFrom('chrome-body', fmt(c.total), R_WORKER);
         var el = document.getElementById('m-chrome');
         if (el && c.asof) el.title = 'as of ' + c.asof;
       }
