@@ -1,12 +1,9 @@
 {
   "chrome_users": 680,
-  "fail_streak": {
-    "rosetta": 2,
-    "stackexchange": 1
-  },
-  "generated_at": "2026-10-27T13:57:30Z",
-  "github_repos": 51,
-  "greasyfork_installs": 11421,
+  "fail_streak": {},
+  "generated_at": "2026-10-28T01:40:37Z",
+  "github_repos": 50,
+  "greasyfork_installs": 11430,
   "greasyfork_scripts": 81,
   "pypi_total": 3950,
   "rosetta_new": 43,
@@ -21,8 +18,5 @@
   },
   "stackexchange_rep": 24651,
   "stackexchange_sites": 118,
-  "stale": [
-    "rosetta",
-    "stackexchange"
-  ]
+  "stale": []
 }
