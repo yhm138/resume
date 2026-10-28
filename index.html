@@ -417,6 +417,15 @@
   }
   applyZhihu();
 
+  // 2c) 知乎与博客园：Worker 里知乎被机房 IP 拦住，这里读本地脚本发布的快照
+  getJSON('https://raw.githubusercontent.com/yhm138/resume/main/web-stats.json?v=1')
+    .then(function (w) {
+      if (w.zhihu_voteup) set('zh-voteup', fmt(w.zhihu_voteup));
+      if (w.zhihu_favorited) set('zh-fav', fmt(w.zhihu_favorited));
+      if (w.cnblogs_reads) set('cb-reads', Number(w.cnblogs_reads).toLocaleString('en-US'));
+    })
+    .catch(function () { /* 静态值兜底 */ });
+
   // 3) Chrome 扩展用户数：由本地脚本定期发布成 JSON（Google 拒绝机房 IP，
   //    所以 Cloudflare 和 GitHub Actions 都取不到，只能从住宅网络算好后发布）
   getJSON('https://raw.githubusercontent.com/yhm138/resume/main/chrome-users.json?v=1')
