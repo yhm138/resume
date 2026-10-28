@@ -49,10 +49,10 @@
   .contact .k{font-family:var(--mono);font-size:9.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-3)}
 
   /* ---------- live strip ---------- */
-  .live{display:grid;grid-template-columns:repeat(4,1fr);border-bottom:1px solid var(--rule)}
+  .live{display:grid;grid-template-columns:repeat(5,1fr);border-bottom:1px solid var(--rule)}
   .live__cell{padding:18px 0 16px 22px;border-left:1px solid var(--rule)}
-  .live__cell:nth-child(4n+1){border-left:0;padding-left:0}
-  .live__cell:nth-child(n+5){border-top:1px solid var(--rule)}
+  .live__cell:nth-child(5n+1){border-left:0;padding-left:0}
+  .live__cell:nth-child(n+6){border-top:1px solid var(--rule)}
   .live__num{font-family:var(--mono);font-variant-numeric:tabular-nums;font-size:25px;line-height:1.1;letter-spacing:-.03em;display:block}
   .tag{display:inline-block;width:5px;height:5px;border-radius:50%;margin-right:6px;vertical-align:middle}
   .tag--live{background:var(--live)}
@@ -214,6 +214,13 @@
     <div class="live__cell">
       <span class="live__num" id="m-douyin">71</span>
       <span class="live__k"><i class="tag tag--snap"></i><a href="https://www.douyin.com/user/MS4wLjABAAAA1_4tBCUwtrW4IBcNkz5ouwndczRoFQfvehgQPH2CroA" target="_blank" rel="noreferrer">Douyin likes</a></span>
+    </div>    <div class="live__cell">
+      <span class="live__num" id="m-leetcode">1,953</span>
+      <span class="live__k"><i class="tag tag--snap"></i><a href="https://leetcode.cn/u/yhm138_/" target="_blank" rel="noreferrer">LeetCode solved</a></span>
+    </div>
+    <div class="live__cell">
+      <span class="live__num" id="m-hackerrank">5</span>
+      <span class="live__k"><i class="tag tag--snap"></i><a href="https://www.hackerrank.com/profile/aspen1382020" target="_blank" rel="noreferrer">HackerRank badges</a></span>
     </div>    <div class="live__meta" style="grid-column:1/-1">
       <span class="js-only"><i class="tag tag--live"></i>live · GitHub, GreasyFork, SE per-site</span>
       <span class="js-only"><i class="tag tag--snap"></i>cache · PyPI, SE total, RosettaCode</span>
@@ -453,6 +460,8 @@
       if (m.stackexchange_sites) set('se-sites', String(m.stackexchange_sites));
       if (m.bilibili_followers != null) set('m-bili', fmt(m.bilibili_followers));
       if (m.douyin_likes != null) set('m-douyin', fmt(m.douyin_likes));
+      if (m.leetcode_solved != null) set('m-leetcode', Number(m.leetcode_solved).toLocaleString('en-US'));
+      if (m.hackerrank_badges != null) set('m-hackerrank', fmt(m.hackerrank_badges));
       })
       .catch(function () { /* 静态值兜底 */ });
   }
