@@ -311,7 +311,7 @@
       <article class="entry">
         <div class="entry__head"><div class="entry__org">Writing</div></div>
         <ul class="bul">
-          <li><span class="hl">160k+</span> reads on <a href="https://cnblogs.com/yhm138" target="_blank" rel="noreferrer">Cnblogs</a>; <span class="hl">620</span> upvotes and <span class="hl">1.8k</span> saves on <a href="https://www.zhihu.com/people/yong-hu-ming-32" target="_blank" rel="noreferrer">Zhihu</a>; <span class="hl" id="se-cg">7.3k</span> Code Golf, <span class="hl" id="se-mm">2.4k</span> Mathematica and <span class="hl" id="se-math">1.6k</span> Mathematics reputation across <a href="https://stackexchange.com/users/21083779/138-aspen?tab=accounts" target="_blank" rel="noreferrer">Stack Exchange</a>.</li>
+          <li><span class="hl">160k+</span> reads on <a href="https://cnblogs.com/yhm138" target="_blank" rel="noreferrer">Cnblogs</a>; <span class="hl" id="zh-voteup">937</span> upvotes and <span class="hl" id="zh-fav">1.8k</span> saves on <a href="https://www.zhihu.com/people/yong-hu-ming-32" target="_blank" rel="noreferrer">Zhihu</a>; <span class="hl" id="se-cg">7.3k</span> Code Golf, <span class="hl" id="se-mm">2.4k</span> Mathematica and <span class="hl" id="se-math">1.6k</span> Mathematics reputation across <a href="https://stackexchange.com/users/21083779/138-aspen?tab=accounts" target="_blank" rel="noreferrer">Stack Exchange</a>.</li>
         </ul>
       </article>
     </div>
@@ -404,6 +404,17 @@
       if (rep) set(s[0], fmt(rep));
     });
   })));
+
+  // 2b) 知乎：Worker 若能取到就用它，取不到保留静态值
+  function applyZhihu() {
+    getJSON('https://autumn-thunder-2ee6.aspen1382020.workers.dev/metrics')
+      .then(function (m) {
+        if (m.zhihu_voteup) set('zh-voteup', fmt(m.zhihu_voteup));
+        if (m.zhihu_favorited) set('zh-fav', fmt(m.zhihu_favorited));
+      })
+      .catch(function () { /* 静态值兜底 */ });
+  }
+  applyZhihu();
 
   // 3) Chrome 扩展用户数：由本地脚本定期发布成 JSON（Google 拒绝机房 IP，
   //    所以 Cloudflare 和 GitHub Actions 都取不到，只能从住宅网络算好后发布）
