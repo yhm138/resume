@@ -29,6 +29,8 @@ UA = ("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
 OEIS_USER = "Haomin%20Yang"
 C360_UUID = "8d5253e5-771f-4039-9fa0-cd51de2b0639"
 OBS_USER = "@aspen1382020"
+CF_HANDLE = "yhm7000_"
+NC_UID = "473856205"
 
 
 def fetch(url, headers=None, timeout=45):
@@ -98,6 +100,55 @@ def hackerrank():
             "certificates": body.count("certificate-link")}
 
 
+def codeforces():
+    """Public API, no key. /user.status is ~150 KB, which is why the page does not
+    fetch it itself; the solved count is the number of distinct accepted problems."""
+    info = json.loads(fetch("https://codeforces.com/api/user.info?handles=" + CF_HANDLE))["result"][0]
+    time.sleep(1)
+    subs = json.loads(fetch("https://codeforces.com/api/user.status?handle=%s&from=1&count=10000"
+                            % CF_HANDLE))["result"]
+    solved = set()
+    for s in subs:
+        if s.get("verdict") != "OK":
+            continue
+        p = s.get("problem", {})
+        solved.add("%s:%s" % (p.get("contestId") or p.get("problemsetName"), p.get("index")))
+    return {"rating": info.get("rating"),
+            "max_rating": info.get("maxRating"),
+            "rank": info.get("rank"),
+            "max_rank": info.get("maxRank"),
+            "solved": len(solved),
+            "submissions": len(subs)}
+
+
+def nowcoder():
+    """Contest profile + practice page are server-rendered; no CORS, so only this script
+    can read them. Values sit in <div class="state-num">N</div><span>LABEL</span>."""
+    profile = fetch("https://ac.nowcoder.com/acm/contest/profile/" + NC_UID,
+                    {"Accept": "text/html,application/xhtml+xml"})
+    practice = fetch("https://ac.nowcoder.com/acm/contest/profile/" + NC_UID + "/practice-coding",
+                     {"Accept": "text/html,application/xhtml+xml"})
+
+    def stat(html, label):
+        m = re.search(r'class="state-num[^"]*">([^<]+)</div>\s*<span>' + re.escape(label) + r'</span>',
+                      html)
+        return m.group(1).strip() if m else None
+
+    def as_int(v):
+        try:
+            return int(v)
+        except (TypeError, ValueError):
+            return v
+
+    return {"rating": as_int(stat(profile, "Rating")),
+            "rating_rank": stat(profile, "Rating\u6392\u540d"),
+            "rating_contests": as_int(stat(profile, "次Rating赛")),
+            "contests": as_int(stat(profile, "次比赛")),
+            "attempted": as_int(stat(practice, "题已挑战")),
+            "passed": as_int(stat(practice, "题已通过")),
+            "submissions": as_int(stat(practice, "次提交"))}
+
+
 def load_previous():
     if not os.path.exists(OUT):
         return {}
@@ -110,10 +161,12 @@ def load_previous():
 
 def main():
     prev = load_previous()
-    result = {"oeis": {}, "observable": {}, "code360": {}, "hackerrank": {}}
+    result = {"oeis": {}, "observable": {}, "code360": {}, "hackerrank": {},
+              "codeforces": {}, "nowcoder": {}}
     stale = []
     for key, fn in (("oeis", oeis), ("observable", observable), ("code360", code360),
-                    ("hackerrank", hackerrank)):
+                    ("hackerrank", hackerrank), ("codeforces", codeforces),
+                    ("nowcoder", nowcoder)):
         try:
             result[key] = fn()
         except Exception as e:
@@ -136,14 +189,15 @@ def main():
     result["stale"] = stale
     ordered = {"generated_at": result["generated_at"], "stale": stale,
                "oeis": result["oeis"], "observable": result["observable"],
-               "code360": result["code360"], "hackerrank": result["hackerrank"]}
+               "code360": result["code360"], "hackerrank": result["hackerrank"],
+               "codeforces": result["codeforces"], "nowcoder": result["nowcoder"]}
     tmp = OUT + ".tmp"
     with open(tmp, "w", encoding="utf-8", newline="\n") as f:
         json.dump(ordered, f, ensure_ascii=False, indent=2)
         f.write("\n")
     os.replace(tmp, OUT)
-    changed = [k for k in ("oeis", "observable", "code360", "hackerrank")
-               if prev.get(k) != result[k]]
+    changed = [k for k in ("oeis", "observable", "code360", "hackerrank",
+                          "codeforces", "nowcoder") if prev.get(k) != result[k]]
     print("wrote profiles.json, changed:", ",".join(changed) or "metadata only")
 
     def git(*args):
