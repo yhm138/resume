@@ -91,7 +91,9 @@ Worker 负责“浏览器取不到”的那几项：这些站点要么不发 COR
 
 **LinkedIn 完全取不到。** 任何非登录请求都返回 HTTP 999（LinkedIn 的反爬状态码），且抓取违反其条款。页面上只保留链接。
 
-**牛客没有公开的统计数据。** `https://gw-c.nowcoder.com/api/sparta/user/profile/<id>` 能拿到昵称、学历、身份标签，但刷题数、排名都不对外。
+**牛客的数据在竞赛主页的 HTML 里，不在 sparta API 里。** `https://gw-c.nowcoder.com/api/sparta/user/profile/<id>` 只有昵称、学历、身份标签；竞赛主页 `https://ac.nowcoder.com/acm/contest/profile/<id>` 是服务器直出，能看到 Rating（1036）、Rating 排名（9999+）、Rating 赛场次（10）与总场次（28），`.../practice-coding` 页还有「613 题已挑战 / 490 题已通过 / 1452 次提交」。这两个页面不需要登录，也不发 CORS 头。
+
+**Codeforces 的公开 API 带 `Access-Control-Allow-Origin: *`。** `user.info`、`user.rating`、`user.status` 浏览器可直连；个人页数据：rating 1396、峰值 1485（specialist）、2 场 rated。简历页只用静态文案，没有接实时。
 
 **Bilibili 的播放量需要 wbi 签名。** `x/relation/stat`（粉丝/关注）和 `x/web-interface/card`（粉丝/投稿/获赞）都免签名，但播放总数只在创作中心可见，`x/space/wbi/arc/search` 返回 412。
 
