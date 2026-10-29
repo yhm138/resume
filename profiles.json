@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-10-28T13:59:46Z",
+  "generated_at": "2026-10-29T02:37:19Z",
   "stale": [],
   "oeis": {
     "sequences": 3,
@@ -17,5 +17,22 @@
   "hackerrank": {
     "badges": 2,
     "certificates": 11
+  },
+  "codeforces": {
+    "rating": 1396,
+    "max_rating": 1485,
+    "rank": "pupil",
+    "max_rank": "specialist",
+    "solved": 127,
+    "submissions": 275
+  },
+  "nowcoder": {
+    "rating": 1036,
+    "rating_rank": "9999+",
+    "rating_contests": 10,
+    "contests": 28,
+    "attempted": 613,
+    "passed": 490,
+    "submissions": 1452
   }
 }
