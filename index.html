@@ -222,12 +222,12 @@
       <span class="live__k"><i class="tag tag--snap"></i><a href="https://leetcode.cn/u/yhm138_/" target="_blank" rel="noreferrer">LeetCode solved</a></span>
     </div>
     <div class="live__cell">
-      <span class="live__num" id="m-hackerrank">11</span>
-      <span class="live__k"><i class="tag tag--snap"></i><a href="https://www.hackerrank.com/profile/aspen1382020" target="_blank" rel="noreferrer">HackerRank certs</a></span>
+      <span class="live__num" id="m-sebadges">347</span>
+      <span class="live__k"><i class="tag tag--live"></i><a href="https://stackexchange.com/users/21083779/138-aspen?tab=accounts" target="_blank" rel="noreferrer">SE badges</a></span>
     </div>    <div class="live__meta" style="grid-column:1/-1">
-      <span class="js-only"><i class="tag tag--live"></i>live · GitHub, GreasyFork, SE per-site</span>
+      <span class="js-only"><i class="tag tag--live"></i>live · GitHub, GreasyFork, SE per-site, SE badges</span>
       <span class="js-only"><i class="tag tag--snap"></i>cache · PyPI, SE, RosettaCode, LeetCode, AoC</span>
-      <span class="js-only"><i class="tag tag--snap"></i>local · Chrome, HackerRank, blogs</span>
+      <span class="js-only"><i class="tag tag--snap"></i>local · Chrome, blogs</span>
       <span class="js-only"><span id="stamp">—</span> · <a href="https://github.com/yhm138/resume/commits/main/metrics.json" target="_blank" rel="noreferrer">history</a></span>
     </div>
   </section>
@@ -581,6 +581,7 @@
             setFrom('se-silver', String(si), R_SNAPSHOT);
             setFrom('se-bronze', String(b), R_SNAPSHOT);
             setFrom('se-badges', String(g + si + b), R_SNAPSHOT);
+        setFrom('m-sebadges', String(g + si + b), R_SNAPSHOT);
           }
         })
         .catch(function () { /* 静态值兜底 */ });
@@ -635,8 +636,6 @@
         setFrom('obs-notebooks', String(p.observable.notebooks), R_SNAPSHOT);
       if (p.code360 && p.code360.problems != null)
         setFrom('c360-problems', String(p.code360.problems), R_SNAPSHOT);
-      if (p.hackerrank && p.hackerrank.certificates != null)
-        setFrom('m-hackerrank', String(p.hackerrank.certificates), R_SNAPSHOT);
       if (p.codeforces) {
         if (p.codeforces.solved != null) setFrom('cf-solved', String(p.codeforces.solved), R_SNAPSHOT);
         if (p.codeforces.max_rating != null) setFrom('cf-peak', num(p.codeforces.max_rating), R_SNAPSHOT);
