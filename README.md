@@ -23,7 +23,7 @@
 | Codewars（38 kata / 5 kyu） | Cloudflare Worker | 10 分钟 |
 | leetcode.com 通过题数（14） | Cloudflare Worker | 10 分钟 |
 | 博客阅读量（221,229 = 博客园 + CSDN + 掘金，数据条标签 `Blog reads · 3 sites`） | Worker + 本机 `profiles.json` | 10 分钟 / 每周一 |
-| 知乎赞同 / 收藏（937 / 1,833） | 本机计划任务 → `web-stats.json` | 每周一（开机则更新） |
+| 知乎回答 / 赞同 / 收藏 / 感谢（165 / 937 / 1,833 / 620） | 本机计划任务 → `web-stats.json` | 每周一（开机则更新） |
 | Chrome 扩展用户（671 / 6 个） | 本机计划任务 → `chrome-users.json` | 每周一（开机则更新） |
 | Codeforces（127 题 / 峰值 1,485） | 本机计划任务 → `profiles.json` | 每周一（开机则更新） |
 | 牛客（490 已通过 / 613 已挑战，Rating 1,036） | 本机计划任务 → `profiles.json` | 每周一（开机则更新） |
@@ -42,7 +42,7 @@
 
 > 表格里括号中的数字是写这行时的快照（例如博客园与 PyPI 的那两个数一直在涨）；线上按各自通道刷新，以页面显示为准。
 
-> 知乎的三个数字容易混：`voteup_count` 是赞同（937），`favorited_count` 是收藏（1,833），`thanked_count` 是感谢（620）。简历正文里说的“620 次喜欢”指的是感谢数。
+> 知乎的四个数字容易混：`answer_count` 是回答（165），`voteup_count` 是赞同（937），`favorited_count` 是收藏（1,833），`thanked_count` 是感谢（620）。页面现在四个都写了，不要把“感谢”当成“喜欢/赞同”。
 
 > 抖音的 `follower_count` 对未登录访客返回 `null`，所以当年那格放的是**获赞数**（`total_favorited`）。这格已被换掉：B 站 35 粉、抖音 71 赞是数据条里最弱的两项，现在的位置给了博客阅读量与 AoC 名次。
 

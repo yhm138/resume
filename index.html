@@ -406,7 +406,7 @@
         <div class="entry__head"><div class="entry__org">Writing</div></div>
         <ul class="bul">
           <li><span class="stat" id="blog-reads">221,229</span> reads across <span class="hl" id="blog-posts">155</span> posts on <a href="https://cnblogs.com/yhm138" target="_blank" rel="noreferrer">Cnblogs</a> (<span class="hl" id="cb-reads">164,959</span> reads, <span class="hl" id="cb-posts">139</span> posts), <a href="https://blog.csdn.net/weixin_45183579" target="_blank" rel="noreferrer">CSDN</a> (<span class="hl" id="csdn-visits">53,019</span> reads, <span class="hl" id="csdn-posts">8</span> posts) and <a href="https://juejin.cn/user/935003303452199" target="_blank" rel="noreferrer">Juejin</a> (<span class="hl" id="jj-views">3,251</span> reads, <span class="hl" id="jj-posts">8</span> posts).</li>
-          <li><span class="hl" id="zh-voteup">937</span> upvotes and <span class="hl" id="zh-fav">1,833</span> saves on <a href="https://www.zhihu.com/people/yong-hu-ming-32" target="_blank" rel="noreferrer">Zhihu</a>; <span class="stat" id="se-total">24,651</span> reputation and <span class="hl" id="se-badges">347</span> badges (<span id="se-gold">1</span> gold, <span id="se-silver">29</span> silver, <span id="se-bronze">317</span> bronze) across <span class="hl" id="se-sites">118</span> <a href="https://stackexchange.com/users/21083779/138-aspen?tab=accounts" target="_blank" rel="noreferrer">Stack Exchange</a> sites, including <span class="hl" id="se-cg">7.3k</span> on Code Golf, <span class="hl" id="se-mm">2.4k</span> on Mathematica and <span class="hl" id="se-math">1.6k</span> on Mathematics.</li>
+          <li><span class="hl" id="zh-answers">165</span> answers, <span class="hl" id="zh-voteup">937</span> upvotes, <span class="hl" id="zh-fav">1,833</span> saves and <span class="hl" id="zh-thanked">620</span> thanks on <a href="https://www.zhihu.com/people/yong-hu-ming-32" target="_blank" rel="noreferrer">Zhihu</a>; <span class="stat" id="se-total">24,651</span> reputation and <span class="hl" id="se-badges">347</span> badges (<span id="se-gold">1</span> gold, <span id="se-silver">29</span> silver, <span id="se-bronze">317</span> bronze) across <span class="hl" id="se-sites">118</span> <a href="https://stackexchange.com/users/21083779/138-aspen?tab=accounts" target="_blank" rel="noreferrer">Stack Exchange</a> sites, including <span class="hl" id="se-cg">7.3k</span> on Code Golf, <span class="hl" id="se-mm">2.4k</span> on Mathematica and <span class="hl" id="se-math">1.6k</span> on Mathematics.</li>
         </ul>
       </article>
 
@@ -597,6 +597,8 @@
     .then(function (w) {
       if (w.zhihu_voteup != null) setFrom('zh-voteup', fmt(w.zhihu_voteup), R_SNAPSHOT);
       if (w.zhihu_favorited != null) setFrom('zh-fav', fmt(w.zhihu_favorited), R_SNAPSHOT);
+      if (w.zhihu_answers != null) setFrom('zh-answers', String(w.zhihu_answers), R_SNAPSHOT);
+      if (w.zhihu_thanked != null) setFrom('zh-thanked', String(w.zhihu_thanked), R_SNAPSHOT);
       if (w.cnblogs_reads != null) {
         setFrom('cb-reads', num(w.cnblogs_reads), R_SNAPSHOT);
         BLOG.reads.cnblogs = Number(w.cnblogs_reads);
