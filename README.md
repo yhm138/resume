@@ -20,16 +20,16 @@
 | Bilibili 粉丝 / 视频数（35 / 10） | Cloudflare Worker | 10 分钟 |
 | 抖音获赞 / 作品数（71 / 2） | Cloudflare Worker | 10 分钟 |
 | LeetCode 通过题数（1,953，站点排名 1,612） | Cloudflare Worker | 10 分钟 |
-| HackerRank 认证（11 张 / 2 枚徽章） | 本机计划任务 → `profiles.json` | 每小时（开机则更新） |
-| Codeforces（127 题 / 峰值 1,485） | 本机计划任务 → `profiles.json` | 每小时（开机则更新） |
-| 牛客（490 已通过 / 613 已挑战，Rating 1,036） | 本机计划任务 → `profiles.json` | 每小时（开机则更新） |
 | Codewars（38 kata / 5 kyu） | Cloudflare Worker | 10 分钟 |
 | leetcode.com 通过题数（14） | Cloudflare Worker | 10 分钟 |
 | 知乎赞同 / 收藏（937 / 1,833） | 本机计划任务 → `web-stats.json` | 每周一（开机则更新） |
 | Chrome 扩展用户（671 / 6 个） | 本机计划任务 → `chrome-users.json` | 每周一（开机则更新） |
-| OEIS（3 个序列 / 8 次修订） | 本机计划任务 → `profiles.json` | 每小时（开机则更新） |
-| Observable（1 个 notebook） | 本机计划任务 → `profiles.json` | 每小时（开机则更新） |
-| Code360（1 题通过 / 250 分） | 本机计划任务 → `profiles.json` | 每小时（开机则更新） |
+| HackerRank 认证（11 张 / 2 枚徽章） | 本机计划任务 → `profiles.json` | 每周一（开机则更新） |
+| Codeforces（127 题 / 峰值 1,485） | 本机计划任务 → `profiles.json` | 每周一（开机则更新） |
+| 牛客（490 已通过 / 613 已挑战，Rating 1,036） | 本机计划任务 → `profiles.json` | 每周一（开机则更新） |
+| OEIS（3 个序列 / 8 次修订） | 本机计划任务 → `profiles.json` | 每周一（开机则更新） |
+| Observable（1 个 notebook） | 本机计划任务 → `profiles.json` | 每周一（开机则更新） |
+| Code360（1 题通过 / 250 分） | 本机计划任务 → `profiles.json` | 每周一（开机则更新） |
 
 页面上用两种圆点区分：实心 = 每次访问实时取；空心 = 定时缓存或本地刷新。数据条共 10 格，桌面 5 列、移动 2 列。
 
@@ -93,9 +93,9 @@ Worker 负责“浏览器取不到”的那几项：这些站点要么不发 COR
 
 **LinkedIn 完全取不到。** 任何非登录请求都返回 HTTP 999（LinkedIn 的反爬状态码），且抓取违反其条款。页面上只保留链接。
 
-**牛客的数据在竞赛主页的 HTML 里，不在 sparta API 里。** `https://gw-c.nowcoder.com/api/sparta/user/profile/<id>` 只有昵称、学历、身份标签；竞赛主页 `https://ac.nowcoder.com/acm/contest/profile/<id>` 是服务器直出，能看到 Rating（1036）、Rating 排名（9999+）、Rating 赛场次（10）与总场次（28），`.../practice-coding` 页还有「613 题已挑战 / 490 题已通过 / 1452 次提交」。这两个页面不需要登录，也不发 CORS 头；页面上的 490 / 613 由本机每小时任务发布。
+**牛客的数据在竞赛主页的 HTML 里，不在 sparta API 里。** `https://gw-c.nowcoder.com/api/sparta/user/profile/<id>` 只有昵称、学历、身份标签；竞赛主页 `https://ac.nowcoder.com/acm/contest/profile/<id>` 是服务器直出，能看到 Rating（1036）、Rating 排名（9999+）、Rating 赛场次（10）与总场次（28），`.../practice-coding` 页还有「613 题已挑战 / 490 题已通过 / 1452 次提交」。这两个页面不需要登录，也不发 CORS 头；页面上的 490 / 613 由本机每周一任务发布。
 
-**Codeforces 的公开 API 带 `Access-Control-Allow-Origin: *`。** `user.info`、`user.rating`、`user.status` 浏览器可直连；个人页数据：rating 1396、峰值 1485（specialist）、2 场 rated。页面上只展示「127 题 + 峰值 1,485」，走本机每小时任务发布——`/user.status` 一次约 150 KB，不值得每次访问都拉。
+**Codeforces 的公开 API 带 `Access-Control-Allow-Origin: *`。** `user.info`、`user.rating`、`user.status` 浏览器可直连；个人页数据：rating 1396、峰值 1485（specialist）、2 场 rated。页面上只展示「127 题 + 峰值 1,485」，走本机每周一任务发布——`/user.status` 一次约 150 KB，不值得每次访问都拉。
 
 **Bilibili 的播放量需要 wbi 签名。** `x/relation/stat`（粉丝/关注）和 `x/web-interface/card`（粉丝/投稿/获赞）都免签名，但播放总数只在创作中心可见，`x/space/wbi/arc/search` 返回 412。
 
@@ -109,7 +109,7 @@ Worker 负责“浏览器取不到”的那几项：这些站点要么不发 COR
 
 **Code360 还拒绝机房 IP。** 用 `r.jina.ai` 和 `api.allorigins.win` 各试一次，返回的都是 403 Access Denied，所以 Cloudflare Worker 也取不到它，这条只能靠住宅网络。同一份 API 带上 `Referer` / `Origin` 从本机直连返回 200。
 
-**Observable 会对空 UA 或连续请求返回 429。** 抓取时带浏览器 UA，且每小时只取一次；调试时不要连续打同一个 profile 页。
+**Observable 会对空 UA 或连续请求返回 429。** 抓取时带浏览器 UA，且每周只取一次；调试时不要连续打同一个 profile 页。
 
 **Lark wiki（AIME / Putnam 解法）对外可读，但目录接口要登录。** 直接请求 `https://adzu3lvjw4g.sg.larksuite.com/space/api/wiki/v2/tree/get_info/?...wiki_token=...` 返回 `{"code":5,"msg":"Login Required"}`，只有带网页会话的浏览器才拿得到完整目录树。所以页面上只放链接和静态计数（33 个 AIME 年份 / 68 篇 Putnam，共 101 页）：这批数字一年才动一次，没必要上自动化。
 
@@ -148,7 +148,7 @@ TaskName : \resume chrome users
 日志     : C:\Users\Yangh\resume-metrics\run.log
 ```
 
-**刷新平台计数器（OEIS / Observable / Code360 / HackerRank / Codeforces / 牛客）**：在仓库根目录运行 `python update-profiles.py`。数字没变就不写文件，也不提交；有变化才 `git commit` + `push`。计划任务：
+**刷新平台计数器（OEIS / Observable / Code360 / HackerRank / Codeforces / 牛客）**：在仓库根目录运行 `python update-profiles.py`。数字没变就不写文件，也不提交；有变化才 `git commit` + `push`。计划任务每周一 09:40 跑一次（错开 09:30 的 Chrome/知乎任务）：
 
 ```
 TaskName : \resume profile stats
