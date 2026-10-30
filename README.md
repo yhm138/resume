@@ -137,10 +137,17 @@ Worker 负责“浏览器取不到”的那几项：这些站点要么不发 COR
 | Kaggle | — | 返回 reCAPTCHA 页 | 无法自动取 |
 | OSChina | `yhm138` | 页面里没有用户名，无法判定账号存在 | 需人工确认 |
 | YouTube | 试过 `@yhm138`、`@aspen1382020`（404），`@aspen138` 非频道页 | — | 有频道再给链接 |
-| 微博 / 小红书 / X / Instagram / Threads / 豆瓣 / 简书 | — | 反爬或需登录态 | 不建议 |
+| 网易云音乐 | `id=1544379686` | 公开 API `api/v1/user/detail/<id>` 可取 listenSongs 2,873 / level 7 / 7 个歌单 / 0 粉丝 | 只放链接 |
+| 豆瓣 | `220820619` | 匿名访客看不到关注数，广播需登录；只有 2 本书、2 部电影 | 只放链接 |
+| 简书 | `796435070e0c` | 2 篇文章 / 1 粉丝 / 38 字 | 只放链接 |
+| 微博 / 小红书 / X / Instagram / Threads | — | 反爬或需登录态 | 不建议 |
 | 微信公众号 / 视频号 / 即刻 | — | 无公开接口 | 做不到 |
 
 另外：已有平台上还有一批“小数字”没展示（CSDN 粉丝 16 / 获赞 17 / 收藏 167 / 排名 42,007，掘金关注 2 / 掘力值 97，Gitee followers 0，Bluesky 0 帖 6 粉，Mastodon 2 帖 0 粉）。它们都在 `profiles.json` 里，但不要为了凑数放上页面——量级低于 100 的指标只会稀释已有的强数字。
+
+## 外链确认弹窗
+
+页面里所有 `http(s)` 链接点击后先弹出 `<dialog class="leave">`（纸色、衬线标题、等宽按钮，与页面同一套变量），确认后才用 `window.open(url, '_blank', 'noopener,noreferrer')` 打开新标签。Esc、点背景、`Stay here` 都能关闭，关闭后焦点回到原链接；`prefers-reduced-motion: reduce` 下不加动画。拦截逻辑挂在 `document` 的捕获阶段，只拦 `^https?://`，站内锚点放行；没有 JS 时链接照常直接跳转。
 
 ## 响应式
 
