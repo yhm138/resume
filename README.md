@@ -22,11 +22,12 @@
 | LeetCode 通过题数（1,953，站点排名 1,612） | Cloudflare Worker | 10 分钟 |
 | Codewars（38 kata / 5 kyu） | Cloudflare Worker | 10 分钟 |
 | leetcode.com 通过题数（14） | Cloudflare Worker | 10 分钟 |
-| 博客阅读量（221,229 = 博客园 + CSDN + 掘金） | Worker + 本机 `profiles.json` | 10 分钟 / 每周一 |
+| 博客阅读量（221,229 = 博客园 + CSDN + 掘金，数据条标签 `Blog reads · 3 sites`） | Worker + 本机 `profiles.json` | 10 分钟 / 每周一 |
 | 知乎赞同 / 收藏（937 / 1,833） | 本机计划任务 → `web-stats.json` | 每周一（开机则更新） |
 | Chrome 扩展用户（671 / 6 个） | 本机计划任务 → `chrome-users.json` | 每周一（开机则更新） |
 | Codeforces（127 题 / 峰值 1,485） | 本机计划任务 → `profiles.json` | 每周一（开机则更新） |
 | 牛客（490 已通过 / 613 已挑战，Rating 1,036） | 本机计划任务 → `profiles.json` | 每周一（开机则更新） |
+| HackerRank 认证（11 张 / 2 枚徽章，正文里） | 本机计划任务 → `profiles.json` | 每周一（开机则更新） |
 | OEIS（3 个序列 / 8 次修订） | 本机计划任务 → `profiles.json` | 每周一（开机则更新） |
 | Observable（1 个 notebook） | 本机计划任务 → `profiles.json` | 每周一（开机则更新） |
 | Code360（1 题通过 / 250 分） | 本机计划任务 → `profiles.json` | 每周一（开机则更新） |
@@ -91,7 +92,7 @@ Worker 负责“浏览器取不到”的那几项：这些站点要么不发 COR
 
 **Codewars 有完全公开的 JSON API。** `https://www.codewars.com/api/v1/users/aspen138` 直接返回 honor、kata 完成数与段位。
 
-**HackerRank 的旧 REST 接口数的是领域，不是徽章。** `https://www.hackerrank.com/rest/hackers/aspen1382020/badges` 返回 5 条（Problem Solving / Java / Python / SQL / Ruby，即账号有活动的领域），不是个人页「Badges」栏里的徽章（2 枚）。真实数字是 **2 枚徽章 + 11 张认证**（SQL Basic/Intermediate/Advanced、Python、Java、Go、JavaScript、Rest API、Problem Solving，另加一张 Software Engineer Intern 的 role 认证），可直接从个人页 HTML 数 `class="hacker-badge"` 与 `certificate-link`，该页服务器直出。这组数字曾占据数据条一格，2026-10 因数量太小换成 Stack Exchange 徽章（347），数据仍保留在 `profiles.json` 的 `hackerrank` 字段里。
+**HackerRank 的旧 REST 接口数的是领域，不是徽章。** `https://www.hackerrank.com/rest/hackers/aspen1382020/badges` 返回 5 条（Problem Solving / Java / Python / SQL / Ruby，即账号有活动的领域），不是个人页「Badges」栏里的徽章（2 枚）。真实数字是 **2 枚徽章 + 11 张认证**（SQL Basic/Intermediate/Advanced、Python、Java、Go、JavaScript、Rest API、Problem Solving，另加一张 Software Engineer Intern 的 role 认证），可直接从个人页 HTML 数 `class="hacker-badge"` 与 `certificate-link`，该页服务器直出。这组数字曾占据数据条一格，2026-10 因数量太小换成 Stack Exchange 徽章（347）；现在改由正文 Problem solving 那一句展示（「11 verified HackerRank certifications」），数据仍来自 `profiles.json` 的 `hackerrank` 字段。
 
 **leetcode.com 与 leetcode.cn 是两个独立的账号体系。** 国际站走 `leetcode.com/graphql` 的 `submitStatsGlobal`，国内站走 `leetcode.cn/graphql` 的 `userProfileUserQuestionProgress`，数字不通用（国内 1,953，国际 14）。
 
