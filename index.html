@@ -754,11 +754,25 @@
       opener = null;
     });
 
+    // 只对社交 / 博客类站点确认；GitHub、LinkedIn、PyPI 这类专业链接直接跳
+    var CONFIRM_HOSTS = ['csdn.net', 'juejin.cn', 'douban.com', 'jianshu.com',
+                         'music.163.com', 'bsky.app', 'mastodon.social'];
+    function needsConfirm(href) {
+      var host;
+      try { host = new URL(href, location.href).hostname.replace(/^www\./, ''); }
+      catch (err) { return false; }
+      for (var i = 0; i < CONFIRM_HOSTS.length; i++) {
+        var d = CONFIRM_HOSTS[i];
+        if (host === d || host.slice(-(d.length + 1)) === '.' + d) return true;
+      }
+      return false;
+    }
     document.addEventListener('click', function (e) {
       var a = e.target.closest ? e.target.closest('a[href]') : null;
       if (!a) return;
       var href = a.getAttribute('href') || '';
-      if (!/^https?:\/\//i.test(href)) return;   /* 站内锚点放行 */
+      if (!/^https?:\/\//i.test(href)) return;
+      if (!needsConfirm(href)) return;            /* 不在名单里的直接跳 */
       e.preventDefault();
       open(href, a);
     }, true);

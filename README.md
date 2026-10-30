@@ -147,7 +147,7 @@ Worker 负责“浏览器取不到”的那几项：这些站点要么不发 COR
 
 ## 外链确认弹窗
 
-页面里所有 `http(s)` 链接点击后先弹出 `<dialog class="leave">`（纸色、衬线标题、等宽按钮，与页面同一套变量），确认后才用 `window.open(url, '_blank', 'noopener,noreferrer')` 打开新标签。Esc、点背景、`Stay here` 都能关闭，关闭后焦点回到原链接；`prefers-reduced-motion: reduce` 下不加动画。拦截逻辑挂在 `document` 的捕获阶段，只拦 `^https?://`，站内锚点放行；没有 JS 时链接照常直接跳转。
+只有**社交 / 博客类**外链（`CONFIRM_HOSTS`：csdn.net、juejin.cn、douban.com、jianshu.com、music.163.com、bsky.app、mastodon.social）点击后先弹出 `<dialog class="leave">`（纸色、衬线标题、等宽按钮，与页面同一套变量），确认后才用 `window.open(url, '_blank', 'noopener,noreferrer')` 打开新标签；GitHub、LinkedIn、PyPI 等专业链接直接按原样跳转。改名单只需改 JS 里的 `CONFIRM_HOSTS` 数组。Esc、点背景、`Stay here` 都能关闭，关闭后焦点回到原链接；`prefers-reduced-motion: reduce` 下不加动画。拦截逻辑挂在 `document` 的捕获阶段，只拦 `^https?://`，站内锚点放行；没有 JS 时链接照常直接跳转。
 
 ## 响应式
 
