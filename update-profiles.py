@@ -31,6 +31,11 @@ C360_UUID = "8d5253e5-771f-4039-9fa0-cd51de2b0639"
 OBS_USER = "@aspen1382020"
 CF_HANDLE = "yhm7000_"
 NC_UID = "473856205"
+CSDN_USER = "weixin_45183579"
+JUEJIN_UID = "935003303452199"
+GITEE_USER = "yhm138"
+MASTODON_ACCT = "aspen138"
+BSKY_HANDLE = "aspen138.bsky.social"
 
 
 def fetch(url, headers=None, timeout=45):
@@ -40,6 +45,15 @@ def fetch(url, headers=None, timeout=45):
     req = urllib.request.Request(url, headers=h)
     with urllib.request.urlopen(req, timeout=timeout) as r:
         return r.read().decode("utf-8", "replace")
+
+
+def post_json(url, payload, headers=None, timeout=45):
+    h = {"User-Agent": UA, "Accept": "application/json", "Content-Type": "application/json"}
+    if headers:
+        h.update(headers)
+    req = urllib.request.Request(url, data=json.dumps(payload).encode("utf-8"), headers=h, method="POST")
+    with urllib.request.urlopen(req, timeout=timeout) as r:
+        return json.loads(r.read().decode("utf-8", "replace"))
 
 
 def oeis():
@@ -149,6 +163,96 @@ def nowcoder():
             "submissions": as_int(stat(practice, "次提交"))}
 
 
+def csdn():
+    """Profile page is server-rendered (no CORS). Numbers sit in
+    <div class="user-profile-statistics-num">N</div><div ...-name">LABEL</div>."""
+    body = fetch("https://blog.csdn.net/%s?type=blog" % CSDN_USER,
+                 {"Accept": "text/html,application/xhtml+xml",
+                  "Accept-Language": "zh-CN,zh;q=0.9"})
+    if "安全验证" in body or "Security Verification" in body:
+        raise RuntimeError("CSDN served a captcha page")
+    pairs = {name: num for num, name in re.findall(
+        r'user-profile-statistics-num"[^>]*>([^<]+)</div>\s*'
+        r'<div class="user-profile-statistics-name"[^>]*>([^<]+)</div>', body)}
+    text = re.sub(r"<[^>]+>", " ", body)
+
+    def grab(pattern):
+        m = re.search(pattern, text)
+        return int(m.group(1).replace(",", "")) if m else None
+
+    def as_int(v):
+        try:
+            return int(v.replace(",", ""))
+        except (AttributeError, ValueError):
+            return None
+
+    return {"posts": as_int(pairs.get("原创")),
+            "visits": as_int(pairs.get("总访问量")),
+            "fans": as_int(pairs.get("粉丝")),
+            "likes": grab(r"获得\s*([\d,]+)\s*次点赞"),
+            "comments": grab(r"内容获得\s*([\d,]+)\s*次评论"),
+            "favorites": grab(r"获得\s*([\d,]+)\s*次收藏"),
+            "rank": grab(r"博客总排名\s*([\d,]+)\s*名")}
+
+
+def juejin():
+    """Public JSON APIs, no CORS. Articles are paginated; count them and sum views."""
+    hdr = {"Accept": "application/json", "Referer": "https://juejin.cn/user/%s" % JUEJIN_UID}
+    info = json.loads(fetch("https://api.juejin.cn/user_api/v1/user/get?user_id=%s" % JUEJIN_UID, hdr))["data"]
+    posts = views = diggs = 0
+    cursor = "0"
+    for _ in range(20):
+        page = post_json("https://api.juejin.cn/content_api/v1/article/query_list",
+                         {"user_id": JUEJIN_UID, "cursor": cursor, "sort_type": 2, "limit": 20}, hdr)
+        batch = page.get("data") or []
+        if not batch:
+            break
+        for item in batch:
+            a = item.get("article_info") or {}
+            posts += 1
+            views += a.get("view_count") or 0
+            diggs += a.get("digg_count") or 0
+        cursor = str(page.get("cursor") or "")
+        if not cursor or len(batch) < 20:
+            break
+    return {"posts": posts, "views": views, "diggs": diggs,
+            "followers": info.get("follower_count"), "power": info.get("power")}
+
+
+def gitee():
+    """Gitee's API has no CORS; commit counts come from the repo commits endpoint."""
+    hdr = {"Accept": "application/json"}
+    user = json.loads(fetch("https://gitee.com/api/v5/users/%s" % GITEE_USER, hdr))
+    repos = json.loads(fetch("https://gitee.com/api/v5/users/%s/repos?per_page=100" % GITEE_USER, hdr))
+    commits = 0
+    for repo in repos:
+        try:
+            cs = json.loads(fetch("https://gitee.com/api/v5/repos/%s/commits?per_page=100" % repo["full_name"], hdr))
+            commits += len(cs)
+        except Exception:
+            pass
+    return {"repos": len(repos),
+            "stars": sum(r.get("stargazers_count") or 0 for r in repos),
+            "forks": sum(r.get("forks_count") or 0 for r in repos),
+            "commits": commits,
+            "followers": user.get("followers")}
+
+
+def mastodon():
+    acct = json.loads(fetch("https://mastodon.social/api/v1/accounts/lookup?acct=%s" % MASTODON_ACCT,
+                            {"Accept": "application/json"}))
+    return {"statuses": acct.get("statuses_count"),
+            "followers": acct.get("followers_count"),
+            "following": acct.get("following_count")}
+
+
+def bluesky():
+    p = json.loads(fetch("https://public.api.bsky.app/xrpc/app.bsky.actor.getProfile?actor=%s" % BSKY_HANDLE,
+                         {"Accept": "application/json"}))
+    return {"posts": p.get("postsCount"), "followers": p.get("followersCount"),
+            "following": p.get("followsCount")}
+
+
 def load_previous():
     if not os.path.exists(OUT):
         return {}
@@ -162,11 +266,13 @@ def load_previous():
 def main():
     prev = load_previous()
     result = {"oeis": {}, "observable": {}, "code360": {}, "hackerrank": {},
-              "codeforces": {}, "nowcoder": {}}
+              "codeforces": {}, "nowcoder": {}, "csdn": {}, "juejin": {},
+              "gitee": {}, "mastodon": {}, "bluesky": {}}
     stale = []
     for key, fn in (("oeis", oeis), ("observable", observable), ("code360", code360),
                     ("hackerrank", hackerrank), ("codeforces", codeforces),
-                    ("nowcoder", nowcoder)):
+                    ("nowcoder", nowcoder), ("csdn", csdn), ("juejin", juejin),
+                    ("gitee", gitee), ("mastodon", mastodon), ("bluesky", bluesky)):
         try:
             result[key] = fn()
         except Exception as e:
@@ -190,14 +296,17 @@ def main():
     ordered = {"generated_at": result["generated_at"], "stale": stale,
                "oeis": result["oeis"], "observable": result["observable"],
                "code360": result["code360"], "hackerrank": result["hackerrank"],
-               "codeforces": result["codeforces"], "nowcoder": result["nowcoder"]}
+               "codeforces": result["codeforces"], "nowcoder": result["nowcoder"],
+               "csdn": result["csdn"], "juejin": result["juejin"], "gitee": result["gitee"],
+               "mastodon": result["mastodon"], "bluesky": result["bluesky"]}
     tmp = OUT + ".tmp"
     with open(tmp, "w", encoding="utf-8", newline="\n") as f:
         json.dump(ordered, f, ensure_ascii=False, indent=2)
         f.write("\n")
     os.replace(tmp, OUT)
     changed = [k for k in ("oeis", "observable", "code360", "hackerrank",
-                          "codeforces", "nowcoder") if prev.get(k) != result[k]]
+                          "codeforces", "nowcoder", "csdn", "juejin", "gitee",
+                          "mastodon", "bluesky") if prev.get(k) != result[k]]
     print("wrote profiles.json, changed:", ",".join(changed) or "metadata only")
 
     def git(*args):

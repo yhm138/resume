@@ -13,15 +13,16 @@
 | GitHub 仓库数 | 浏览器直连 GitHub API | 每次访问 |
 | GreasyFork 安装量 | 浏览器直连 GreasyFork API | 每次访问 |
 | Stack Exchange 分站声誉 | 浏览器直连 SE API | 每次访问 |
+| Stack Exchange 徽章（1 金 / 29 银 / 317 铜，117 站合计） | 浏览器直连 SE API（分页） | 每次访问 |
+| GreasyFork 好评（39） | 浏览器直连 GreasyFork API | 每次访问 |
 | Stack Exchange 全站声誉（24.7k / 118 站） | Cloudflare Worker | 10 分钟 |
 | PyPI 累计下载（3,951） | Cloudflare Worker | 10 分钟 |
 | RosettaCode（465 任务页 / 43 新建） | Cloudflare Worker | 10 分钟 |
 | 博客园总阅读（164,729 / 139 篇） | Cloudflare Worker | 10 分钟 |
-| Bilibili 粉丝 / 视频数（35 / 10） | Cloudflare Worker | 10 分钟 |
-| 抖音获赞 / 作品数（71 / 2） | Cloudflare Worker | 10 分钟 |
 | LeetCode 通过题数（1,953，站点排名 1,612） | Cloudflare Worker | 10 分钟 |
 | Codewars（38 kata / 5 kyu） | Cloudflare Worker | 10 分钟 |
 | leetcode.com 通过题数（14） | Cloudflare Worker | 10 分钟 |
+| 博客阅读量（221,229 = 博客园 + CSDN + 掘金） | Worker + 本机 `profiles.json` | 10 分钟 / 每周一 |
 | 知乎赞同 / 收藏（937 / 1,833） | 本机计划任务 → `web-stats.json` | 每周一（开机则更新） |
 | Chrome 扩展用户（671 / 6 个） | 本机计划任务 → `chrome-users.json` | 每周一（开机则更新） |
 | HackerRank 认证（11 张 / 2 枚徽章） | 本机计划任务 → `profiles.json` | 每周一（开机则更新） |
@@ -30,6 +31,12 @@
 | OEIS（3 个序列 / 8 次修订） | 本机计划任务 → `profiles.json` | 每周一（开机则更新） |
 | Observable（1 个 notebook） | 本机计划任务 → `profiles.json` | 每周一（开机则更新） |
 | Code360（1 题通过 / 250 分） | 本机计划任务 → `profiles.json` | 每周一（开机则更新） |
+| 博客园文章数（139） | 本机计划任务 → `web-stats.json` | 每周一（开机则更新） |
+| CSDN（53,019 访问 / 8 篇 / 16 粉） | 本机计划任务 → `profiles.json` | 每周一（开机则更新） |
+| 掘金（3,251 阅读 / 8 篇） | 本机计划任务 → `profiles.json` | 每周一（开机则更新） |
+| Gitee（1 仓库 / 9 commits） | 本机计划任务 → `profiles.json` | 每周一（开机则更新） |
+| Bluesky（0 帖 / 6 粉）、Mastodon（2 帖 / 0 粉） | 本机计划任务 → `profiles.json` | 每周一（开机则更新） |
+| Advent of Code 2024 全球名次（#14 / 1,699 分） | 静态（历史赛果） | 不更新 |
 
 页面上用两种圆点区分：实心 = 每次访问实时取；空心 = 定时缓存或本地刷新。数据条共 10 格，桌面 5 列、移动 2 列。
 
@@ -37,7 +44,7 @@
 
 > 知乎的三个数字容易混：`voteup_count` 是赞同（937），`favorited_count` 是收藏（1,833），`thanked_count` 是感谢（620）。简历正文里说的“620 次喜欢”指的是感谢数。
 
-> 抖音的 `follower_count` 对未登录访客返回 `null`，所以那一格放的是**获赞数**（`total_favorited`），不是粉丝数；`mplatform_followers_count` 是唯一对游客可见的粉丝字段（当前值 6）。
+> 抖音的 `follower_count` 对未登录访客返回 `null`，所以当年那格放的是**获赞数**（`total_favorited`）。这格已被换掉：B 站 35 粉、抖音 71 赞是数据条里最弱的两项，现在的位置给了博客阅读量与 AoC 名次。
 
 ## 三层降级
 
@@ -63,7 +70,7 @@
 | `chrome-ids.json` | 6 个扩展到 Chrome Web Store ID，Worker 读取它 |
 | `chrome-users.json` | 扩展用户数合计与逐项明细，由本机计划任务发布 |
 | `web-stats.json` | 知乎赞同/收藏与博客园总阅读，由本机计划任务发布 |
-| `profiles.json` | OEIS / Observable / Code360 / HackerRank / Codeforces / 牛客 计数器，由本机计划任务发布 |
+| `profiles.json` | OEIS / Observable / Code360 / HackerRank / Codeforces / 牛客 / CSDN / 掘金 / Gitee / Bluesky / Mastodon 计数器，由本机计划任务发布 |
 | `update-profiles.py` | 采集上面三个平台并自行 commit + push 的脚本 |
 
 ## Cloudflare Worker
@@ -150,7 +157,7 @@ TaskName : \resume chrome users
 日志     : C:\Users\Yangh\resume-metrics\run.log
 ```
 
-**刷新平台计数器（OEIS / Observable / Code360 / HackerRank / Codeforces / 牛客）**：在仓库根目录运行 `python update-profiles.py`。数字没变就不写文件，也不提交；有变化才 `git commit` + `push`。计划任务每周一 09:40 跑一次（错开 09:30 的 Chrome/知乎任务）：
+**刷新平台计数器（OEIS / Observable / Code360 / HackerRank / Codeforces / 牛客 / CSDN / 掘金 / Gitee / Bluesky / Mastodon）**：在仓库根目录运行 `python update-profiles.py`。数字没变就不写文件，也不提交；有变化才 `git commit` + `push`。计划任务每周一 09:40 跑一次（错开 09:30 的 Chrome/知乎任务）：
 
 ```
 TaskName : \resume profile stats
