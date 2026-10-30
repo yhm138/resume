@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-10-30T09:45:11Z",
+  "generated_at": "2026-10-30T09:45:55Z",
   "stale": [],
   "oeis": {
     "sequences": 3,
@@ -36,9 +36,9 @@
     "submissions": 1452
   },
   "csdn": {
-    "posts": null,
-    "visits": null,
-    "fans": null,
+    "posts": 8,
+    "visits": 53019,
+    "fans": 16,
     "likes": 17,
     "comments": 3,
     "favorites": 167,
