@@ -1,13 +1,6 @@
 {
-  "generated_at": "2026-10-30T01:37:21Z",
-  "stale": [
-    "oeis",
-    "observable",
-    "code360",
-    "hackerrank",
-    "codeforces",
-    "nowcoder"
-  ],
+  "generated_at": "2026-10-30T05:37:18Z",
+  "stale": [],
   "oeis": {
     "sequences": 3,
     "revisions": 8
