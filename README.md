@@ -122,6 +122,26 @@ Worker 负责“浏览器取不到”的那几项：这些站点要么不发 COR
 
 **Lark wiki（AIME / Putnam 解法）对外可读，但目录接口要登录。** 直接请求 `https://adzu3lvjw4g.sg.larksuite.com/space/api/wiki/v2/tree/get_info/?...wiki_token=...` 返回 `{"code":5,"msg":"Login Required"}`，只有带网页会话的浏览器才拿得到完整目录树。所以页面上只放链接和静态计数（33 个 AIME 年份 / 68 篇 Putnam，共 101 页）：这批数字一年才动一次，没必要上自动化。
 
+## 还能接哪些社媒（2026-10 调研结论）
+
+结论：**能接的都接完了，没有新的值得接的社媒源。** 下表是逐个实测的结果，不要再重复调研；只有拿到新账号链接时才需要重开。
+
+| 平台 | 账号 | 实测结果 | 结论 |
+| --- | --- | --- | --- |
+| GitLab | `yhm138` 存在（id 9277119） | 0 个公开项目、无 followers、API 无 CORS | 没内容 |
+| V2EX | `yhm138` | HTTP 404 | 无账号 |
+| ModelScope | `author=yhm138` | HTTP 404 | 无模型 |
+| Hugging Face | `yhm138` | 无模型、无数据集 | 无内容 |
+| npm | `yhm138` | 无维护的包 | 无内容 |
+| AtCoder | `yhm138` | 账号存在，无 rating / 比赛记录 | 不值得放 |
+| Kaggle | — | 返回 reCAPTCHA 页 | 无法自动取 |
+| OSChina | `yhm138` | 页面里没有用户名，无法判定账号存在 | 需人工确认 |
+| YouTube | 试过 `@yhm138`、`@aspen1382020`（404），`@aspen138` 非频道页 | — | 有频道再给链接 |
+| 微博 / 小红书 / X / Instagram / Threads / 豆瓣 / 简书 | — | 反爬或需登录态 | 不建议 |
+| 微信公众号 / 视频号 / 即刻 | — | 无公开接口 | 做不到 |
+
+另外：已有平台上还有一批“小数字”没展示（CSDN 粉丝 16 / 获赞 17 / 收藏 167 / 排名 42,007，掘金关注 2 / 掘力值 97，Gitee followers 0，Bluesky 0 帖 6 粉，Mastodon 2 帖 0 粉）。它们都在 `profiles.json` 里，但不要为了凑数放上页面——量级低于 100 的指标只会稀释已有的强数字。
+
 ## 响应式
 
 三档断点，逐档验证过无横向溢出（量 `documentElement.scrollWidth` 并扫描元素右边界）：
