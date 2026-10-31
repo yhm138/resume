@@ -59,7 +59,7 @@ Advent of Code 2024（#14 / 1,699 分）、AIME + Putnam 解法 wiki（101 页 =
 
 ### 6. 只放链接（不展示数字）
 
-Bluesky、Mastodon、Jianshu、crates.io、npm、Docker Hub、SourceForge、Kaggle、JetBrains Marketplace、Google Play、天池（天池另有 3 场比赛的计数）。
+Bluesky、Mastodon、Jianshu、crates.io、npm、Docker Hub、SourceForge、Kaggle、JetBrains Marketplace、Google Play、Wolfram Community、MaplePrimes、天池（天池另有 3 场比赛的计数）。
 
 ## 降级链
 
@@ -115,6 +115,8 @@ Bluesky、Mastodon、Jianshu、crates.io、npm、Docker Hub、SourceForge、Kagg
 | LintCode | 无公开统计接口，SPA | 放弃 |
 | 51CTO | 腾讯云 EdgeOne WAF 拦截页 | 放弃 |
 | Bilibili 播放量 | 需 wbi 签名，播放总数只在创作中心 | 放弃 |
+| Wolfram Community | 0 主题 / 0 回复 / 2 徽章 / 访问 1 天（Discourse API 可读） | 先放链接（等发布） |
+| MaplePrimes | 0 声誉 / 0 徽章，注册 25 天 | 先放链接（等发布） |
 | 微信公众号 / 视频号 / 即刻 | 无公开接口 | 做不到 |
 | 微博 / 小红书 / X / Instagram / Threads | 反爬或需登录态 | 不建议 |
 | GitHub Actions 定时 | 该账号的 `schedule` 不触发（空仓库验证过，`workflow_dispatch` 正常） | 本仓库不放定时 workflow |
