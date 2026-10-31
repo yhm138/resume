@@ -138,6 +138,7 @@
 | 天池 | `userId=1095279495628` | `home/science/races` 返回 3 场比赛；`getByUserId` 显示 Junior Developer 勋章；带 CORS | 显示「3 competitions」 |
 | Wolfram Community | `aspen1382020` | Discourse API：0 主题 / 0 回复 / 2 徽章 | 只放链接 |
 | MaplePrimes | `Aspen138` | 0 声誉 / 0 徽章 | 只放链接 |
+| Reddit | `Aspen138` | 匿名访问返回「This account has been banned」，取不到 karma / 帖子数 | 已放链接（用户要求），恢复后补数字 |
 | YouTube | `@yhm138`、`@aspen1382020` 均 404 | — | 有频道再给链接 |
 
 已有平台还有些「小数字」没展示（CSDN 粉丝 16 / 获赞 17 / 收藏 167 / 排名 42,007，掘金关注 2 / 掘力值 97，Gitee followers 0）。它们都在 `profiles.json` 里——量级低于 100 的指标只会稀释已有的强数字，别为了凑数放上去。
