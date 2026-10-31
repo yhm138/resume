@@ -14,7 +14,7 @@
 | GreasyFork 安装量 | 浏览器直连 GreasyFork API | 每次访问 |
 | Stack Exchange 分站声誉 | 浏览器直连 SE API | 每次访问 |
 | Stack Exchange 徽章（1 金 / 29 银 / 317 铜，117 站合计） | 浏览器直连 SE API（分页） | 每次访问 |
-| GreasyFork 好评（39） | 浏览器直连 GreasyFork API | 每次访问 |
+| GreasyFork 好评（39） | 浏览器直连 GreasyFork API | 每次访问 |
 | ScriptCat 安装（2,676 / 6 个脚本） | 静态（页面为 Next.js 渲染，未接自动化） | 不更新 |
 | Stack Exchange 全站声誉（24.7k / 118 站） | Cloudflare Worker | 10 分钟 |
 | PyPI 累计下载（3,951） | Cloudflare Worker | 10 分钟 |
@@ -141,13 +141,13 @@ Worker 负责“浏览器取不到”的那几项：这些站点要么不发 COR
 | 网易云音乐 | `id=1544379686` | 公开 API `api/v1/user/detail/<id>` 可取 listenSongs 2,873 / level 7 / 7 个歌单 / 0 粉丝 | 只放链接 |
 | 豆瓣 | `220820619` | 匿名访客看不到关注数，广播需登录；只有 2 本书、2 部电影 | 只放链接 |
 | 简书 | `796435070e0c` | 2 篇文章 / 1 粉丝 / 38 字 | 只放链接 |
-| crates.io | `yhm138`（id 201685） | 0 个 crate、0 下载 | 没内容 |
-| npm | `~aspen138` | 0 个包 | 没内容 |
-| Docker Hub | `aspen138` | 0 个仓库 | 没内容 |
-| JetBrains Marketplace | `/author/me` | 该地址只有登录后才能打开，公开链接不可用 | 不能放 |
-| SourceForge | `aspen138` | Cloudflare 安全验证，取不到 | 放弃 |
-| Kaggle | `aspen138` | reCAPTCHA 拦截 | 放弃 |
-| ScriptCat | `130089` | 6 个脚本、2,676 次安装、2 粉丝 | 已放进 Open source |
+| crates.io | `yhm138`（id 201685） | 0 个 crate、0 下载 | 没内容 |
+| npm | `~aspen138` | 0 个包 | 没内容 |
+| Docker Hub | `aspen138` | 0 个仓库 | 没内容 |
+| JetBrains Marketplace | `/author/me` | 该地址只有登录后才能打开，公开链接不可用 | 不能放 |
+| SourceForge | `aspen138` | Cloudflare 安全验证，取不到 | 放弃 |
+| Kaggle | `aspen138` | reCAPTCHA 拦截 | 放弃 |
+| ScriptCat | `130089` | 6 个脚本、2,676 次安装、2 粉丝 | 已放进 Open source |
 | 微博 / 小红书 / X / Instagram / Threads | — | 反爬或需登录态 | 不建议 |
 | 微信公众号 / 视频号 / 即刻 | — | 无公开接口 | 做不到 |
 
