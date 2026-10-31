@@ -139,6 +139,7 @@
 | Wolfram Community | `aspen1382020` | Discourse API：0 主题 / 0 回复 / 2 徽章 | 只放链接 |
 | MaplePrimes | `Aspen138` | 0 声誉 / 0 徽章 | 只放链接 |
 | Reddit | `Aspen138` | 匿名访问返回「This account has been banned」，取不到 karma / 帖子数 | 已放链接（用户要求），恢复后补数字 |
+| Wolfram Function Repository | `PublisherID=OnehundredthirtyeightAspen` | 浏览器渲染后可见 **1 个已发布函数**：`MostFrequentKStringDistance`（v1.0.0，2026-01-16）；页面是 SPA，纯 HTTP 只有空壳，资源 API 未带凭据返回 401 | 已放链接 + 计数（静态） |
 | Quora | `138-Aspen` | 纯 HTTP 403；浏览器能打开：0 回答 / 0 问题 / 0 帖 / 0 粉，2021-01 加入 | 只放链接（等发布） |
 | YouTube | `@yhm138`、`@aspen1382020` 均 404 | — | 有频道再给链接 |
 
