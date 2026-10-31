@@ -144,7 +144,7 @@ Bluesky、Mastodon、Jianshu、crates.io、npm、Docker Hub、SourceForge、Kagg
 | SourceForge | `aspen138` | Cloudflare 验证页 | 先放链接，取不到数据 |
 | Kaggle | `aspen138` | reCAPTCHA | 先放链接，取不到数据 |
 | JetBrains Marketplace | `/author/me` | 匿名访客只见登录页，公开 URL 要等插件上线 | 先放链接，上线后换 `/author/<vendor>` |
-| Google Play | 开发者 ID 7351019373232905041 | 后台地址对匿名访客重定向到 Google 登录；公开页 `store/apps/dev?id=...` 目前 404 | 先放链接，上线第一个应用后换成公开页 |
+| Google Play | 开发者 ID 7351019373232905041 | 页面链接指向公开开发者页 `store/apps/dev?id=...`；因为还没有已发布应用，该地址目前 404，上架后自动变成有效页。后台地址 `/console/...` 对匿名访客只跳 Google 登录，不放在页面上 | 已放公开页（暂 404） |
 | AtCoder | `yhm138` | 账号存在，无 rating / 比赛记录 | 不值得放 |
 | 网易云音乐 | `id=1544379686` | API 可取 2,873 首 / level 7 / 7 歌单 / 0 粉 | 只放链接（页面未放） |
 | 豆瓣 | `220820619` | 匿名看不到关注数，广播需登录 | 只放链接（页面未放） |
