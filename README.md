@@ -55,7 +55,10 @@
 ## 通道细节
 
 - **浏览器直连**：GitHub、GreasyFork、Stack Exchange 都带 CORS，页面每次访问直接取；SE 徽章走 `users/21083779/associated`，117 个分站 > 100 条/页，必须翻页，否则少算（曾少算成 306）。
-- **Cloudflare Worker**：`https://autumn-thunder-2ee6.aspen1382020.workers.dev/metrics`，缓存 10 分钟，`Access-Control-Allow-Origin: *`；`GET /` 是状态页（`primary` / `fallback` / `unavailable`）。代码不在本仓库，改它要控制台粘贴部署。它仍在跑 Bilibili、抖音、HackerRank 三项，但页面已不用（见「撤掉的展示」）。
+- **Cloudflare Worker（v3，源码见 `worker.js`）**：`https://autumn-thunder-2ee6.aspen1382020.workers.dev/metrics`，缓存 10 分钟，`Access-Control-Allow-Origin: *`；`GET /` 是状态页（`primary` / `fallback` / `unavailable`，并列出本次缺了哪些字段）；`GET /?nocache=1` 绕过缓存。
+  - v3 修的东西：GreasyFork 改用规范地址（旧地址 301 且跳转后丢 CORS）；Bilibili / 抖音 / LeetCode 加浏览器 UA + referer（旧的 `resume-metrics` UA 被拒，这正是那几个字段从返回里消失的原因）；Bilibili 增加 `x/relation/stat` 兜底；Stack Exchange 改为「账号页抓取为主、API `/associated` 兜底」；知乎从 Worker 移除（所有机房 IP 都 403，只能本机跑）。
+  - 口径差异：账号页抓到 118 站 / 24,671；SE API `associated` 是 117 站 / 24,570。两个都算对，只是站点集合不同，页面按抓到的那个数显示。
+  - RosettaCode 会间歇性被 Cloudflare challenge，两条通道都可能失败，此时页面回落到静态的 465 / 43。
 - **本机任务 A**（`\resume chrome users`，每周一 09:30，`C:\Users\Yangh\resume-metrics\run.cmd`）：`update-chrome-users.py` + `update-web-stats.py`，通过 `gh` 直接提交；跑的是拒绝机房 IP 的源（Chrome Web Store、知乎）。
 - **本机任务 B**（`\resume profile stats`，每周一 09:40）：仓库根目录 `python update-profiles.py`，数字没变就不写文件也不提交；跑的是无 CORS 的源（OEIS、Observable、Code360、CSDN、掘金、Gitee、牛客、Codeforces、HackerRank、Bluesky、Mastodon、ScriptCat）。
 - **访客信息**：城市/国家靠 ipinfo.io（失败退回 api.country.is，只到国家），PV/UV 靠 vercount.one 的脚本（写一个 1 年期 cookie 用来判首次 UV，本地 localStorage 缓存上次值）。这两项都会把访客 IP 发给第三方；页面本身不写 cookie。两者都失败时显示 `—`，不影响其它数字。
@@ -89,11 +92,13 @@
 | `web-stats.json` | 知乎四个计数 + 博客园阅读 / 文章数 |
 | `profiles.json` | 12 个平台的计数器（见上表「每周一」部分） |
 | `visitor-map.json` | 各国家访客数（abacus 计数器聚合，周快照） |
-| `update-profiles.py` | 采集 `profiles.json` 并自行 commit + push |
+| `update-profiles.py` | 采集 `profiles.json` 并自行 commit + push |
+| `worker.js` | Cloudflare Worker 源码（改完手动粘到控制台部署；仓库这份是源，不是部署产物） |
 
 ## 维护
 
-- **刷新快照**：`python metrics.py && git add metrics.json && git commit -m "chore: refresh metrics" && git push`
+- **刷新快照**：`python metrics.py && git add metrics.json && git commit -m "chore: refresh metrics" && git push`
+- **改 Worker**：编辑仓库里的 `worker.js` → 复制粘贴到 Cloudflare 控制台 → 部署；然后开 `https://autumn-thunder-2ee6.aspen1382020.workers.dev/` 看每个源是 `primary` / `fallback` / `unavailable`，再开 `?nocache=1` 确认新值。
 - **刷新 Chrome / 知乎 / 博客园**：见本机任务 A；**刷新平台计数器**：见本机任务 B（同时重算 `visitor-map.json`：64 个国家各一次 GET，约 30 秒）。
 - **新增或下线 Chrome 扩展**：改 `chrome-ids.json` 的 `ids` 数组，Worker 下次请求生效；下线扩展的详情页 404 会被跳过。
 - **部署**：改 `index.html` → commit + push 到 `main`，Pages 自动构建。验证必须带 cache buster（`?v=<时间戳>`），否则约 10 分钟边缘缓存会让你看到旧页面；实测 75 秒时可能仍是旧版，轮询到出现预期内容为止。
