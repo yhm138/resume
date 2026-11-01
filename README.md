@@ -50,7 +50,7 @@
 - 博客园「总阅读数」含首页与分类页浏览，不等于逐篇阅读之和（后者约 11 万）；「博客阅读量」是博客园 + CSDN + 掘金三家相加，任一源缺值就不出总数。
 - 数据条共 10 格（桌面 5 列 × 2 行，≤780px 2 列），顺序：repos / GF installs / SE reputation / RosettaCode / PyPI / Chrome / blog reads / AoC / LeetCode / SE badges。实心圆点 = 每次访问实时取，空心 = 定时或本机刷新。
 
-数据条下面还有一行访客信息：`you · 城市, 国家`（ipinfo.io 按访客 IP 判断）、`views` / `visitors`（vercount 的整站 PV / UV，按域名计，不是本页单独计数）。再下面是一张点阵世界地图：陆地用分隔线色画点，访客国家用 teal 圆点（半径随访问量开方增长），数据来自 `visitor-map.json` 的周快照。
+**页面最底部（页脚里）**是访客信息：`you · 城市, 国家`（ipinfo.io 按访客 IP 判断）、`views` / `visitors`（vercount 的整站 PV / UV，按域名计，不是本页单独计数），下面一张点阵世界地图：陆地用分隔线色画点，访客国家用 teal 圆点（半径随访问量开方增长），数据来自 `visitor-map.json` 的周快照。这两块都带 `js-only`，打印时不出现。
 
 ## 通道细节
 

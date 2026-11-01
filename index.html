@@ -66,14 +66,14 @@
   @keyframes pulse{0%,100%{opacity:1}50%{opacity:.32}}
 
   /* ---------- 访客信息条 ---------- */
-  .visitor{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:6px 18px;
-    padding:10px 0 0;border-top:1px solid var(--rule);
+  .visitor{display:flex;flex-wrap:wrap;gap:6px 18px;margin:18px 0 0;
+    padding:12px 0 0;border-top:1px solid var(--rule);
     font-family:var(--mono);font-size:10px;letter-spacing:.12em;
-    color:var(--ink-3);text-transform:uppercase;margin:0}
+    color:var(--ink-3);text-transform:uppercase}
   .visitor .tag{width:5px;height:5px;margin-right:6px}
   .visitor a{border-bottom:0}
 
-  .vmap{grid-column:1/-1;margin:0;padding:12px 0 4px;max-width:420px}
+  .vmap{margin:14px 0 0;padding:0;max-width:380px}
   .vmap__svg{display:block;width:100%;height:auto}
   .vmap__svg path{fill:var(--rule);opacity:.9}
   .vmap__svg circle{fill:var(--accent);opacity:.85}
@@ -112,7 +112,8 @@
   .skills dt,.honors dt{font-weight:600;font-size:13.5px;letter-spacing:.04em;padding:9px 0}
   .skills dd,.honors dd{margin:0;color:var(--ink-2);font-size:14.2px;padding:9px 0}
 
-  footer{margin-top:48px;padding-top:16px;border-top:2px solid var(--ink);font-family:var(--mono);font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-3);display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
+  footer{margin-top:48px;padding-top:16px;border-top:2px solid var(--ink);font-family:var(--mono);font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-3)}
+  .foot__top{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
 
   .rise{opacity:0;transform:translateY(10px);animation:rise .72s cubic-bezier(.2,.7,.3,1) forwards;animation-delay:calc(var(--i,0)*65ms)}
   @keyframes rise{to{opacity:1;transform:none}}
@@ -281,18 +282,6 @@
       <span class="js-only"><i class="tag tag--snap"></i>local · Chrome, blogs</span>
       <span class="js-only"><span id="stamp">—</span> · <a href="https://github.com/yhm138/resume/commits/main/metrics.json" target="_blank" rel="noreferrer">history</a></span>
     </div>
-    <p class="visitor js-only" title="你的城市/国家按 IP 由 ipinfo.io 判断；PV/UV 由 vercount.one 统计（整站口径，按域名）。页面本身不写 cookie。">
-      <span><i class="tag tag--live"></i>you · <span id="v-geo">—</span></span>
-      <span><i class="tag tag--snap"></i>views · <span id="vercount_value_site_pv">—</span></span>
-      <span><i class="tag tag--snap"></i>visitors · <span id="vercount_value_site_uv">—</span></span>
-    </p>
-    <figure class="vmap js-only" id="vmap" aria-labelledby="vmapCap">
-      <svg class="vmap__svg" viewBox="0 0 96 48" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Map of visitors by country">
-        <path id="vmap-land" d=""></path>
-        <g id="vmap-dots"></g>
-      </svg>
-      <figcaption id="vmapCap">visitors by country · <span id="vmap-total">—</span> visits from <span id="vmap-countries">—</span> countries · weekly snapshot</figcaption>
-    </figure>
   </section>
 
   <!-- 01 -->
@@ -484,8 +473,22 @@
   </section>
 
   <footer class="rise" style="--i:8">
-    <span>Haomin Yang · Résumé</span>
-    <span class="js-only">Scheduled metrics are versioned in git; links are live per visit</span>
+    <div class="foot__top">
+      <span>Haomin Yang · Résumé</span>
+      <span class="js-only">Scheduled metrics are versioned in git; links are live per visit</span>
+    </div>
+    <p class="visitor js-only" title="你的城市/国家按 IP 由 ipinfo.io 判断；PV/UV 由 vercount.one 统计（整站口径，按域名）。页面本身不写 cookie。">
+      <span><i class="tag tag--live"></i>you · <span id="v-geo">—</span></span>
+      <span><i class="tag tag--snap"></i>views · <span id="vercount_value_site_pv">—</span></span>
+      <span><i class="tag tag--snap"></i>visitors · <span id="vercount_value_site_uv">—</span></span>
+    </p>
+    <figure class="vmap js-only" id="vmap" aria-labelledby="vmapCap">
+      <svg class="vmap__svg" viewBox="0 0 96 48" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Map of visitors by country">
+        <path id="vmap-land" d=""></path>
+        <g id="vmap-dots"></g>
+      </svg>
+      <figcaption id="vmapCap" title="weekly snapshot from visitor-map.json">visitors by country · <span id="vmap-total">—</span> visits / <span id="vmap-countries">—</span> countries · weekly</figcaption>
+    </figure>
   </footer>
 </main>
 
