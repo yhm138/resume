@@ -72,6 +72,11 @@
     color:var(--ink-3);text-transform:uppercase}
   .visitor .tag{width:5px;height:5px;margin-right:6px}
   .visitor a{border-bottom:0}
+  .visitor .v-exact{margin-left:8px;padding:0 0 1px;border:0;border-bottom:1px dashed var(--ink-3);background:none;
+    font:inherit;letter-spacing:inherit;text-transform:inherit;color:inherit;cursor:pointer;line-height:1.2}
+  .visitor .v-exact:hover,.visitor .v-exact:focus-visible{color:var(--accent);border-bottom-color:var(--accent);outline:0}
+  .visitor .v-exact[hidden]{display:none}
+  .visitor .v-exact[aria-busy="true"]{opacity:.5;border-bottom-style:solid}
 
   .vmap{margin:16px auto 0;padding:0;max-width:380px}
   .vmap__svg{display:block;width:100%;height:auto}
@@ -477,8 +482,8 @@
       <span>Haomin Yang · Résumé</span>
       <span class="js-only">Scheduled metrics are versioned in git; links are live per visit</span>
     </div>
-    <p class="visitor js-only" title="你的城市/国家按 IP 由 ipinfo.io 判断；PV/UV 由 vercount.one 统计（整站口径，按域名）。页面本身不写 cookie。">
-      <span><i class="tag tag--live"></i>you · <span id="v-geo">—</span></span>
+    <p class="visitor js-only" title="City and country are an IP-based guess from ipinfo.io, shown with &asymp;. Click locate me to use this device's GPS / Wi-Fi position instead — the coordinates are only sent to BigDataCloud to resolve a place name. PV/UV come from vercount.one (domain-wide; this page sets no cookie).">
+      <span><i class="tag tag--live"></i>you · <span id="v-geo">—</span><button type="button" class="v-exact" id="v-exact" title="Use this device's location instead of the IP guess (asks once)">locate me</button></span>
       <span><i class="tag tag--snap"></i>views · <span id="vercount_value_site_pv">—</span></span>
       <span><i class="tag tag--snap"></i>visitors · <span id="vercount_value_site_uv">—</span></span>
     </p>
@@ -890,15 +895,63 @@
         .catch(function () { /* 留 — */ });
     }
 
-    // 当前访客：显示城市/国家，并给所在国家 +1（只有被追踪的国家才有计数器）
+    // 当前访客：先按 IP 估一个城市（前面加 ≈，因为 IP 库只到 ISP 登记的机房城市，
+    // 合肥的家宽经常被判成上海），再给所在国家 +1（只有被追踪的国家才有计数器）。
+    // 想更准就点 locate me：走浏览器 Geolocation（Wi-Fi/GPS），坐标只用一次、发给
+    // BigDataCloud 的 client 反查接口换地名（带 CORS、无 key）；授权过之后每次访问静默复用。
     if (!geo) return;
+    var exactBtn = document.getElementById('v-exact');
+    var GEO_RANK = 0;                       // 1 = IP 估算，2 = 设备定位；后者不许被前者覆盖
+    function showGeo(parts, rank) {
+      if (!parts.length || rank < GEO_RANK) return;
+      GEO_RANK = rank;
+      geo.textContent = parts.join(', ');
+    }
     function apply(city, cc) {
       var parts = [city, regionName(cc)].filter(Boolean);
-      if (parts.length) geo.textContent = parts.join(', ');
-      if (cc && CENT[cc]) {
+      if (parts.length) showGeo(['≈ ' + parts[0]].concat(parts.slice(1)), 1);
+      if (cc && CENT[cc]) {                 // 只按 IP 那个国家计数，精修不重复 +1
         fetch('https://abacus.jasoncameron.dev/hit/' + NS + '/c-' + cc.toLowerCase(), { mode: 'cors' })
           .catch(function () { /* 计数失败不影响页面 */ });
       }
+    }
+    function setBtn(label, busy) {
+      if (!exactBtn) return;
+      exactBtn.textContent = label;
+      if (busy) exactBtn.setAttribute('aria-busy', 'true');
+      else exactBtn.removeAttribute('aria-busy');
+    }
+    function precise(lat, lon) {
+      fetch('https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=' + lat +
+            '&longitude=' + lon + '&localityLanguage=en', { headers: { Accept: 'application/json' } })
+        .then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); })
+        .then(function (j) {
+          var cc = (j.countryCode || '').toUpperCase();
+          var parts = [j.city || j.locality, cc ? regionName(cc) : ''].filter(Boolean);
+          if (!parts.length) throw new Error('no place');
+          showGeo(parts, 2);
+          if (exactBtn) exactBtn.hidden = true;
+        })
+        .catch(function () { setBtn('locate me', false); });
+    }
+    function askDevice() {
+      if (!navigator.geolocation) { if (exactBtn) exactBtn.hidden = true; return; }
+      setBtn('locating', true);
+      navigator.geolocation.getCurrentPosition(
+        function (pos) { precise(pos.coords.latitude, pos.coords.longitude); },
+        function () { setBtn('locate me', false); },
+        { enableHighAccuracy: false, timeout: 9000, maximumAge: 600000 }
+      );
+    }
+    if (exactBtn) {
+      exactBtn.addEventListener('click', function (e) { e.preventDefault(); askDevice(); });
+      try {                                  // 之前授权过：直接静默复用，不再弹窗
+        if (navigator.permissions && navigator.permissions.query) {
+          navigator.permissions.query({ name: 'geolocation' }).then(function (st) {
+            if (st.state === 'granted') askDevice();
+          }).catch(function () { /* Safari 没有这项：等用户点按钮 */ });
+        }
+      } catch (e) { /* 老浏览器忽略 */ }
     }
     fetch('https://ipinfo.io/json', { headers: { Accept: 'application/json' } })
       .then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); })

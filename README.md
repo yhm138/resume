@@ -15,7 +15,7 @@
 | GreasyFork 好评（39） | 浏览器直连 GreasyFork API | 每次访问 |
 | Stack Exchange 分站声誉 | 浏览器直连 SE API | 每次访问 |
 | Stack Exchange 徽章（347，117 站合计） | 浏览器直连 SE API（分页） | 每次访问 |
-| 访客城市 / 国家 | 浏览器直连 ipinfo.io（降级 api.country.is） | 每次访问 |
+| 访客城市 / 国家（`≈` = IP 估算，`locate me` = 设备定位） | 浏览器直连 ipinfo.io（降级 api.country.is）；精修走 Geolocation + BigDataCloud 反查 | 每次访问 / 按需 |
 | 整站 PV / UV | vercount.one 脚本（busuanzi 兼容） | 每次访问 |
 | Codeberg 仓库数（5） | 浏览器直连 Codeberg API（Gitea/Forgejo） | 每次访问 |
 | 天池（3 场比赛） | 浏览器直连 Tianchi API（带 CORS） | 每次访问 |
@@ -51,7 +51,7 @@
 - 博客园「总阅读数」含首页与分类页浏览，不等于逐篇阅读之和（后者约 11 万）；「博客阅读量」是博客园 + CSDN + 掘金三家相加，任一源缺值就不出总数。
 - 数据条共 10 格（桌面 5 列 × 2 行，≤780px 2 列），顺序：repos / GF installs / SE reputation / RosettaCode / PyPI / Chrome / blog reads / AoC / LeetCode / SE badges。实心圆点 = 每次访问实时取，空心 = 定时或本机刷新。
 
-**页面最底部**（页脚里）是访客信息：`you · 城市, 国家`（ipinfo.io 按访客 IP 判断）、`views` / `visitors`（vercount 的整站 PV / UV，按域名计，不是本页单独计数），下面一张点阵世界地图：陆地用分隔线色画点，访客国家用 teal 圆点（半径随访问量开方增长），数据来自 `visitor-map.json` 的周快照。这两块都带 `js-only`，打印时不出现。
+**页面最底部**（页脚里）是访客信息：`you · 城市, 国家`（ipinfo.io 按访客 IP 判断，带 `≈` 表示是估算值；点 `locate me` 用设备定位精修）、`views` / `visitors`（vercount 的整站 PV / UV，按域名计，不是本页单独计数），下面一张点阵世界地图：陆地用分隔线色画点，访客国家用 teal 圆点（半径随访问量开方增长），数据来自 `visitor-map.json` 的周快照。这两块都带 `js-only`，打印时不出现。
 
 ## 通道细节
 
@@ -63,6 +63,8 @@
 - **本机任务 A**（`\resume chrome users`，每周一 09:30，`C:\Users\Yangh\resume-metrics\run.cmd`）：`update-chrome-users.py` + `update-web-stats.py`，通过 `gh` 直接提交；跑的是拒绝机房 IP 的源（Chrome Web Store、知乎）。
 - **本机任务 B**（`\resume profile stats`，每周一 09:40）：仓库根目录 `python update-profiles.py`，数字没变就不写文件也不提交；跑的是无 CORS 的源（OEIS、Observable、Code360、CSDN、掘金、Gitee、牛客、Codeforces、HackerRank、Bluesky、Mastodon、ScriptCat）。
 - **访客信息**：城市/国家靠 ipinfo.io（失败退回 api.country.is，只到国家），PV/UV 靠 vercount.one 的脚本（写一个 1 年期 cookie 用来判首次 UV，本地 localStorage 缓存上次值）。这两项都会把访客 IP 发给第三方；页面本身不写 cookie。两者都失败时显示 `—`，不影响其它数字。
+
+  城市前加 `≈` 是因为 IP 库只能到 ISP 登记的机房城市（合肥的家宽常被判成上海）；点 `locate me` 走浏览器 Geolocation（Wi-Fi/GPS，授权一次、之后每次访问静默复用），坐标只发给 BigDataCloud 的 client 反查接口换地名，精修时不再给该国计数器 +1。拒绝授权或设备定位失败就保留 IP 估算值，不影响其它数字。
 - **访客分布地图**：页面每访问一次，按 ipinfo 给的国家调一次 `abacus.jasoncameron.dev/hit/yhm138resume/c-<iso2>`（只对 64 个被追踪的国家/地区，其余忽略）；周任务再把每个国家的计数器读出来写进 `visitor-map.json`。地图本身是页内 SVG：96×48 陆地掩码（base64，768 字节）+ 64 个国家经纬度，全部内联，不加载任何地图库或瓦片。
 
 ## 降级链
