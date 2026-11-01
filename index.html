@@ -560,8 +560,10 @@
 
   function apply(m, rank) {
     setFrom('m-repos', fmt(m.github_repos), rank);
-    setFrom('m-gf', fmt(m.greasyfork_installs), rank);
-    setFrom('gf-installs', num(m.greasyfork_installs), rank);
+    if (m.greasyfork_installs != null) {
+      setFrom('m-gf', fmt(m.greasyfork_installs), rank);
+      setFrom('gf-installs', num(m.greasyfork_installs), rank);
+    }
     if (m.greasyfork_scripts) setFrom('gf-scripts', String(m.greasyfork_scripts), rank);
     setFrom('m-se', fmt(m.stackexchange_rep), rank);
     if (m.stackexchange_rep != null) {
@@ -571,8 +573,10 @@
     setFrom('m-rosetta', fmt(m.rosetta_tasks), rank);
     setFrom('ros-tasks', fmt(m.rosetta_tasks), rank);
     if (m.rosetta_new) setFrom('ros-new', String(m.rosetta_new), rank);
-    setFrom('m-pypi', fmt(m.pypi_total), rank);
-    setFrom('pypi-body', num(m.pypi_total), rank);
+    if (m.pypi_total != null) {
+      setFrom('m-pypi', fmt(m.pypi_total), rank);
+      setFrom('pypi-body', num(m.pypi_total), rank);
+    }
     if (m.cnblogs_reads != null) {
       setFrom('cb-reads', num(m.cnblogs_reads), rank);
       BLOG.reads.cnblogs = Number(m.cnblogs_reads);
@@ -618,7 +622,7 @@
     getJSON('https://api.github.com/users/' + GH_USER).then(function (u) {
       setFrom('m-repos', fmt(u.public_repos), R_WORKER);
     }),
-    getJSON('https://api.greasyfork.org/users/' + GF_UID + '.json').then(function (u) {
+    getJSON('https://api.greasyfork.org/en/users/' + GF_UID + '-138-aspen.json').then(function (u) {
       var list = u.scripts || [];
       var total = list.reduce(function (s, x) { return s + (x.total_installs || 0); }, 0);
       var good = list.reduce(function (s, x) { return s + (x.good_ratings || 0); }, 0);
