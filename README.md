@@ -38,8 +38,8 @@
 | Bluesky（0 帖 / 6 粉）、Mastodon（2 帖 / 0 粉） | 本机计划任务 → `profiles.json` | 每周一（开机则更新） |
 | Advent of Code 2024 全球名次（#14 / 1,699 分） | 静态（历史赛果） | 不更新 |
 | AIME / Putnam 解法 wiki（101 页） | 静态（一年加一两页） | 不更新 |
-| ScriptCat（6 脚本 / 2,676 安装） | 静态（Next.js 渲染，未接自动化） | 不更新 |
-| 天池（3 场比赛） | 静态 | 不更新 |
+| ScriptCat（6 脚本 / 2,683 安装） | 本机计划任务 → `profiles.json`（后端 JSON API 无 CORS） | 每周一（开机则更新） |
+| 天池（3 场比赛） | 浏览器直连 Tianchi API（带 CORS） | 每次访问 |
 
 三条口径提醒：
 
@@ -52,7 +52,7 @@
 - **浏览器直连**：GitHub、GreasyFork、Stack Exchange 都带 CORS，页面每次访问直接取；SE 徽章走 `users/21083779/associated`，117 个分站 > 100 条/页，必须翻页，否则少算（曾少算成 306）。
 - **Cloudflare Worker**：`https://autumn-thunder-2ee6.aspen1382020.workers.dev/metrics`，缓存 10 分钟，`Access-Control-Allow-Origin: *`；`GET /` 是状态页（`primary` / `fallback` / `unavailable`）。代码不在本仓库，改它要控制台粘贴部署。它仍在跑 Bilibili、抖音、HackerRank 三项，但页面已不用（见「撤掉的展示」）。
 - **本机任务 A**（`\resume chrome users`，每周一 09:30，`C:\Users\Yangh\resume-metrics\run.cmd`）：`update-chrome-users.py` + `update-web-stats.py`，通过 `gh` 直接提交；跑的是拒绝机房 IP 的源（Chrome Web Store、知乎）。
-- **本机任务 B**（`\resume profile stats`，每周一 09:40）：仓库根目录 `python update-profiles.py`，数字没变就不写文件也不提交；跑的是无 CORS 的源（OEIS、Observable、Code360、CSDN、掘金、Gitee、牛客、Codeforces、HackerRank、Bluesky、Mastodon）。
+- **本机任务 B**（`\resume profile stats`，每周一 09:40）：仓库根目录 `python update-profiles.py`，数字没变就不写文件也不提交；跑的是无 CORS 的源（OEIS、Observable、Code360、CSDN、掘金、Gitee、牛客、Codeforces、HackerRank、Bluesky、Mastodon、ScriptCat）。
 
 ## 降级链
 
@@ -80,7 +80,7 @@
 | `chrome-ids.json` | 6 个扩展的商店 ID，Worker 读它 |
 | `chrome-users.json` | 扩展用户合计与逐项明细 |
 | `web-stats.json` | 知乎四个计数 + 博客园阅读 / 文章数 |
-| `profiles.json` | 11 个平台的计数器（见上表「每周一」部分） |
+| `profiles.json` | 12 个平台的计数器（见上表「每周一」部分） |
 | `update-profiles.py` | 采集 `profiles.json` 并自行 commit + push |
 
 ## 维护

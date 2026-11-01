@@ -36,6 +36,7 @@ JUEJIN_UID = "935003303452199"
 GITEE_USER = "yhm138"
 MASTODON_ACCT = "aspen138"
 BSKY_HANDLE = "aspen138.bsky.social"
+SCRIPT_CAT_UID = "130089"
 
 
 def fetch(url, headers=None, timeout=45):
@@ -253,6 +254,15 @@ def bluesky():
             "following": p.get("followsCount")}
 
 
+def scriptcat():
+    """ScriptCat is a Next.js site, but its backend exposes a plain JSON API (no CORS)."""
+    page = json.loads(fetch("https://scriptcat.org/api/v2/users/%s/scripts?page=1&size=100" % SCRIPT_CAT_UID,
+                            {"Accept": "application/json"}))
+    items = page.get("data", {}).get("list", [])
+    return {"scripts": len(items),
+            "installs": sum((it.get("total_install") or 0) for it in items)}
+
+
 def load_previous():
     if not os.path.exists(OUT):
         return {}
@@ -267,12 +277,13 @@ def main():
     prev = load_previous()
     result = {"oeis": {}, "observable": {}, "code360": {}, "hackerrank": {},
               "codeforces": {}, "nowcoder": {}, "csdn": {}, "juejin": {},
-              "gitee": {}, "mastodon": {}, "bluesky": {}}
+              "gitee": {}, "mastodon": {}, "bluesky": {}, "scriptcat": {}}
     stale = []
     for key, fn in (("oeis", oeis), ("observable", observable), ("code360", code360),
                     ("hackerrank", hackerrank), ("codeforces", codeforces),
                     ("nowcoder", nowcoder), ("csdn", csdn), ("juejin", juejin),
-                    ("gitee", gitee), ("mastodon", mastodon), ("bluesky", bluesky)):
+                    ("gitee", gitee), ("mastodon", mastodon), ("bluesky", bluesky),
+                    ("scriptcat", scriptcat)):
         try:
             result[key] = fn()
         except Exception as e:
@@ -298,7 +309,8 @@ def main():
                "code360": result["code360"], "hackerrank": result["hackerrank"],
                "codeforces": result["codeforces"], "nowcoder": result["nowcoder"],
                "csdn": result["csdn"], "juejin": result["juejin"], "gitee": result["gitee"],
-               "mastodon": result["mastodon"], "bluesky": result["bluesky"]}
+               "mastodon": result["mastodon"], "bluesky": result["bluesky"],
+               "scriptcat": result["scriptcat"]}
     tmp = OUT + ".tmp"
     with open(tmp, "w", encoding="utf-8", newline="\n") as f:
         json.dump(ordered, f, ensure_ascii=False, indent=2)
@@ -306,7 +318,7 @@ def main():
     os.replace(tmp, OUT)
     changed = [k for k in ("oeis", "observable", "code360", "hackerrank",
                           "codeforces", "nowcoder", "csdn", "juejin", "gitee",
-                          "mastodon", "bluesky") if prev.get(k) != result[k]]
+                          "mastodon", "bluesky", "scriptcat") if prev.get(k) != result[k]]
     print("wrote profiles.json, changed:", ",".join(changed) or "metadata only")
 
     def git(*args):
