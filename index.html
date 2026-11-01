@@ -692,11 +692,11 @@
           return r.json();
         })
         .then(function (list) {
-          list = list || [];
+          if (!Array.isArray(list)) throw new Error('unexpected payload');
           seen += list.length;
           if (total == null && list.length === PAGE) { page += 1; step(); return; }
           var n = (total != null && isFinite(total)) ? total : seen;
-          if (isFinite(n) && n > 0) setFrom('cbg-repos', String(n), R_WORKER);
+          if (isFinite(n)) setFrom('cbg-repos', String(n), R_WORKER);
         })
         .catch(function () { /* 静态值兜底 */ });
     }
