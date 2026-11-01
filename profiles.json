@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-10-30T09:45:55Z",
+  "generated_at": "2026-11-01T03:52:52Z",
   "stale": [],
   "oeis": {
     "sequences": 3,
@@ -46,7 +46,7 @@
   },
   "juejin": {
     "posts": 8,
-    "views": 3251,
+    "views": 3252,
     "diggs": 0,
     "followers": 2,
     "power": 97
@@ -67,5 +67,9 @@
     "posts": 0,
     "followers": 6,
     "following": 6
+  },
+  "scriptcat": {
+    "scripts": 6,
+    "installs": 2683
   }
 }
