@@ -465,7 +465,7 @@
       <article class="entry">
         <div class="entry__head"><div class="entry__org">Elsewhere</div></div>
         <ul class="bul">
-          <li><a href="https://oeis.org/history?user=Haomin%20Yang" target="_blank" rel="noreferrer">OEIS</a> — <span class="hl" id="oeis-seqs">3</span> sequences edited across <span class="hl" id="oeis-revs">8</span> revisions; <a href="https://observablehq.com/@aspen1382020" target="_blank" rel="noreferrer">Observable</a> — <span class="hl" id="obs-notebooks">1</span> notebook; <a href="https://www.naukri.com/code360/profile/8d5253e5-771f-4039-9fa0-cd51de2b0639" target="_blank" rel="noreferrer">Code360</a> — <span class="hl" id="c360-problems">1</span> problem solved; <a href="https://gitee.com/yhm138" target="_blank" rel="noreferrer">Gitee</a> — <span class="hl" id="gitee-repos">1</span> repository, <span class="hl" id="gitee-commits">9</span> commits; <a href="https://resources.wolframcloud.com/publishers/resources?PublisherID=OnehundredthirtyeightAspen" target="_blank" rel="noreferrer">Wolfram Function Repository</a> — <span class="hl">1</span> published function.</li>
+          <li><a href="https://oeis.org/history?user=Haomin%20Yang" target="_blank" rel="noreferrer">OEIS</a> — <span class="hl" id="oeis-seqs">3</span> sequences edited across <span class="hl" id="oeis-revs">8</span> revisions; <a href="https://observablehq.com/@aspen1382020" target="_blank" rel="noreferrer">Observable</a> — <span class="hl" id="obs-notebooks">1</span> notebook; <a href="https://www.naukri.com/code360/profile/8d5253e5-771f-4039-9fa0-cd51de2b0639" target="_blank" rel="noreferrer">Code360</a> — <span class="hl" id="c360-problems">1</span> problem solved; <a href="https://gitee.com/yhm138" target="_blank" rel="noreferrer">Gitee</a> — <span class="hl" id="gitee-repos">1</span> repository, <span class="hl" id="gitee-commits">9</span> commits; <a href="https://codeberg.org/FlintUser" target="_blank" rel="noreferrer">Codeberg</a> — <span class="hl" id="cbg-repos">5</span> repositories; <a href="https://resources.wolframcloud.com/publishers/resources?PublisherID=OnehundredthirtyeightAspen" target="_blank" rel="noreferrer">Wolfram Function Repository</a> — <span class="hl">1</span> published function.</li>
           <li>Also on <a href="https://tianchi.aliyun.com/home/science/scienceDetail?userId=1095279495628" target="_blank" rel="noreferrer">Tianchi</a> (<span class="hl" id="tc-count">3</span> competitions), <a href="https://crates.io/users/yhm138" target="_blank" rel="noreferrer">crates.io</a>, <a href="https://www.npmjs.com/~aspen138" target="_blank" rel="noreferrer">npm</a>, <a href="https://hub.docker.com/u/aspen138" target="_blank" rel="noreferrer">Docker Hub</a>, <a href="https://sourceforge.net/u/aspen138/profile" target="_blank" rel="noreferrer">SourceForge</a>, <a href="https://www.kaggle.com/aspen138" target="_blank" rel="noreferrer">Kaggle</a>, <a href="https://plugins.jetbrains.com/author/me" target="_blank" rel="noreferrer">JetBrains Marketplace</a>, <a href="https://play.google.com/store/apps/dev?id=7351019373232905041" target="_blank" rel="noreferrer">Google Play</a>, <a href="https://www.jianshu.com/u/796435070e0c" target="_blank" rel="noreferrer">Jianshu</a>, <a href="https://bsky.app/profile/aspen138.bsky.social" target="_blank" rel="noreferrer">Bluesky</a>, <a href="https://mastodon.social/@aspen138" target="_blank" rel="noreferrer">Mastodon</a>, <a href="https://community.wolfram.com/u/aspen1382020/summary" target="_blank" rel="noreferrer">Wolfram Community</a>, <a href="https://www.mapleprimes.com/users/Aspen138" target="_blank" rel="noreferrer">MaplePrimes</a>, <a href="https://www.reddit.com/user/Aspen138/" target="_blank" rel="noreferrer">Reddit</a> and <a href="https://www.quora.com/profile/138-Aspen" target="_blank" rel="noreferrer">Quora</a>.</li>
         </ul>
       </article>
@@ -677,6 +677,31 @@
       if (total != null) setFrom('tc-count', String(total), R_WORKER);
     })
     .catch(function () { /* 静态值兜底 */ });
+
+  // 2f) Codeberg：Gitea/Forgejo 的公开 API 带 CORS，仓库存量接口还暴露 X-Total-Count；
+  //     有总数就直接用，没有就按每页 50 翻页数数。接口挂了保留静态值。
+  (function loadCodebergRepos() {
+    var PAGE = 50, page = 1, seen = 0, total = null;
+    function step() {
+      fetch('https://codeberg.org/api/v1/users/FlintUser/repos?limit=' + PAGE + '&page=' + page,
+            { headers: { Accept: 'application/json' } })
+        .then(function (r) {
+          if (!r.ok) throw new Error(r.status);
+          var t = r.headers.get('X-Total-Count');
+          if (t != null && t !== '') total = Number(t);
+          return r.json();
+        })
+        .then(function (list) {
+          list = list || [];
+          seen += list.length;
+          if (total == null && list.length === PAGE) { page += 1; step(); return; }
+          var n = (total != null && isFinite(total)) ? total : seen;
+          if (isFinite(n) && n > 0) setFrom('cbg-repos', String(n), R_WORKER);
+        })
+        .catch(function () { /* 静态值兜底 */ });
+    }
+    step();
+  })();
 
   // 2b) 上面那个请求已经把 Worker 的全部字段应用了，这里不再重复请一次。
   //     Worker 上知乎被机房 IP 拦住，所以知乎走下面的本地快照。

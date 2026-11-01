@@ -17,6 +17,8 @@
 | Stack Exchange 徽章（347，117 站合计） | 浏览器直连 SE API（分页） | 每次访问 |
 | 访客城市 / 国家 | 浏览器直连 ipinfo.io（降级 api.country.is） | 每次访问 |
 | 整站 PV / UV | vercount.one 脚本（busuanzi 兼容） | 每次访问 |
+| Codeberg 仓库数（5） | 浏览器直连 Codeberg API（Gitea/Forgejo） | 每次访问 |
+| 天池（3 场比赛） | 浏览器直连 Tianchi API（带 CORS） | 每次访问 |
 | Stack Exchange 全站声誉（24.7k / 118 站） | Cloudflare Worker | 10 分钟 |
 | PyPI 累计下载（3,959） | Cloudflare Worker | 10 分钟 |
 | RosettaCode（465 任务页 / 43 新建） | Cloudflare Worker | 10 分钟 |
@@ -39,10 +41,9 @@
 | Gitee（1 仓库 / 9 commits） | 本机计划任务 → `profiles.json` | 每周一（开机则更新） |
 | Bluesky（0 帖 / 6 粉）、Mastodon（2 帖 / 0 粉） | 本机计划任务 → `profiles.json` | 每周一（开机则更新） |
 | 访客分布地图（按国家；页面每次访问给本国 +1） | 本机计划任务 → `visitor-map.json` | 每周一（开机则更新） |
+| ScriptCat（6 脚本 / 2,683 安装） | 本机计划任务 → `profiles.json`（后端 JSON API 无 CORS） | 每周一（开机则更新） |
 | Advent of Code 2024 全球名次（#14 / 1,699 分） | 静态（历史赛果） | 不更新 |
 | AIME / Putnam 解法 wiki（101 页） | 静态（一年加一两页） | 不更新 |
-| ScriptCat（6 脚本 / 2,683 安装） | 本机计划任务 → `profiles.json`（后端 JSON API 无 CORS） | 每周一（开机则更新） |
-| 天池（3 场比赛） | 浏览器直连 Tianchi API（带 CORS） | 每次访问 |
 
 三条口径提醒：
 
@@ -54,7 +55,7 @@
 
 ## 通道细节
 
-- **浏览器直连**：GitHub、GreasyFork、Stack Exchange 都带 CORS，页面每次访问直接取；SE 徽章走 `users/21083779/associated`，117 个分站 > 100 条/页，必须翻页，否则少算（曾少算成 306）。
+- **浏览器直连**：GitHub、GreasyFork、Stack Exchange、天池、Codeberg（Gitea/Forgejo API）都带 CORS，页面每次访问直接取；SE 徽章走 `users/21083779/associated`，117 个分站 > 100 条/页，必须翻页，否则少算（曾少算成 306）。
 - **Cloudflare Worker（v3，源码见 `worker.js`）**：`https://autumn-thunder-2ee6.aspen1382020.workers.dev/metrics`，缓存 10 分钟，`Access-Control-Allow-Origin: *`；`GET /` 是状态页（`primary` / `fallback` / `unavailable`，并列出本次缺了哪些字段）；`GET /?nocache=1` 绕过缓存。
   - v3 修的东西：GreasyFork 改用规范地址（旧地址 301 且跳转后丢 CORS）；Bilibili / 抖音 / LeetCode 加浏览器 UA + referer（旧的 `resume-metrics` UA 被拒，这正是那几个字段从返回里消失的原因）；Bilibili 增加 `x/relation/stat` 兜底；Stack Exchange 改为「账号页抓取为主、API `/associated` 兜底」；知乎从 Worker 移除（所有机房 IP 都 403，只能本机跑）。
   - 口径差异：账号页抓到 118 站 / 24,671；SE API `associated` 是 117 站 / 24,570。两个都算对，只是站点集合不同，页面按抓到的那个数显示。
