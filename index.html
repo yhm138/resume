@@ -73,6 +73,13 @@
   .visitor .tag{width:5px;height:5px;margin-right:6px}
   .visitor a{border-bottom:0}
 
+  .vmap{grid-column:1/-1;margin:0;padding:12px 0 4px;max-width:420px}
+  .vmap__svg{display:block;width:100%;height:auto}
+  .vmap__svg path{fill:var(--rule);opacity:.9}
+  .vmap__svg circle{fill:var(--accent);opacity:.85}
+  .vmap figcaption{margin-top:8px;font-family:var(--mono);font-size:9px;letter-spacing:.12em;
+    text-transform:uppercase;color:var(--ink-3)}
+
   /* ---------- sections ---------- */
   .sec{display:grid;grid-template-columns:var(--rail) 1fr;padding:36px 0 4px;border-top:1px solid var(--rule)}
   .sec:first-of-type{border-top:0}
@@ -130,6 +137,8 @@
     .live__k{font-size:8.5px;letter-spacing:.03em}
     .live__meta{font-size:8px}
     .visitor{font-size:8px;letter-spacing:.07em;gap:4px 14px;padding-top:8px}
+    .vmap{padding-top:10px}
+    .vmap figcaption{font-size:7.5px;letter-spacing:.08em}
     footer{font-size:9px;gap:8px}
   }
 
@@ -277,6 +286,13 @@
       <span><i class="tag tag--snap"></i>views · <span id="vercount_value_site_pv">—</span></span>
       <span><i class="tag tag--snap"></i>visitors · <span id="vercount_value_site_uv">—</span></span>
     </p>
+    <figure class="vmap js-only" id="vmap" aria-labelledby="vmapCap">
+      <svg class="vmap__svg" viewBox="0 0 96 48" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Map of visitors by country">
+        <path id="vmap-land" d=""></path>
+        <g id="vmap-dots"></g>
+      </svg>
+      <figcaption id="vmapCap">visitors by country · <span id="vmap-total">—</span> visits from <span id="vmap-countries">—</span> countries · weekly snapshot</figcaption>
+    </figure>
   </section>
 
   <!-- 01 -->
@@ -790,25 +806,75 @@
       open(href, a);
     }, true);
   })();
-  // 5) 访客信息：城市/国家按访客 IP 判断（ipwho.is，带 CORS）；PV/UV 由 vercount 脚本填 #vercount_value_*
+  // 5) 访客信息：城市/国家（ipinfo.io）+ 本站访客分布图（visitor-map.json 的周快照 + abacus 计数）
   (function () {
     var geo = document.getElementById('v-geo');
-    if (!geo) return;
+    var fig = document.getElementById('vmap');
+    var LAND = 'AAAAfw/AAAAAAAAAAAAD8f/gHgAAYAAAAACD5//AAAAAHAAAAAGBAH/gAAID/AAAAgDy+D+AAwIv///Aj/+ZXD4AD+f/////T///3DgwHZ//////D//+GBgAe//////uBh/+HgAAe/////2QBAf/jwACM/////ggAAP/34AFP/////wgAAP//wAA//////gAAAH//gAB//////gAAAH//gAA7zP///AAAAH/+AADllv//+QAAAH/8AAHAfv//kQAAAD/8AAA4D///ywAAAB/4AAD4H///xAAAAA/QAAH/////wAAAABcIAAP/7v//wAAAAA8AAAP/74//wAAAAAMkAAf//8efAAAAAAPGAAP/94ccAAAAAABwAAP//wIOAAAAAAAQAAP//AIOAAAAAAATwAP//wIAEAAAAAAH4AH//gEAAAAAAAAH8AAP/gAEgAAAAAAH+AAH/AAJ4AAAAAAP/AAP+AAFhgAAAAAP/wAH8AAAAaAAAAAH/4AH8AABgQgAAAAH/wAD+AAAAAAAAAAD/wAH+AAABAAAAAAB/wAH+gAAHoAAAAAB/gAH4gAAP4AAAAAB/gAD4gAA/8AAAAAB+AAD4AAA/+AAAAAB+AAD4AAA/+AAAAAB8AABwAAAf+AAAAAB8AABAAAAQcAAAAAD4AAAAAAAAcAAAAADgAAAAAAAAAAAAAABgAAAAAAAAAAAAAADAAAAAAAAAAMAAAADAAAAAAAAAAAAAAADIAAAAAAAAAAAAAABAAAAAAAAAAA';
+    var CENT = {"CA":[-101.6,57.7],"US":[-99.1,39.5],"KZ":[67.3,48.2],"ID":[114.0,-0.3],"AR":[-65.1,-35.2],"CL":[-71.7,-37.3],"KE":[37.8,0.6],"RU":[99.2,61.7],"NO":[14.2,64.5],"ZA":[25.1,-29.0],"MX":[-102.6,23.9],"BR":[-53.1,-10.8],"PE":[-74.4,-9.2],"CO":[-73.1,3.9],"FR":[2.3,46.6],"NG":[8.0,9.5],"IL":[35.0,31.5],"AE":[54.2,23.9],"TH":[101.0,15.0],"VN":[106.3,16.7],"KR":[127.8,36.4],"IN":[79.6,22.9],"BD":[90.3,23.8],"PK":[69.4,30.0],"SE":[16.6,62.8],"UA":[31.2,49.1],"PL":[19.3,52.1],"AT":[14.1,47.6],"HU":[19.4,47.2],"RO":[24.9,45.9],"LT":[23.9,55.3],"LV":[24.8,56.8],"EE":[25.8,58.6],"DE":[10.3,51.1],"BG":[25.2,42.8],"GR":[22.6,39.3],"TR":[35.4,39.0],"HR":[16.6,45.0],"CH":[8.1,46.8],"BE":[4.6,50.7],"NL":[5.5,52.3],"PT":[-8.1,39.6],"ES":[-3.6,40.3],"IE":[-8.0,53.2],"NZ":[170.5,-44.0],"AU":[134.4,-25.6],"LK":[80.7,7.7],"CN":[103.9,36.6],"IT":[12.2,43.5],"DK":[9.3,56.2],"GB":[-2.7,53.9],"PH":[121.5,15.8],"MY":[114.7,3.5],"SI":[14.9,46.1],"FI":[26.2,64.5],"SK":[19.5,48.7],"CZ":[15.3,49.8],"JP":[136.9,36.0],"SA":[44.5,24.1],"EG":[29.8,26.5],"RS":[20.8,44.2],"HK":[114.2,22.3],"TW":[121.0,23.7],"SG":[103.8,1.35]};
+    var W = 96, H = 48, LAT1 = 84, LAT0 = -56, NS = 'yhm138resume';
+
     function regionName(code) {
       try { return new Intl.DisplayNames(['en'], { type: 'region' }).of(code) || code; }
       catch (e) { return code; }
     }
-    function show(city, country) {
-      var parts = [city, country].filter(Boolean);
+    function proj(lon, lat) {
+      return [(lon + 180) / 360 * W, (LAT1 - lat) / (LAT1 - LAT0) * H];
+    }
+
+    // 点阵世界地图：把 96x48 的陆地掩码画成一条 path
+    if (fig) {
+      var bits = atob(LAND), d = '';
+      for (var i = 0; i < bits.length * 8; i++) {
+        if ((bits.charCodeAt(i >> 3) >> (7 - (i & 7))) & 1) {
+          d += 'M' + (i % W) + ' ' + Math.floor(i / W) + 'h1v1h-1z';
+        }
+      }
+      document.getElementById('vmap-land').setAttribute('d', d);
+    }
+
+    // 分布连线：周快照
+    if (fig) {
+      fetch('https://raw.githubusercontent.com/yhm138/resume/main/visitor-map.json?t=' + Date.now(), { headers: { Accept: 'application/json' } })
+        .then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); })
+        .then(function (m) {
+          var counts = (m && m.countries) || {}, g = document.getElementById('vmap-dots');
+          var total = 0, n = 0, html = '';
+          Object.keys(counts).forEach(function (cc) {
+            var pt = CENT[cc];
+            if (!pt) return;
+            var v = Number(counts[cc]) || 0;
+            if (!v) return;
+            var p = proj(pt[0], pt[1]);
+            var r = Math.min(2.4, 0.5 + Math.sqrt(v) * 0.3);
+            html += '<circle cx="' + p[0].toFixed(2) + '" cy="' + p[1].toFixed(2) + '" r="' + r.toFixed(2) + '"><title>' + cc + ' · ' + v + '</title></circle>';
+            total += v;
+            n += 1;
+          });
+          g.innerHTML = html;
+          document.getElementById('vmap-total').textContent = total.toLocaleString('en-US');
+          document.getElementById('vmap-countries').textContent = n;
+        })
+        .catch(function () { /* 留 — */ });
+    }
+
+    // 当前访客：显示城市/国家，并给所在国家 +1（只有被追踪的国家才有计数器）
+    if (!geo) return;
+    function apply(city, cc) {
+      var parts = [city, regionName(cc)].filter(Boolean);
       if (parts.length) geo.textContent = parts.join(', ');
+      if (cc && CENT[cc]) {
+        fetch('https://abacus.jasoncameron.dev/hit/' + NS + '/c-' + cc.toLowerCase(), { mode: 'cors' })
+          .catch(function () { /* 计数失败不影响页面 */ });
+      }
     }
     fetch('https://ipinfo.io/json', { headers: { Accept: 'application/json' } })
       .then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); })
-      .then(function (j) { show(j.city || j.region, j.country ? regionName(j.country) : ''); })
+      .then(function (j) { apply(j.city || j.region, (j.country || '').toUpperCase()); })
       .catch(function () {
         fetch('https://api.country.is/', { headers: { Accept: 'application/json' } })
           .then(function (r) { return r.json(); })
-          .then(function (j) { show('', j.country ? regionName(j.country) : ''); })
+          .then(function (j) { apply('', (j.country || '').toUpperCase()); })
           .catch(function () { /* 保持 — */ });
       });
   })();

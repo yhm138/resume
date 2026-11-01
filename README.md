@@ -37,7 +37,8 @@
 | CSDN（53,019 访问 / 8 篇 / 16 粉） | 本机计划任务 → `profiles.json` | 每周一（开机则更新） |
 | 掘金（3,251 阅读 / 8 篇） | 本机计划任务 → `profiles.json` | 每周一（开机则更新） |
 | Gitee（1 仓库 / 9 commits） | 本机计划任务 → `profiles.json` | 每周一（开机则更新） |
-| Bluesky（0 帖 / 6 粉）、Mastodon（2 帖 / 0 粉） | 本机计划任务 → `profiles.json` | 每周一（开机则更新） |
+| Bluesky（0 帖 / 6 粉）、Mastodon（2 帖 / 0 粉） | 本机计划任务 → `profiles.json` | 每周一（开机则更新） |
+| 访客分布地图（按国家；页面每次访问给本国 +1） | 本机计划任务 → `visitor-map.json` | 每周一（开机则更新） |
 | Advent of Code 2024 全球名次（#14 / 1,699 分） | 静态（历史赛果） | 不更新 |
 | AIME / Putnam 解法 wiki（101 页） | 静态（一年加一两页） | 不更新 |
 | ScriptCat（6 脚本 / 2,683 安装） | 本机计划任务 → `profiles.json`（后端 JSON API 无 CORS） | 每周一（开机则更新） |
@@ -49,7 +50,7 @@
 - 博客园「总阅读数」含首页与分类页浏览，不等于逐篇阅读之和（后者约 11 万）；「博客阅读量」是博客园 + CSDN + 掘金三家相加，任一源缺值就不出总数。
 - 数据条共 10 格（桌面 5 列 × 2 行，≤780px 2 列），顺序：repos / GF installs / SE reputation / RosettaCode / PyPI / Chrome / blog reads / AoC / LeetCode / SE badges。实心圆点 = 每次访问实时取，空心 = 定时或本机刷新。
 
-数据条下面还有一行访客信息：`you · 城市, 国家`（ipinfo.io 按访客 IP 判断）、`views` / `visitors`（vercount 的整站 PV / UV，按域名计，不是本页单独计数）。
+数据条下面还有一行访客信息：`you · 城市, 国家`（ipinfo.io 按访客 IP 判断）、`views` / `visitors`（vercount 的整站 PV / UV，按域名计，不是本页单独计数）。再下面是一张点阵世界地图：陆地用分隔线色画点，访客国家用 teal 圆点（半径随访问量开方增长），数据来自 `visitor-map.json` 的周快照。
 
 ## 通道细节
 
@@ -57,7 +58,8 @@
 - **Cloudflare Worker**：`https://autumn-thunder-2ee6.aspen1382020.workers.dev/metrics`，缓存 10 分钟，`Access-Control-Allow-Origin: *`；`GET /` 是状态页（`primary` / `fallback` / `unavailable`）。代码不在本仓库，改它要控制台粘贴部署。它仍在跑 Bilibili、抖音、HackerRank 三项，但页面已不用（见「撤掉的展示」）。
 - **本机任务 A**（`\resume chrome users`，每周一 09:30，`C:\Users\Yangh\resume-metrics\run.cmd`）：`update-chrome-users.py` + `update-web-stats.py`，通过 `gh` 直接提交；跑的是拒绝机房 IP 的源（Chrome Web Store、知乎）。
 - **本机任务 B**（`\resume profile stats`，每周一 09:40）：仓库根目录 `python update-profiles.py`，数字没变就不写文件也不提交；跑的是无 CORS 的源（OEIS、Observable、Code360、CSDN、掘金、Gitee、牛客、Codeforces、HackerRank、Bluesky、Mastodon、ScriptCat）。
-- **访客信息**：城市/国家靠 ipinfo.io（失败退回 api.country.is，只到国家），PV/UV 靠 vercount.one 的脚本（写一个 1 年期 cookie 用来判首次 UV，本地 localStorage 缓存上次值）。这两项都会把访客 IP 发给第三方；页面本身不写 cookie。两者都失败时显示 `—`，不影响其它数字。
+- **访客信息**：城市/国家靠 ipinfo.io（失败退回 api.country.is，只到国家），PV/UV 靠 vercount.one 的脚本（写一个 1 年期 cookie 用来判首次 UV，本地 localStorage 缓存上次值）。这两项都会把访客 IP 发给第三方；页面本身不写 cookie。两者都失败时显示 `—`，不影响其它数字。
+- **访客分布地图**：页面每访问一次，按 ipinfo 给的国家调一次 `abacus.jasoncameron.dev/hit/yhm138resume/c-<iso2>`（只对 64 个被追踪的国家/地区，其余忽略）；周任务再把每个国家的计数器读出来写进 `visitor-map.json`。地图本身是页内 SVG：96×48 陆地掩码（base64，768 字节）+ 64 个国家经纬度，全部内联，不加载任何地图库或瓦片。
 
 ## 降级链
 
@@ -85,13 +87,14 @@
 | `chrome-ids.json` | 6 个扩展的商店 ID，Worker 读它 |
 | `chrome-users.json` | 扩展用户合计与逐项明细 |
 | `web-stats.json` | 知乎四个计数 + 博客园阅读 / 文章数 |
-| `profiles.json` | 12 个平台的计数器（见上表「每周一」部分） |
+| `profiles.json` | 12 个平台的计数器（见上表「每周一」部分） |
+| `visitor-map.json` | 各国家访客数（abacus 计数器聚合，周快照） |
 | `update-profiles.py` | 采集 `profiles.json` 并自行 commit + push |
 
 ## 维护
 
 - **刷新快照**：`python metrics.py && git add metrics.json && git commit -m "chore: refresh metrics" && git push`
-- **刷新 Chrome / 知乎 / 博客园**：见本机任务 A；**刷新平台计数器**：见本机任务 B。
+- **刷新 Chrome / 知乎 / 博客园**：见本机任务 A；**刷新平台计数器**：见本机任务 B（同时重算 `visitor-map.json`：64 个国家各一次 GET，约 30 秒）。
 - **新增或下线 Chrome 扩展**：改 `chrome-ids.json` 的 `ids` 数组，Worker 下次请求生效；下线扩展的详情页 404 会被跳过。
 - **部署**：改 `index.html` → commit + push 到 `main`，Pages 自动构建。验证必须带 cache buster（`?v=<时间戳>`），否则约 10 分钟边缘缓存会让你看到旧页面；实测 75 秒时可能仍是旧版，轮询到出现预期内容为止。
 

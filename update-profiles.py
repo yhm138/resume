@@ -37,6 +37,11 @@ GITEE_USER = "yhm138"
 MASTODON_ACCT = "aspen138"
 BSKY_HANDLE = "aspen138.bsky.social"
 SCRIPT_CAT_UID = "130089"
+ABACUS_NS = "yhm138resume"
+# 只统计这些国家/地区的访客（abacus 每个国家一个计数器，页面每次访问 hit 一次）
+VISITOR_TRACKED = ("CN HK TW SG JP KR US CA GB DE FR NL SE CH AU IN BR RU AE MY TH VN PH ID "
+                   "PK BD LK KZ UA PL IT ES PT IE NO DK FI CZ AT BE GR TR IL SA EG ZA NG KE "
+                   "MX AR CL CO PE NZ LT LV EE SI HR SK HU RO BG RS").split()
 
 
 def fetch(url, headers=None, timeout=45):
@@ -263,6 +268,24 @@ def scriptcat():
             "installs": sum((it.get("total_install") or 0) for it in items)}
 
 
+def visitor_map():
+    """Read the per-country counters written by the page itself (abacus, CORS-enabled)."""
+    out, total = {}, 0
+    for iso in VISITOR_TRACKED:
+        try:
+            j = json.loads(fetch("https://abacus.jasoncameron.dev/get/%s/c-%s" % (ABACUS_NS, iso.lower()),
+                                 {"Accept": "application/json"}))
+            v = int(j.get("value") or 0)
+        except Exception:
+            v = 0
+        if v:
+            out[iso] = v
+            total += v
+        time.sleep(0.4)          # abacus 限流 30 次/10 秒
+    return {"generated_at": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
+            "total": total, "countries": out}
+
+
 def load_previous():
     if not os.path.exists(OUT):
         return {}
@@ -321,14 +344,22 @@ def main():
                           "mastodon", "bluesky", "scriptcat") if prev.get(k) != result[k]]
     print("wrote profiles.json, changed:", ",".join(changed) or "metadata only")
 
+    vm = visitor_map()
+    vm_path = os.path.join(REPO, "visitor-map.json")
+    with open(vm_path, "w", encoding="utf-8", newline="\n") as f:
+        json.dump(vm, f, ensure_ascii=False, indent=2)
+        f.write("\n")
+    print("visitor-map: %d visits from %d countries" % (vm["total"], len(vm["countries"])))
+
     def git(*args):
         return subprocess.run(["git", "-C", REPO] + list(args), capture_output=True, text=True,
                               timeout=120)
 
-    if git("status", "--porcelain", "profiles.json").stdout.strip():
-        git("add", "profiles.json")
+    changed_files = git("status", "--porcelain", "profiles.json", "visitor-map.json").stdout.strip()
+    if changed_files:
+        git("add", "profiles.json", "visitor-map.json")
         git("-c", "user.name=yhm138", "-c", "user.email=aspen1382020@gmail.com",
-            "commit", "-m", "chore: refresh profile counters")
+            "commit", "-m", "chore: refresh profile counters and visitor map")
         push = git("push", "origin", "main")
         if push.returncode != 0:
             print("push failed:", push.stderr.strip()[:400])
