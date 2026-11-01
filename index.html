@@ -65,6 +65,14 @@
   .dot{width:5px;height:5px;border-radius:50%;background:var(--live);box-shadow:0 0 0 3px rgba(15,138,95,.14);animation:pulse 2.6s ease-in-out infinite}
   @keyframes pulse{0%,100%{opacity:1}50%{opacity:.32}}
 
+  /* ---------- 访客信息条 ---------- */
+  .visitor{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:6px 18px;
+    padding:10px 0 0;border-top:1px solid var(--rule);
+    font-family:var(--mono);font-size:10px;letter-spacing:.12em;
+    color:var(--ink-3);text-transform:uppercase;margin:0}
+  .visitor .tag{width:5px;height:5px;margin-right:6px}
+  .visitor a{border-bottom:0}
+
   /* ---------- sections ---------- */
   .sec{display:grid;grid-template-columns:var(--rail) 1fr;padding:36px 0 4px;border-top:1px solid var(--rule)}
   .sec:first-of-type{border-top:0}
@@ -121,6 +129,7 @@
     .live__num{font-size:18px}
     .live__k{font-size:8.5px;letter-spacing:.03em}
     .live__meta{font-size:8px}
+    .visitor{font-size:8px;letter-spacing:.07em;gap:4px 14px;padding-top:8px}
     footer{font-size:9px;gap:8px}
   }
 
@@ -263,6 +272,11 @@
       <span class="js-only"><i class="tag tag--snap"></i>local · Chrome, blogs</span>
       <span class="js-only"><span id="stamp">—</span> · <a href="https://github.com/yhm138/resume/commits/main/metrics.json" target="_blank" rel="noreferrer">history</a></span>
     </div>
+    <p class="visitor js-only" title="你的城市/国家按 IP 由 ipinfo.io 判断；PV/UV 由 vercount.one 统计（整站口径，按域名）。页面本身不写 cookie。">
+      <span><i class="tag tag--live"></i>you · <span id="v-geo">—</span></span>
+      <span><i class="tag tag--snap"></i>views · <span id="vercount_value_site_pv">—</span></span>
+      <span><i class="tag tag--snap"></i>visitors · <span id="vercount_value_site_uv">—</span></span>
+    </p>
   </section>
 
   <!-- 01 -->
@@ -776,7 +790,30 @@
       open(href, a);
     }, true);
   })();
+  // 5) 访客信息：城市/国家按访客 IP 判断（ipwho.is，带 CORS）；PV/UV 由 vercount 脚本填 #vercount_value_*
+  (function () {
+    var geo = document.getElementById('v-geo');
+    if (!geo) return;
+    function regionName(code) {
+      try { return new Intl.DisplayNames(['en'], { type: 'region' }).of(code) || code; }
+      catch (e) { return code; }
+    }
+    function show(city, country) {
+      var parts = [city, country].filter(Boolean);
+      if (parts.length) geo.textContent = parts.join(', ');
+    }
+    fetch('https://ipinfo.io/json', { headers: { Accept: 'application/json' } })
+      .then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); })
+      .then(function (j) { show(j.city || j.region, j.country ? regionName(j.country) : ''); })
+      .catch(function () {
+        fetch('https://api.country.is/', { headers: { Accept: 'application/json' } })
+          .then(function (r) { return r.json(); })
+          .then(function (j) { show('', j.country ? regionName(j.country) : ''); })
+          .catch(function () { /* 保持 — */ });
+      });
+  })();
 })();
 </script>
+<script src="https://events.vercount.one/js" defer></script>
 </body>
 </html>
