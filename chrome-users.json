@@ -1,6 +1,6 @@
 {
-  "total": 408,
-  "items": 4,
+  "total": 656,
+  "items": 6,
   "listed": 6,
   "per_extension": [
     {
@@ -9,15 +9,23 @@
     },
     {
       "id": "boebkheclhddjhdgligonfkneafgjcjd",
-      "users": 260
+      "users": 250
     },
     {
       "id": "cabmbcjgepkpfdlbaipmaaabonmbhhge",
-      "users": 5
+      "users": 4
+    },
+    {
+      "id": "ffdeppmjhjegdeeklmaegggafilphkoc",
+      "users": 217
+    },
+    {
+      "id": "ajlgcagiaaehcjcflefnijfbmaocnfmb",
+      "users": 15
     },
     {
       "id": "keggdnnfiiikofjdkbaehpgboikfeaji",
-      "users": 42
+      "users": 69
     }
   ]
 }
