@@ -19,6 +19,7 @@
 | 整站 PV / UV | vercount.one 脚本（busuanzi 兼容） | 每次访问 |
 | Codeberg 仓库数（5） | 浏览器直连 Codeberg API（Gitea/Forgejo） | 每次访问 |
 | 天池（3 场比赛） | 浏览器直连 Tianchi API（带 CORS） | 每次访问 |
+| dsh-image-rescue npm 累计下载（动态，静态兜底 358） | 浏览器直连 npm downloads API（发布日 2026-11-12 至今逐日求和） | 每次访问 |
 | Stack Exchange 全站声誉（24.7k / 118 站） | Cloudflare Worker | 10 分钟 |
 | PyPI 累计下载（3,959） | Cloudflare Worker | 10 分钟 |
 | RosettaCode（465 任务页 / 43 新建） | Cloudflare Worker | 10 分钟 |
@@ -44,7 +45,6 @@
 | ScriptCat（6 脚本 / 2,683 安装） | 本机计划任务 → `profiles.json`（后端 JSON API 无 CORS） | 每周一（开机则更新） |
 | Advent of Code 2024 全球名次（#14 / 1,699 分） | 静态（历史赛果） | 不更新 |
 | AIME / Putnam 解法 wiki（101 页） | 静态（一年加一两页） | 不更新 |
-| dsh-image-rescue npm 周下载（358，11-09~11-15） | 静态（npm 官方统计，含发布日 296 与 CI/镜像） | 不更新 |
 
 三条口径提醒：
 
@@ -56,7 +56,7 @@
 
 ## 通道细节
 
-- **浏览器直连**：GitHub、GreasyFork、Stack Exchange、天池、Codeberg（Gitea/Forgejo API）都带 CORS，页面每次访问直接取；SE 徽章走 `users/21083779/associated`，117 个分站 > 100 条/页，必须翻页，否则少算（曾少算成 306）。
+- **浏览器直连**：GitHub、GreasyFork、Stack Exchange、天池、Codeberg（Gitea/Forgejo API）、npm downloads API（`api.npmjs.org`）都带 CORS，页面每次访问直接取；SE 徽章走 `users/21083779/associated`，117 个分站 > 100 条/页，必须翻页，否则少算（曾少算成 306）。
 - **Cloudflare Worker（v3，源码见 `worker.js`）**：`https://autumn-thunder-2ee6.aspen1382020.workers.dev/metrics`，缓存 10 分钟，`Access-Control-Allow-Origin: *`；`GET /` 是状态页（`primary` / `fallback` / `unavailable`，并列出本次缺了哪些字段）；`GET /?nocache=1` 绕过缓存。
   - v3 修的东西：GreasyFork 改用规范地址（旧地址 301 且跳转后丢 CORS）；Bilibili / 抖音 / LeetCode 加浏览器 UA + referer（旧的 `resume-metrics` UA 被拒，这正是那几个字段从返回里消失的原因）；Bilibili 增加 `x/relation/stat` 兜底；Stack Exchange 改为「账号页抓取为主、API `/associated` 兜底」；知乎从 Worker 移除（所有机房 IP 都 403，只能本机跑）。
   - 口径差异：账号页抓到 118 站 / 24,671；SE API `associated` 是 117 站 / 24,570。两个都算对，只是站点集合不同，页面按抓到的那个数显示。
@@ -104,7 +104,7 @@
 | 项目 | 链接 | 页面上的数字 | 口径 / 备注 |
 | --- | --- | --- | --- |
 | workbuddy-toolkit | [GitHub](https://github.com/yhm138/workbuddy-toolkit) | 无 | 3 个 WorkBuddy 桌面扩展（会话桥、复制会话 ID、云会话），CI 跑 Windows 与 Linux |
-| dsh-image-rescue | [GitHub](https://github.com/yhm138/dsh-image-rescue) · [npm](https://www.npmjs.com/package/dsh-image-rescue) · [市场页](https://awesome-dsh-plugin.com/p/yhm138/dsh-image-rescue/) | npm 周下载 358（11-09~11-15） | 11-12 发布当天 296，之后 29 / 15 / 18；npm 统计含自动更新 / 镜像 / 爬虫，**不等于用户数**。0 star / 0 fork / 0 issue 与 60 次 clone（14 天、33 个来源）不展示 |
+| dsh-image-rescue | [GitHub](https://github.com/yhm138/dsh-image-rescue) · [npm](https://www.npmjs.com/package/dsh-image-rescue) · [市场页](https://awesome-dsh-plugin.com/p/yhm138/dsh-image-rescue/) | npm 累计下载（动态，静态兜底 358） | 页面每次访问从 npm downloads API 现算：发布日 2026-11-12 到今天逐日求和，数字链到 npm-stat 趋势图；npm 统计含自动更新 / 镜像 / 爬虫，**不等于用户数**。0 star / 0 fork / 0 issue 与 60 次 clone（14 天、33 个来源）不展示 |
 
 dsh-image-rescue 的契约事实（2026-11-17 用 npm registry + GitHub API 核过）：版本 `0.1.0`，`engines.dsh = ">=0.2.1-rc.2 <0.3.0-0"`，`dsh.bundle.patch: ./cordis.patch.yml`，发布物 11 个文件 / 85.3 kB（registry `dist.fileCount=11`；tarball 实测 85,294 字节，sha1 与 shasum `f86fcdac49c4dce712ab87717b376917102f4162` 一致）。挂载 `@deepseek-ai/dsh-attachment` 的 `ctx.attachments`：`admitPromptContent(content: AttachmentAdmissionPart[]) → Promise<AdmittedPromptContentPart[]>`、`imageLimits`（maxImageBytes / maxImagesPerMessage / maxMessageImageBytes / maxImagePixels / maxImageDimension / mediaTypes）、`validateImage`、`saveImage`、`saveFile`、`fileHostPath`、`readFileStream`；类型 `AttachmentAdmissionPart` = text | image（mediaType + base64 data）| file，返回 `AdmittedPromptContentPart` = text | image 附件 | file 附件，文件引用 `{attachmentId, name, bytes}`。插件导出 `apply(ctx, config)`、`inject = ['attachments']`、`wrapAttachmentStore(store, config)`；配置项 `enabled`（默认 true）、`note`（默认一句中文，`false` 关闭）。救回 `IMAGE_DIMENSION_TOO_LARGE`、`IMAGE_TOO_MANY_PIXELS`、`IMAGE_TOO_LARGE`、`IMAGES_TOO_LARGE`、`TOO_MANY_IMAGES`，`INVALID_IMAGE` 等输入损坏类不救回。awesome-dsh-plugin 的 jsdelivr（#1）与站点（#3）索引都收录，bruc3van 精选（#2）未收录。
 
@@ -139,7 +139,7 @@ dsh-image-rescue 的契约事实（2026-11-17 用 npm registry + GitHub API 核�
 - **Bilibili 35 粉 / 抖音 71 赞**：数据条最弱的两格，换成博客阅读量与 AoC 名次。
 - **HackerRank 认证格**：11 张认证 + 2 枚徽章，数字太小，从数据条撤下，改在 Problem solving 正文写「11 verified HackerRank certifications (2 skill badges)」。
 - **网易云音乐 / 豆瓣**：和找工作无关且数字太弱，链接都不放；简书、Bluesky、Mastodon 按「以后会发布」保留链接但不展示数字。
-- **dsh-image-rescue 的 0 star / 0 fork / 0 issue 与 14 天 60 次 clone（33 个独立来源）**：clone 基本是爬虫 / 镜像；页面只写 npm 周下载 358 并注明含 CI 与镜像、不等于用户数，不写 star。
+- **dsh-image-rescue 的 0 star / 0 fork / 0 issue 与 14 天 60 次 clone（33 个独立来源）**：clone 基本是爬虫 / 镜像；页面只写 npm 累计下载（每次访问现算）并注明含 CI 与镜像、不等于用户数，不写 star。
 
 ## 调研结论：还能接什么
 

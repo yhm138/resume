@@ -445,7 +445,7 @@
         <ul class="bul">
           <li><span class="hl">What it fixes</span> — DeepSeek Harness rejects the whole message when an attached image is over 8192 px on one side (or 64 M pixels / 20 MiB encoded), blocking tasks like “four scans into one PDF”. The plugin wraps the host's attachment admission: images within the limits keep the original flow; an oversized image is stored <span class="hl">byte for byte</span> as a generic file attachment (no rescale, no re-encode, no crop) and handed to the model as a read-only path it can open with <span class="hl">read_image</span> or convert at full resolution. Corrupt or mistyped files still raise the native error.</li>
           <li><span class="hl">Host contract</span> — wraps <span class="hl">admitPromptContent</span> on <span class="hl">ctx.attachments</span> of <span class="hl">@deepseek-ai/dsh-attachment</span>; rescues IMAGE_DIMENSION_TOO_LARGE, IMAGE_TOO_MANY_PIXELS, IMAGE_TOO_LARGE, IMAGES_TOO_LARGE and TOO_MANY_IMAGES, and passes INVALID_IMAGE through. Host-only Cordis plugin, no client code or build step; exports apply(ctx, config) and wrapAttachmentStore(store, config), with options <span class="hl">enabled</span> and <span class="hl">note</span>.</li>
-          <li><a href="https://www.npmjs.com/package/dsh-image-rescue" target="_blank" rel="noreferrer">npm 0.1.0</a>, <a href="https://awesome-dsh-plugin.com/p/yhm138/dsh-image-rescue/" target="_blank" rel="noreferrer">listed in the awesome-dsh-plugin index</a>; <span class="hl">358</span> npm downloads in its release week (11-09 – 11-15, 296 on the release day — npm's counter includes CI and mirrors, not users). Install: <span class="hl">dsh plugin --profile &lt;profile&gt; add dsh-image-rescue</span>.</li>
+          <li><a href="https://www.npmjs.com/package/dsh-image-rescue" target="_blank" rel="noreferrer">npm 0.1.0</a>, <a href="https://awesome-dsh-plugin.com/p/yhm138/dsh-image-rescue/" target="_blank" rel="noreferrer">listed in the awesome-dsh-plugin index</a>; <a href="https://npm-stat.com/charts.html?package=dsh-image-rescue&amp;from=2026-11-12" target="_blank" rel="noreferrer"><span class="hl" id="npm-dl">358</span> downloads since release</a> (npm's counter includes CI and mirrors, not users). Install: <span class="hl">dsh plugin --profile &lt;profile&gt; add dsh-image-rescue</span>.</li>
         </ul>
       </article>
 
@@ -718,6 +718,25 @@
         .catch(function () { /* 静态值兜底 */ });
     }
     step();
+  })();
+
+  // 2g) npm 下载量：官方 downloads API 带 CORS（access-control-allow-origin: *），
+  //     累计值 = 发布日到今天逐日相加；接口失败就保留静态值。数字本身链到 npm-stat 的趋势图。
+  (function loadNpmDownloads() {
+    var PKG = 'dsh-image-rescue', RELEASED = '2026-11-12';
+    var out = document.getElementById('npm-dl');
+    if (!out) return;
+    var today = new Date().toISOString().slice(0, 10);
+    fetch('https://api.npmjs.org/downloads/range/' + RELEASED + ':' + today + '/' + PKG,
+          { headers: { Accept: 'application/json' } })
+      .then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); })
+      .then(function (j) {
+        var list = j && j.downloads;
+        if (!Array.isArray(list)) throw new Error('unexpected payload');
+        var total = list.reduce(function (s, d) { return s + (Number(d.downloads) || 0); }, 0);
+        if (total > 0) setFrom('npm-dl', num(total), R_WORKER);
+      })
+      .catch(function () { /* 静态值兜底 */ });
   })();
 
   // 2b) 上面那个请求已经把 Worker 的全部字段应用了，这里不再重复请一次。
