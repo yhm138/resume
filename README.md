@@ -19,7 +19,7 @@
 | 整站 PV / UV | vercount.one 脚本（busuanzi 兼容） | 每次访问 |
 | Codeberg 仓库数（5） | 浏览器直连 Codeberg API（Gitea/Forgejo） | 每次访问 |
 | 天池（3 场比赛） | 浏览器直连 Tianchi API（带 CORS） | 每次访问 |
-| dsh-image-rescue npm 累计下载（动态，静态兜底 358；页面内联折线） | 浏览器直连 npm downloads API（发布日 2026-11-12 至今逐日求和、顺带画 SVG 折线） | 每次访问 |
+| dsh-image-rescue npm 累计下载（动态，静态兜底 358） | 浏览器直连 npm downloads API（发布日 2026-11-12 至今逐日求和） | 每次访问 |
 | Stack Exchange 全站声誉（24.7k / 118 站） | Cloudflare Worker | 10 分钟 |
 | PyPI 累计下载（3,959） | Cloudflare Worker | 10 分钟 |
 | RosettaCode（465 任务页 / 43 新建） | Cloudflare Worker | 10 分钟 |
@@ -105,8 +105,6 @@
 | --- | --- | --- | --- |
 | workbuddy-toolkit | [GitHub](https://github.com/yhm138/workbuddy-toolkit) | 无 | 3 个 WorkBuddy 桌面扩展（会话桥、复制会话 ID、云会话），CI 跑 Windows 与 Linux |
 | dsh-image-rescue | [GitHub](https://github.com/yhm138/dsh-image-rescue) · [npm](https://www.npmjs.com/package/dsh-image-rescue) · [市场页](https://awesome-dsh-plugin.com/p/yhm138/dsh-image-rescue/) | npm 累计下载（动态，静态兜底 358） | 页面每次访问从 npm downloads API 现算：发布日 2026-11-12 到今天逐日求和，数字链到 npm-stat 趋势图；npm 统计含自动更新 / 镜像 / 爬虫，**不等于用户数**。0 star / 0 fork / 0 issue 与 60 次 clone（14 天、33 个来源）不展示 |
-
-页面上的 npm 数字是一个指向 npm-stat 趋势图的链接；同一次 npm downloads API 响应还会在页面里画一条累计下载折线（内联 SVG，`.spark`，320×96 viewBox，每次访问重画）。**不提交图片资产、也不加定时任务**：图表要新的一手数据就在页面里，避免再出现「本地任务周更 / 推送失败导致图冻住」这类问题；接口失败时折线隐藏、数字保留静态兜底。
 
 dsh-image-rescue 的契约事实（2026-11-17 用 npm registry + GitHub API 核过）：版本 `0.1.0`，`engines.dsh = ">=0.2.1-rc.2 <0.3.0-0"`，`dsh.bundle.patch: ./cordis.patch.yml`，发布物 11 个文件 / 85.3 kB（registry `dist.fileCount=11`；tarball 实测 85,294 字节，sha1 与 shasum `f86fcdac49c4dce712ab87717b376917102f4162` 一致）。挂载 `@deepseek-ai/dsh-attachment` 的 `ctx.attachments`：`admitPromptContent(content: AttachmentAdmissionPart[]) → Promise<AdmittedPromptContentPart[]>`、`imageLimits`（maxImageBytes / maxImagesPerMessage / maxMessageImageBytes / maxImagePixels / maxImageDimension / mediaTypes）、`validateImage`、`saveImage`、`saveFile`、`fileHostPath`、`readFileStream`；类型 `AttachmentAdmissionPart` = text | image（mediaType + base64 data）| file，返回 `AdmittedPromptContentPart` = text | image 附件 | file 附件，文件引用 `{attachmentId, name, bytes}`。插件导出 `apply(ctx, config)`、`inject = ['attachments']`、`wrapAttachmentStore(store, config)`；配置项 `enabled`（默认 true）、`note`（默认一句中文，`false` 关闭）。救回 `IMAGE_DIMENSION_TOO_LARGE`、`IMAGE_TOO_MANY_PIXELS`、`IMAGE_TOO_LARGE`、`IMAGES_TOO_LARGE`、`TOO_MANY_IMAGES`，`INVALID_IMAGE` 等输入损坏类不救回。awesome-dsh-plugin 的 jsdelivr（#1）与站点（#3）索引都收录，bruc3van 精选（#2）未收录。
 
