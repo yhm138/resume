@@ -6,7 +6,7 @@
 
 ## 指标来源
 
-> 下表按**更新频率**排序：每次访问 → 10 分钟 → 每周一 → 不更新。括号里的数字是写表时的快照，线上以页面显示为准。
+> 下表按**更新频率**排序：每次访问 → 10 分钟 → 每天 → 不更新。括号里的数字是写表时的快照，线上以页面显示为准。
 
 | 指标 | 载体 | 更新频率 |
 | --- | --- | --- |
@@ -27,22 +27,22 @@
 | LeetCode 通过题数（1,953） | Cloudflare Worker | 10 分钟 |
 | Codewars（38 kata / 5 kyu） | Cloudflare Worker | 10 分钟 |
 | leetcode.com 通过题数（14） | Cloudflare Worker | 10 分钟 |
-| 博客阅读量（221k = 博客园 + CSDN + 掘金） | Worker + 本机 `profiles.json` | 10 分钟 / 每周一 |
-| 知乎回答 / 赞同 / 收藏 / 感谢（165 / 937 / 1,833 / 620） | 本机计划任务 A 与 B 都会跑 `update-web-stats.py` → `web-stats.json` | 每周一（开机则更新；值不变不提交） |
-| 博客园文章数（139） | 本机计划任务 A 与 B 都会跑 `update-web-stats.py` → `web-stats.json` | 每周一（开机则更新；值不变不提交） |
-| Chrome 扩展用户（671 / 6 个） | 本机计划任务 → `chrome-users.json` | 每周一（开机则更新） |
-| HackerRank 认证（11 张 / 2 枚徽章） | 本机计划任务 → `profiles.json` | 每周一（开机则更新） |
-| Codeforces（127 题 / 峰值 1,485） | 本机计划任务 → `profiles.json` | 每周一（开机则更新） |
-| 牛客（490 已通过 / 613 已挑战） | 本机计划任务 → `profiles.json` | 每周一（开机则更新） |
-| OEIS（3 序列 / 8 修订） | 本机计划任务 → `profiles.json` | 每周一（开机则更新） |
-| Observable（1 notebook） | 本机计划任务 → `profiles.json` | 每周一（开机则更新） |
-| Code360（1 题通过 / 250 分） | 本机计划任务 → `profiles.json` | 每周一（开机则更新） |
-| CSDN（53,019 访问 / 8 篇 / 16 粉） | 本机计划任务 → `profiles.json` | 每周一（开机则更新） |
-| 掘金（3,251 阅读 / 8 篇） | 本机计划任务 → `profiles.json` | 每周一（开机则更新） |
-| Gitee（1 仓库 / 9 commits） | 本机计划任务 → `profiles.json` | 每周一（开机则更新） |
-| Bluesky（0 帖 / 6 粉）、Mastodon（2 帖 / 0 粉） | 本机计划任务 → `profiles.json` | 每周一（开机则更新） |
-| 访客分布地图（按国家；页面每次访问给本国 +1） | 本机计划任务 → `visitor-map.json` | 每周一（开机则更新） |
-| ScriptCat（6 脚本 / 2,683 安装） | 本机计划任务 → `profiles.json`（后端 JSON API 无 CORS） | 每周一（开机则更新） |
+| 博客阅读量（221k = 博客园 + CSDN + 掘金） | Worker + 本机 `profiles.json` | 10 分钟 / 每天 |
+| 知乎回答 / 赞同 / 收藏 / 感谢（165 / 937 / 1,833 / 620） | 本机计划任务 A 与 B 都会跑 `update-web-stats.py` → `web-stats.json` | 每天（开机则更新；值不变不提交） |
+| 博客园文章数（139） | 本机计划任务 A 与 B 都会跑 `update-web-stats.py` → `web-stats.json` | 每天（开机则更新；值不变不提交） |
+| Chrome 扩展用户（671 / 6 个） | 本机计划任务 → `chrome-users.json` | 每天（开机则更新） |
+| HackerRank 认证（11 张 / 2 枚徽章） | 本机计划任务 → `profiles.json` | 每天（开机则更新） |
+| Codeforces（127 题 / 峰值 1,485） | 本机计划任务 → `profiles.json` | 每天（开机则更新） |
+| 牛客（490 已通过 / 613 已挑战） | 本机计划任务 → `profiles.json` | 每天（开机则更新） |
+| OEIS（3 序列 / 8 修订） | 本机计划任务 → `profiles.json` | 每天（开机则更新） |
+| Observable（1 notebook） | 本机计划任务 → `profiles.json` | 每天（开机则更新） |
+| Code360（1 题通过 / 250 分） | 本机计划任务 → `profiles.json` | 每天（开机则更新） |
+| CSDN（53,019 访问 / 8 篇 / 16 粉） | 本机计划任务 → `profiles.json` | 每天（开机则更新） |
+| 掘金（3,251 阅读 / 8 篇） | 本机计划任务 → `profiles.json` | 每天（开机则更新） |
+| Gitee（1 仓库 / 9 commits） | 本机计划任务 → `profiles.json` | 每天（开机则更新） |
+| Bluesky（0 帖 / 6 粉）、Mastodon（2 帖 / 0 粉） | 本机计划任务 → `profiles.json` | 每天（开机则更新） |
+| 访客分布地图（按国家；页面每次访问给本国 +1） | 本机计划任务 → `visitor-map.json` | 每天（开机则更新） |
+| ScriptCat（6 脚本 / 2,683 安装） | 本机计划任务 → `profiles.json`（后端 JSON API 无 CORS） | 每天（开机则更新） |
 | Advent of Code 2024 全球名次（#14 / 1,699 分） | 静态（历史赛果） | 不更新 |
 | AIME / Putnam 解法 wiki（101 页） | 静态（一年加一两页） | 不更新 |
 
@@ -61,8 +61,8 @@
   - v3 修的东西：GreasyFork 改用规范地址（旧地址 301 且跳转后丢 CORS）；Bilibili / 抖音 / LeetCode 加浏览器 UA + referer（旧的 `resume-metrics` UA 被拒，这正是那几个字段从返回里消失的原因）；Bilibili 增加 `x/relation/stat` 兜底；Stack Exchange 改为「账号页抓取为主、API `/associated` 兜底」；知乎从 Worker 移除（所有机房 IP 都 403，只能本机跑）。
   - 口径差异：账号页抓到 118 站 / 24,671；SE API `associated` 是 117 站 / 24,570。两个都算对，只是站点集合不同，页面按抓到的那个数显示。
   - RosettaCode 会间歇性被 Cloudflare challenge，两条通道都可能失败，此时页面回落到静态的 465 / 43。
-- **本机任务 A**（`\resume chrome users`，每周一 09:30，`C:\Users\Yangh\resume-metrics\run.cmd`）：`update-chrome-users.py` + `update-web-stats.py`，通过 `gh` 直接提交；跑的是拒绝机房 IP 的源（Chrome Web Store、知乎）。任务 B 也会跑一次 `update-web-stats.py`（见下），两边都跑是刻意的冗余：`web-stats.json` 值没变就不提交，不会有重复提交。
-- **本机任务 B**（`\resume profile stats`，每周一 09:40）：仓库根目录 `python update-profiles.py`，跑完再用同一个 Python 跑 `C:\Users\Yangh\resume-metrics\update-web-stats.py`（知乎 + 博客园 → `web-stats.json`）；两个脚本的退出码都会写进日志并向上传递，任一失败任务结果就是失败。`update-profiles.py` 每次先 `git fetch` + `git rebase origin/main` 再动手——任务 A 用 gh API 直接写主分支，不同步就 push 会被 `fetch first` 拒掉（2026-11 因此静默失败两周）；push 失败重试 3 次、每次重试前再同步一次；只要本地还有没推的提交，即使本次数字没变也会补推；访客地图每周都重算，不再依赖 profiles 有没有变化；失败会打印 `ERROR:` 并以非零码退出，完整日志在 `%LOCALAPPDATA%\resume-profile-task.log`。跑的是无 CORS 的源（OEIS、Observable、Code360、CSDN、掘金、Gitee、牛客、Codeforces、HackerRank、Bluesky、Mastodon、ScriptCat）。
+- **本机任务 A**（`\resume chrome users`，每天 09:30，`C:\Users\Yangh\resume-metrics\run.cmd`）：`update-chrome-users.py` + `update-web-stats.py`，通过 `gh` 直接提交；跑的是拒绝机房 IP 的源（Chrome Web Store、知乎）。任务 B 也会跑一次 `update-web-stats.py`（见下），两边都跑是刻意的冗余：`web-stats.json` 值没变就不提交，不会有重复提交；`chrome-users.json` 内容没变同样不提交。
+- **本机任务 B**（`\resume profile stats`，每天 09:40）：仓库根目录 `python update-profiles.py`，跑完再用同一个 Python 跑 `C:\Users\Yangh\resume-metrics\update-web-stats.py`（知乎 + 博客园 → `web-stats.json`）；两个脚本的退出码都会写进日志并向上传递，任一失败任务结果就是失败。`update-profiles.py` 每次先 `git fetch` + `git rebase origin/main` 再动手——任务 A 用 gh API 直接写主分支，不同步就 push 会被 `fetch first` 拒掉（2026-11 因此静默失败两周）；push 失败重试 3 次、每次重试前再同步一次；只要本地还有没推的提交，即使本次数字没变也会补推；访客地图每周都重算，不再依赖 profiles 有没有变化；失败会打印 `ERROR:` 并以非零码退出，完整日志在 `%LOCALAPPDATA%\resume-profile-task.log`。跑的是无 CORS 的源（OEIS、Observable、Code360、CSDN、掘金、Gitee、牛客、Codeforces、HackerRank、Bluesky、Mastodon、ScriptCat）。
 - **访客信息**：城市/国家靠 ipinfo.io（失败退回 api.country.is，只到国家），PV/UV 靠 vercount.one 的脚本（写一个 1 年期 cookie 用来判首次 UV，本地 localStorage 缓存上次值）。这两项都会把访客 IP 发给第三方；页面本身不写 cookie。两者都失败时显示 `—`，不影响其它数字。
 
   城市前加 `≈` 是因为 IP 库只能到 ISP 登记的机房城市（合肥的家宽常被判成上海）；点 `locate me` 走浏览器 Geolocation（Wi-Fi/GPS，授权一次、之后每次访问静默复用），坐标只发给 BigDataCloud 的 client 反查接口换地名，精修时不再给该国计数器 +1。拒绝授权或设备定位失败就保留 IP 估算值，不影响其它数字。
@@ -94,7 +94,7 @@
 | `chrome-ids.json` | 6 个扩展的商店 ID，Worker 读它 |
 | `chrome-users.json` | 扩展用户合计与逐项明细 |
 | `web-stats.json` | 知乎四个计数 + 博客园阅读 / 文章数 |
-| `profiles.json` | 12 个平台的计数器（见上表「每周一」部分） |
+| `profiles.json` | 12 个平台的计数器（见上表「每天」部分） |
 | `visitor-map.json` | 各国家访客数（abacus 计数器聚合，周快照） |
 | `update-profiles.py` | 采集 `profiles.json` 并自行 commit + push |
 | `worker.js` | Cloudflare Worker 源码（改完手动粘到控制台部署；仓库这份是源，不是部署产物） |

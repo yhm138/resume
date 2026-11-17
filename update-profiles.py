@@ -435,13 +435,23 @@ def main():
                                "mastodon", "bluesky", "scriptcat") if prev.get(k) != result[k]]
         print("wrote profiles.json, changed:", ",".join(changed) or "metadata only")
 
-    # 访客地图每周都重算：它和上面的计数器无关，profiles 没变的那几周访问量照样在涨
+    # 访客地图每次都重算：它和上面的计数器无关。计数没变就不重写（只改 generated_at 不值得一次提交）
     vm = visitor_map()
     vm_path = os.path.join(REPO, "visitor-map.json")
-    with open(vm_path, "w", encoding="utf-8", newline="\n") as f:
-        json.dump(vm, f, ensure_ascii=False, indent=2)
-        f.write("\n")
-    print("visitor-map: %d visits from %d countries" % (vm["total"], len(vm["countries"])))
+    try:
+        prev_vm = json.load(open(vm_path, encoding="utf-8"))
+    except Exception:
+        prev_vm = {}
+    same = ({k: v for k, v in prev_vm.items() if k != "generated_at"} ==
+            {k: v for k, v in vm.items() if k != "generated_at"})
+    if same:
+        print("visitor-map unchanged: %d visits from %d countries"
+              % (vm["total"], len(vm["countries"])))
+    else:
+        with open(vm_path, "w", encoding="utf-8", newline="\n") as f:
+            json.dump(vm, f, ensure_ascii=False, indent=2)
+            f.write("\n")
+        print("visitor-map: %d visits from %d countries" % (vm["total"], len(vm["countries"])))
 
     return publish()
 
