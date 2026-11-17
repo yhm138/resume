@@ -399,7 +399,13 @@ def main():
                     ("gitee", gitee), ("mastodon", mastodon), ("bluesky", bluesky),
                     ("scriptcat", scriptcat)):
         try:
-            result[key] = fn()
+            got = fn()
+            if not any(v is not None for v in got.values()):
+                raise RuntimeError("every field parsed as null")
+            # 部分字段为 None（页面结构变了 / 反爬页）时保留上一次的值，不让 null 覆盖已发布的数据
+            merged = dict(prev.get(key, {}))
+            merged.update({k: v for k, v in got.items() if v is not None})
+            result[key] = merged
         except Exception as e:
             print("FAIL %s: %s: %s" % (key, type(e).__name__, e))
             result[key] = prev.get(key, {})
