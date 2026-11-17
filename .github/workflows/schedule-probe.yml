@@ -1,0 +1,20 @@
+name: schedule probe
+on:
+  schedule:
+    - cron: "*/5 * * * *"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Record the triggering event
+        run: |
+          echo "event=${GITHUB_EVENT_NAME} utc=$(date -u +%FT%TZ)"
+          {
+            echo "### schedule probe"
+            echo "- event: ${GITHUB_EVENT_NAME}"
+            echo "- utc: $(date -u +%FT%TZ)"
+            echo "- ref: ${GITHUB_REF}"
+          } >> "$GITHUB_STEP_SUMMARY"
