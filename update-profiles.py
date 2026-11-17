@@ -296,7 +296,124 @@ def load_previous():
         return {}
 
 
+def git(*args, timeout=180):
+    """Run git inside the repository; a timeout comes back as returncode 124."""
+    try:
+        return subprocess.run(["git", "-C", REPO] + list(args), capture_output=True, text=True,
+                              timeout=timeout)
+    except subprocess.TimeoutExpired:
+        return subprocess.CompletedProcess(args, 124, "", "timeout after %ss" % timeout)
+
+
+def commit_json_changes(message="chore: refresh profile counters and visitor map"):
+    git("add", "profiles.json", "visitor-map.json")
+    c = git("-c", "user.name=yhm138", "-c", "user.email=aspen1382020@gmail.com",
+            "commit", "-m", message)
+    if c.returncode != 0:
+        print("ERROR: commit failed:", c.stderr.strip()[:300])
+        return False
+    print("committed:", (c.stdout.strip().splitlines() or [""])[0])
+    return True
+
+
+def sync():
+    """Fetch and rebase onto origin/main; fast-forward when nothing local is pending.
+
+    Task A publishes through the GitHub API, so origin/main moves without this clone
+    seeing it. Pushing straight after a local commit is rejected with "fetch first" --
+    that rejection is what left two weeks of counters unpublished.
+    """
+    last = None
+    for attempt in range(3):
+        last = git("fetch", "origin", "main")
+        if last.returncode == 0:
+            break
+        print("fetch attempt %d/3 failed: %s" % (attempt + 1, last.stderr.strip()[:200]))
+        time.sleep(10)
+    else:
+        return False, "fetch origin failed: " + last.stderr.strip()[:300]
+    reb = git("rebase", "origin/main")
+    if reb.returncode != 0:
+        git("rebase", "--abort")
+        return False, "rebase onto origin/main failed: " + reb.stderr.strip()[:300]
+    return True, ""
+
+
+def dirty_json_only():
+    """Return (ok, text). ok=False if a tracked file other than the two JSONs changed.
+
+    git status --porcelain puts the path at column 4 ("XY path", X may be a space),
+    so the raw text must not be stripped before slicing it.
+    """
+    raw = git("status", "--porcelain", "--untracked-files=no").stdout
+    if not raw.strip():
+        return True, ""
+    files = set()
+    for line in raw.splitlines():
+        path = line[3:]
+        if " -> " in path:                      # renames: "R  old -> new"
+            path = path.split(" -> ")[-1]
+        files.add(path.strip())
+    return files <= {"profiles.json", "visitor-map.json"}, raw.strip()
+
+
+def publish():
+    """Commit the two JSON files if they changed, then push whatever origin lacks.
+
+    Exit code 0 only when origin/main contains HEAD. Every failure prints an ERROR
+    line and returns non-zero, so the scheduled task records a failure instead of the
+    console window closing quietly.
+    """
+    ok_dirty, dirty = dirty_json_only()
+    if not ok_dirty:
+        print("ERROR: uncommitted changes outside profiles.json / visitor-map.json:")
+        print(dirty)
+        return 1
+    if dirty and not commit_json_changes():
+        return 1
+
+    ahead = int(git("rev-list", "--count", "origin/main..HEAD").stdout.strip() or 0)
+    if ahead == 0:
+        print("nothing to publish: origin/main already has this data")
+        return 0
+
+    for attempt in range(3):
+        push = git("push", "origin", "main")
+        if push.returncode == 0:
+            print("pushed %d commit(s): %s"
+                  % (ahead, git("log", "-1", "--oneline").stdout.strip()))
+            return 0
+        print("push attempt %d/3 failed: %s" % (attempt + 1, push.stderr.strip()[:300]))
+        ok, msg = sync()                # 采集期间远端可能又被任务 A 推过
+        if not ok:
+            print("ERROR:", msg)
+            return 1
+        ahead = int(git("rev-list", "--count", "origin/main..HEAD").stdout.strip() or 0)
+        if ahead == 0:
+            print("nothing left to push after sync")
+            return 0
+        time.sleep(10)
+    print("ERROR: push failed after 3 attempts; commits kept locally, the next run retries")
+    return 1
+
+
 def main():
+    # 上一次跑到一半留下的改动先落成提交，否则 rebase 会以「有未暂存改动」拒绝执行
+    ok_dirty, dirty = dirty_json_only()
+    if not ok_dirty:
+        print("ERROR: uncommitted changes outside profiles.json / visitor-map.json:")
+        print(dirty)
+        return 1
+    if dirty:
+        print("found uncommitted changes from a previous run")
+        if not commit_json_changes():
+            return 1
+
+    ok, msg = sync()
+    if not ok:
+        print("ERROR:", msg)
+        return 1
+
     prev = load_previous()
     result = {"oeis": {}, "observable": {}, "code360": {}, "hackerrank": {},
               "codeforces": {}, "nowcoder": {}, "csdn": {}, "juejin": {},
@@ -315,35 +432,36 @@ def main():
             stale.append(key)
         time.sleep(1)
     if not all(result[k] for k in result):
-        print("all sources failed, nothing to publish")
-        return 2
+        print("all sources failed, nothing to record")
+        code = publish()               # 仍然把之前失败留下的提交推出去
+        return code if code else 2
 
     result["stale"] = stale
     comparable = {k: v for k, v in prev.items() if k != "generated_at"}
     if comparable == result:
-        print("unchanged:", json.dumps(result, ensure_ascii=False))
-        return 0
+        print("profiles unchanged")
+    else:
+        result = dict(result)
+        result["generated_at"] = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+        result["stale"] = stale
+        ordered = {"generated_at": result["generated_at"], "stale": stale,
+                   "oeis": result["oeis"], "observable": result["observable"],
+                   "code360": result["code360"], "hackerrank": result["hackerrank"],
+                   "codeforces": result["codeforces"], "nowcoder": result["nowcoder"],
+                   "csdn": result["csdn"], "juejin": result["juejin"], "gitee": result["gitee"],
+                   "mastodon": result["mastodon"], "bluesky": result["bluesky"],
+                   "scriptcat": result["scriptcat"]}
+        tmp = OUT + ".tmp"
+        with open(tmp, "w", encoding="utf-8", newline="\n") as f:
+            json.dump(ordered, f, ensure_ascii=False, indent=2)
+            f.write("\n")
+        os.replace(tmp, OUT)
+        changed = [k for k in ("oeis", "observable", "code360", "hackerrank",
+                               "codeforces", "nowcoder", "csdn", "juejin", "gitee",
+                               "mastodon", "bluesky", "scriptcat") if prev.get(k) != result[k]]
+        print("wrote profiles.json, changed:", ",".join(changed) or "metadata only")
 
-    result = dict(result)
-    result["generated_at"] = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
-    result["stale"] = stale
-    ordered = {"generated_at": result["generated_at"], "stale": stale,
-               "oeis": result["oeis"], "observable": result["observable"],
-               "code360": result["code360"], "hackerrank": result["hackerrank"],
-               "codeforces": result["codeforces"], "nowcoder": result["nowcoder"],
-               "csdn": result["csdn"], "juejin": result["juejin"], "gitee": result["gitee"],
-               "mastodon": result["mastodon"], "bluesky": result["bluesky"],
-               "scriptcat": result["scriptcat"]}
-    tmp = OUT + ".tmp"
-    with open(tmp, "w", encoding="utf-8", newline="\n") as f:
-        json.dump(ordered, f, ensure_ascii=False, indent=2)
-        f.write("\n")
-    os.replace(tmp, OUT)
-    changed = [k for k in ("oeis", "observable", "code360", "hackerrank",
-                          "codeforces", "nowcoder", "csdn", "juejin", "gitee",
-                          "mastodon", "bluesky", "scriptcat") if prev.get(k) != result[k]]
-    print("wrote profiles.json, changed:", ",".join(changed) or "metadata only")
-
+    # 访客地图每周都重算：它和上面的计数器无关，profiles 没变的那几周访问量照样在涨
     vm = visitor_map()
     vm_path = os.path.join(REPO, "visitor-map.json")
     with open(vm_path, "w", encoding="utf-8", newline="\n") as f:
@@ -351,24 +469,11 @@ def main():
         f.write("\n")
     print("visitor-map: %d visits from %d countries" % (vm["total"], len(vm["countries"])))
 
-    def git(*args):
-        return subprocess.run(["git", "-C", REPO] + list(args), capture_output=True, text=True,
-                              timeout=120)
-
-    changed_files = git("status", "--porcelain", "profiles.json", "visitor-map.json").stdout.strip()
-    if changed_files:
-        git("add", "profiles.json", "visitor-map.json")
-        git("-c", "user.name=yhm138", "-c", "user.email=aspen1382020@gmail.com",
-            "commit", "-m", "chore: refresh profile counters and visitor map")
-        push = git("push", "origin", "main")
-        if push.returncode != 0:
-            print("push failed:", push.stderr.strip()[:400])
-            return 1
-        print("pushed:", git("log", "-1", "--oneline").stdout.strip())
-    else:
-        print("nothing to commit")
-    return 0
+    return publish()
 
 
 if __name__ == "__main__":
-    sys.exit(main())
+    print("[%s] run start" % datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
+    code = main()
+    print("[%s] run end, exit %d" % (datetime.now().strftime("%Y-%m-%d %H:%M:%S"), code))
+    sys.exit(code)

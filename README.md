@@ -62,7 +62,7 @@
   - 口径差异：账号页抓到 118 站 / 24,671；SE API `associated` 是 117 站 / 24,570。两个都算对，只是站点集合不同，页面按抓到的那个数显示。
   - RosettaCode 会间歇性被 Cloudflare challenge，两条通道都可能失败，此时页面回落到静态的 465 / 43。
 - **本机任务 A**（`\resume chrome users`，每周一 09:30，`C:\Users\Yangh\resume-metrics\run.cmd`）：`update-chrome-users.py` + `update-web-stats.py`，通过 `gh` 直接提交；跑的是拒绝机房 IP 的源（Chrome Web Store、知乎）。
-- **本机任务 B**（`\resume profile stats`，每周一 09:40）：仓库根目录 `python update-profiles.py`，数字没变就不写文件也不提交；跑的是无 CORS 的源（OEIS、Observable、Code360、CSDN、掘金、Gitee、牛客、Codeforces、HackerRank、Bluesky、Mastodon、ScriptCat）。
+- **本机任务 B**（`\resume profile stats`，每周一 09:40）：仓库根目录 `python update-profiles.py`。每次先 `git fetch` + `git rebase origin/main` 再动手——任务 A 用 gh API 直接写主分支，不同步就 push 会被 `fetch first` 拒掉（2026-11 因此静默失败两周）；push 失败重试 3 次、每次重试前再同步一次；只要本地还有没推的提交，即使本次数字没变也会补推；访客地图每周都重算，不再依赖 profiles 有没有变化；失败会打印 `ERROR:` 并以非零码退出，完整日志在 `%LOCALAPPDATA%\resume-profile-task.log`。跑的是无 CORS 的源（OEIS、Observable、Code360、CSDN、掘金、Gitee、牛客、Codeforces、HackerRank、Bluesky、Mastodon、ScriptCat）。
 - **访客信息**：城市/国家靠 ipinfo.io（失败退回 api.country.is，只到国家），PV/UV 靠 vercount.one 的脚本（写一个 1 年期 cookie 用来判首次 UV，本地 localStorage 缓存上次值）。这两项都会把访客 IP 发给第三方；页面本身不写 cookie。两者都失败时显示 `—`，不影响其它数字。
 
   城市前加 `≈` 是因为 IP 库只能到 ISP 登记的机房城市（合肥的家宽常被判成上海）；点 `locate me` 走浏览器 Geolocation（Wi-Fi/GPS，授权一次、之后每次访问静默复用），坐标只发给 BigDataCloud 的 client 反查接口换地名，精修时不再给该国计数器 +1。拒绝授权或设备定位失败就保留 IP 估算值，不影响其它数字。
