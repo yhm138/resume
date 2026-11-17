@@ -131,7 +131,7 @@ dsh-image-rescue 的契约事实（2026-11-17 用 npm registry + GitHub API 核�
 | Bilibili 播放量 | 需 wbi 签名，播放总数只在创作中心 | 放弃 |
 | 微信公众号 / 视频号 / 即刻 | 无公开接口 | 做不到 |
 | 微博 / 小红书 / X / Instagram / Threads | 反爬或需登录态 | 不建议 |
-| GitHub Actions 定时 | 该账号 `schedule` 不触发（空仓库验证过，`workflow_dispatch` 正常） | 不放定时 workflow |
+| GitHub Actions 定时 | 该账号 `schedule` 不触发（2026-11-17 复测：`main` 上放 `cron: "*/5 * * * *"` 探针工作流，41 分钟内 0 次 schedule 事件；同一工作流手动 `workflow_dispatch` 17 秒跑完。Actions 服务本身正常，只有定时不触发） | 不放定时 workflow；需要定时就用本机计划任务 |
 | Lark wiki | 目录树 API 返回 `Login Required`，只有带会话的浏览器能读 | 只放链接 + 静态计数 |
 
 ## 撤掉的展示
