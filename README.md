@@ -4,81 +4,91 @@
 
 单文件页面（`index.html`，样式内联，无构建）+ 一个 Cloudflare Worker + 两个本机计划任务。每个数字的取数通道不同，取不到就退回旧值，不会空白。
 
+## 数据链路
+
+```
+① 浏览器直连（每次访问，页面自己 fetch）
+   GitHub · GreasyFork · Stack Exchange 分站/徽章 · Codeberg · 天池 · npm downloads
+   ipinfo.io（+ BigDataCloud 精修）· vercount.one（PV/UV 脚本）
+② Cloudflare Worker /metrics（缓存 10 分钟）
+   PyPI · SE 全站 · RosettaCode · 博客园阅读 · LeetCode · Codewars · leetcode.com · 抖音
+       ↓ Worker 不可达
+③ metrics.json（仓库里的快照）→ 再退到 index.html 里的静态值
+④ 本机两个计划任务（每天 09:30 / 09:40，直写 main，页面直接读 raw）
+   09:30  \resume chrome users  → chrome-users.json（Chrome Web Store）
+                                  + web-stats.json（知乎 / 博客园）
+   09:40  \resume profile stats → profiles.json（12 个无 CORS 的源）
+                                  + visitor-map.json + web-stats.json（冗余再跑一次）
+```
+
+- 写文件的通道只有两种：Worker（10 分钟）和本机脚本（每天）。页面读 `raw.githubusercontent.com`，不经过 Worker。
+- 每个数字都有静态兜底：接口失败就保留上一次的值或 HTML 里的静态值，不会出现空白或 NaN。
+- Worker 的 `sources` 字段标 `primary` / `fallback` / `unavailable`；**口径不同的兜底值页面不采用**——RosettaCode 的 API 兜底只有 204 条贡献行，和账号页的 465 个任务页不是同一个数，所以只在 `sources.rosetta == "primary"` 时才覆盖。
+- 静态、不更新：AoC 2024 全球 #14（1,699 分）、AIME/Putnam wiki 101 页。
+
 ## 指标来源
 
 > 下表按**更新频率**排序：每次访问 → 10 分钟 → 每天 → 不更新。括号里的数字是写表时的快照，线上以页面显示为准。
 
 | 指标 | 载体 | 更新频率 |
 | --- | --- | --- |
-| GitHub 仓库数（50） | 浏览器直连 GitHub API | 每次访问 |
-| GreasyFork 安装量（11.5k / 81 脚本） | 浏览器直连 GreasyFork API | 每次访问 |
-| GreasyFork 好评（39） | 浏览器直连 GreasyFork API | 每次访问 |
+| GitHub 仓库数（54） | 浏览器直连 GitHub API | 每次访问 |
+| GreasyFork 安装量（11.8k / 82 脚本） | 浏览器直连 GreasyFork API | 每次访问 |
+| GreasyFork 好评（42） | 浏览器直连 GreasyFork API | 每次访问 |
 | Stack Exchange 分站声誉 | 浏览器直连 SE API | 每次访问 |
-| Stack Exchange 徽章（347，117 站合计） | 浏览器直连 SE API（分页） | 每次访问 |
+| Stack Exchange 徽章（347，associated 分页汇总） | 浏览器直连 SE API（分页） | 每次访问 |
 | 访客城市 / 国家（`≈` = IP 估算，`locate me` = 设备定位） | 浏览器直连 ipinfo.io（降级 api.country.is）；精修走 Geolocation + BigDataCloud 反查 | 每次访问 / 按需 |
 | 整站 PV / UV | vercount.one 脚本（busuanzi 兼容） | 每次访问 |
 | Codeberg 仓库数（5） | 浏览器直连 Codeberg API（Gitea/Forgejo） | 每次访问 |
 | 天池（3 场比赛） | 浏览器直连 Tianchi API（带 CORS） | 每次访问 |
 | dsh-image-rescue npm 累计下载（动态，静态兜底 358） | 浏览器直连 npm downloads API（发布日 2026-11-12 至今逐日求和） | 每次访问 |
 | Stack Exchange 全站声誉（24.7k / 118 站） | Cloudflare Worker | 10 分钟 |
-| PyPI 累计下载（3,959） | Cloudflare Worker | 10 分钟 |
-| RosettaCode（465 任务页 / 43 新建） | Cloudflare Worker | 10 分钟 |
-| 博客园总阅读（165,007 / 139 篇） | Cloudflare Worker | 10 分钟 |
+| PyPI 累计下载（4,036） | Cloudflare Worker | 10 分钟 |
+| RosettaCode（465 任务页 / 43 新建；仅主通道成功时采用） | Cloudflare Worker | 10 分钟 |
+| 博客园总阅读（166,129 / 139 篇） | Cloudflare Worker | 10 分钟 |
 | LeetCode 通过题数（1,953） | Cloudflare Worker | 10 分钟 |
 | Codewars（38 kata / 5 kyu） | Cloudflare Worker | 10 分钟 |
 | leetcode.com 通过题数（14） | Cloudflare Worker | 10 分钟 |
-| 博客阅读量（221k = 博客园 + CSDN + 掘金） | Worker + 本机 `profiles.json` | 10 分钟 / 每天 |
-| 知乎回答 / 赞同 / 收藏 / 感谢（165 / 937 / 1,833 / 620） | 本机计划任务 A 与 B 都会跑 `update-web-stats.py` → `web-stats.json` | 每天（开机则更新；值不变不提交） |
+| 博客阅读量（222k = 博客园 + CSDN + 掘金） | Worker + 本机 `profiles.json` | 10 分钟 / 每天 |
+| 知乎回答 / 赞同 / 收藏 / 感谢（164 / 947 / 1,850 / 619） | 本机计划任务 A 与 B 都会跑 `update-web-stats.py` → `web-stats.json` | 每天（开机则更新；值不变不提交） |
 | 博客园文章数（139） | 本机计划任务 A 与 B 都会跑 `update-web-stats.py` → `web-stats.json` | 每天（开机则更新；值不变不提交） |
-| Chrome 扩展用户（671 / 6 个） | 本机计划任务 → `chrome-users.json` | 每天（开机则更新） |
+| Chrome 扩展用户（663 / 6 个） | 本机计划任务 A → `chrome-users.json` | 每天（开机则更新；内容不变不提交） |
 | HackerRank 认证（11 张 / 2 枚徽章） | 本机计划任务 → `profiles.json` | 每天（开机则更新） |
 | Codeforces（127 题 / 峰值 1,485） | 本机计划任务 → `profiles.json` | 每天（开机则更新） |
 | 牛客（490 已通过 / 613 已挑战） | 本机计划任务 → `profiles.json` | 每天（开机则更新） |
 | OEIS（3 序列 / 8 修订） | 本机计划任务 → `profiles.json` | 每天（开机则更新） |
 | Observable（1 notebook） | 本机计划任务 → `profiles.json` | 每天（开机则更新） |
 | Code360（1 题通过 / 250 分） | 本机计划任务 → `profiles.json` | 每天（开机则更新） |
-| CSDN（53,019 访问 / 8 篇 / 16 粉） | 本机计划任务 → `profiles.json` | 每天（开机则更新） |
-| 掘金（3,251 阅读 / 8 篇） | 本机计划任务 → `profiles.json` | 每天（开机则更新） |
+| CSDN（53,040 访问 / 8 篇 / 16 粉） | 本机计划任务 B → `profiles.json` | 每天（开机则更新） |
+| 掘金（3,298 阅读 / 8 篇） | 本机计划任务 B → `profiles.json` | 每天（开机则更新） |
 | Gitee（1 仓库 / 9 commits） | 本机计划任务 → `profiles.json` | 每天（开机则更新） |
 | Bluesky（0 帖 / 6 粉）、Mastodon（2 帖 / 0 粉） | 本机计划任务 → `profiles.json` | 每天（开机则更新） |
-| 访客分布地图（按国家；页面每次访问给本国 +1） | 本机计划任务 → `visitor-map.json` | 每天（开机则更新） |
-| ScriptCat（6 脚本 / 2,683 安装） | 本机计划任务 → `profiles.json`（后端 JSON API 无 CORS） | 每天（开机则更新） |
+| 访客分布地图（按国家；页面每次访问给本国 +1） | 本机计划任务 B → `visitor-map.json` | 每天（开机则更新；计数不变不提交） |
+| ScriptCat（6 脚本 / 2,780 安装） | 本机计划任务 B → `profiles.json`（后端 JSON API 无 CORS） | 每天（开机则更新） |
 | Advent of Code 2024 全球名次（#14 / 1,699 分） | 静态（历史赛果） | 不更新 |
 | AIME / Putnam 解法 wiki（101 页） | 静态（一年加一两页） | 不更新 |
 
 三条口径提醒：
 
-- 知乎四个数别混：`answer_count` 回答（165）、`voteup_count` 赞同（937）、`favorited_count` 收藏（1,833）、`thanked_count` 感谢（620）。
+- 知乎四个数别混：`answer_count` 回答（164）、`voteup_count` 赞同（947）、`favorited_count` 收藏（1,850）、`thanked_count` 感谢（619）。
 - 博客园「总阅读数」含首页与分类页浏览，不等于逐篇阅读之和（后者约 11 万）；「博客阅读量」是博客园 + CSDN + 掘金三家相加，任一源缺值就不出总数。
 - 数据条共 10 格（桌面 5 列 × 2 行，≤780px 2 列），顺序：repos / GF installs / SE reputation / RosettaCode / PyPI / Chrome / blog reads / AoC / LeetCode / SE badges。实心圆点 = 每次访问实时取，空心 = 定时或本机刷新。
 
-**页面最底部**（页脚里）是访客信息：`you · 城市, 国家`（ipinfo.io 按访客 IP 判断，带 `≈` 表示是估算值；点 `locate me` 用设备定位精修）、`views` / `visitors`（vercount 的整站 PV / UV，按域名计，不是本页单独计数），下面一张点阵世界地图：陆地用分隔线色画点，访客国家用 teal 圆点（半径随访问量开方增长），数据来自 `visitor-map.json` 的周快照。这两块都带 `js-only`，打印时不出现。
+**页面最底部**（页脚里）是访客信息：`you · 城市, 国家`（ipinfo.io 按访客 IP 判断，带 `≈` 表示是估算值；点 `locate me` 用设备定位精修）、`views` / `visitors`（vercount 的整站 PV / UV，按域名计，不是本页单独计数），下面一张点阵世界地图：陆地用分隔线色画点，访客国家用 teal 圆点（半径随访问量开方增长），数据来自 `visitor-map.json` 的每日快照。这两块都带 `js-only`，打印时不出现。
 
 ## 通道细节
 
 - **浏览器直连**：GitHub、GreasyFork、Stack Exchange、天池、Codeberg（Gitea/Forgejo API）、npm downloads API（`api.npmjs.org`）都带 CORS，页面每次访问直接取；SE 徽章走 `users/21083779/associated`，117 个分站 > 100 条/页，必须翻页，否则少算（曾少算成 306）。
-- **Cloudflare Worker（v3，源码见 `worker.js`）**：`https://autumn-thunder-2ee6.aspen1382020.workers.dev/metrics`，缓存 10 分钟，`Access-Control-Allow-Origin: *`；`GET /` 是状态页（`primary` / `fallback` / `unavailable`，并列出本次缺了哪些字段）；`GET /?nocache=1` 绕过缓存。
+- **Cloudflare Worker（v3，当前线上就是 v3，源码见 `worker.js`）**：`https://autumn-thunder-2ee6.aspen1382020.workers.dev/metrics`，缓存 10 分钟，`Access-Control-Allow-Origin: *`；`GET /` 是状态页（`primary` / `fallback` / `unavailable`，并列出本次缺了哪些字段）；`GET /?nocache=1` 绕过缓存。
   - v3 修的东西：GreasyFork 改用规范地址（旧地址 301 且跳转后丢 CORS）；Bilibili / 抖音 / LeetCode 加浏览器 UA + referer（旧的 `resume-metrics` UA 被拒，这正是那几个字段从返回里消失的原因）；Bilibili 增加 `x/relation/stat` 兜底；Stack Exchange 改为「账号页抓取为主、API `/associated` 兜底」；知乎从 Worker 移除（所有机房 IP 都 403，只能本机跑）。
-  - 口径差异：账号页抓到 118 站 / 24,671；SE API `associated` 是 117 站 / 24,570。两个都算对，只是站点集合不同，页面按抓到的那个数显示。
-  - RosettaCode 会间歇性被 Cloudflare challenge，两条通道都可能失败，此时页面回落到静态的 465 / 43。
-- **本机任务 A**（`\resume chrome users`，每天 09:30，`C:\Users\Yangh\resume-metrics\run.cmd`）：`update-chrome-users.py` + `update-web-stats.py`，通过 `gh` 直接提交；跑的是拒绝机房 IP 的源（Chrome Web Store、知乎）。任务 B 也会跑一次 `update-web-stats.py`（见下），两边都跑是刻意的冗余：`web-stats.json` 值没变就不提交，不会有重复提交；`chrome-users.json` 内容没变同样不提交。
-- **本机任务 B**（`\resume profile stats`，每天 09:40）：仓库根目录 `python update-profiles.py`，跑完再用同一个 Python 跑 `C:\Users\Yangh\resume-metrics\update-web-stats.py`（知乎 + 博客园 → `web-stats.json`）；两个脚本的退出码都会写进日志并向上传递，任一失败任务结果就是失败。`update-profiles.py` 每次先 `git fetch` + `git rebase origin/main` 再动手——任务 A 用 gh API 直接写主分支，不同步就 push 会被 `fetch first` 拒掉（2026-11 因此静默失败两周）；push 失败重试 3 次、每次重试前再同步一次；只要本地还有没推的提交，即使本次数字没变也会补推；访客地图每周都重算，不再依赖 profiles 有没有变化；失败会打印 `ERROR:` 并以非零码退出，完整日志在 `%LOCALAPPDATA%\resume-profile-task.log`。跑的是无 CORS 的源（OEIS、Observable、Code360、CSDN、掘金、Gitee、牛客、Codeforces、HackerRank、Bluesky、Mastodon、ScriptCat）。
+  - 口径差异：账号页抓到 118 站 / 24,701；SE API `associated` 是 117 站 / 24,600。两个都算对，只是站点集合不同，页面按抓到的那个数显示。
+  - RosettaCode 会间歇性被 Cloudflare challenge：主通道（账号页）挂掉时 Worker 会退到 MediaWiki `usercontribs` 兜底，但那条只返回 204 条贡献行、口径和 465 个任务页不同，页面只在 `sources.rosetta == "primary"` 时采用，否则保留 465 / 43；两条都失败也一样落到静态值。
+- **本机任务 A**（`\resume chrome users`，每天 09:30，`C:\Users\Yangh\resume-metrics\run.cmd`）：`update-chrome-users.py` + `update-web-stats.py`，通过 `gh` 直接提交；跑的是拒绝机房 IP 的源（Chrome Web Store、知乎）。任务 B 也会跑一次 `update-web-stats.py`（见下），两边都跑是刻意的冗余：`web-stats.json` 值没变就不提交，不会有重复提交；`chrome-users.json` 内容没变同样不提交；发布撞车（别人刚写过）会重试一次。
+- **本机任务 B**（`\resume profile stats`，每天 09:40）：仓库根目录 `python update-profiles.py`，跑完再用同一个 Python 跑 `C:\Users\Yangh\resume-metrics\update-web-stats.py`（知乎 + 博客园 → `web-stats.json`）；两个脚本的退出码都会写进日志并向上传递，任一失败任务结果就是失败。`update-profiles.py` 每次先 `git fetch` + `git rebase origin/main` 再动手——任务 A 用 gh API 直接写主分支，不同步就 push 会被 `fetch first` 拒掉（2026-11 因此静默失败两周）；push 失败重试 3 次、每次重试前再同步一次；只要本地还有没推的提交，即使本次数字没变也会补推；访客地图每次都重算，但计数没变就不重写（`generated_at` 单独变不值得一次提交）；某个源返回全 null（反爬页、页面改版）按失败处理、保留上一次的值，部分字段为 null 时也只补非空字段；失败会打印 `ERROR:` 并以非零码退出，完整日志在 `%LOCALAPPDATA%\resume-profile-task.log`。跑的是无 CORS 的源（OEIS、Observable、Code360、CSDN、掘金、Gitee、牛客、Codeforces、HackerRank、Bluesky、Mastodon、ScriptCat）。
 - **访客信息**：城市/国家靠 ipinfo.io（失败退回 api.country.is，只到国家），PV/UV 靠 vercount.one 的脚本（写一个 1 年期 cookie 用来判首次 UV，本地 localStorage 缓存上次值）。这两项都会把访客 IP 发给第三方；页面本身不写 cookie。两者都失败时显示 `—`，不影响其它数字。
 
   城市前加 `≈` 是因为 IP 库只能到 ISP 登记的机房城市（合肥的家宽常被判成上海）；点 `locate me` 走浏览器 Geolocation（Wi-Fi/GPS，授权一次、之后每次访问静默复用），坐标只发给 BigDataCloud 的 client 反查接口换地名，精修时不再给该国计数器 +1。拒绝授权或设备定位失败就保留 IP 估算值，不影响其它数字。
-- **访客分布地图**：页面每访问一次，按 ipinfo 给的国家调一次 `abacus.jasoncameron.dev/hit/yhm138resume/c-<iso2>`（只对 64 个被追踪的国家/地区，其余忽略）；周任务再把每个国家的计数器读出来写进 `visitor-map.json`。地图本身是页内 SVG：96×48 陆地掩码（base64，768 字节）+ 64 个国家经纬度，全部内联，不加载任何地图库或瓦片。
-
-## 降级链
-
-```
-① Cloudflare Worker  /metrics
-      ↓ 不可达
-② metrics.json        仓库里的快照
-      ↓ 读不到
-③ index.html 里的静态值
-```
-
-`web-stats.json`、`chrome-users.json`、`profiles.json` 是第四种模式：本机发布，页面直接读 raw，不经 Worker。最坏结果是「不新鲜」，不是「打不开」。
+- **访客分布地图**：页面每访问一次，按 ipinfo 给的国家调一次 `abacus.jasoncameron.dev/hit/yhm138resume/c-<iso2>`（只对 64 个被追踪的国家/地区，其余忽略）；每天的任务再把每个国家的计数器读出来写进 `visitor-map.json`（计数没变不重写）。地图本身是页内 SVG：96×48 陆地掩码（base64，768 字节）+ 64 个国家经纬度，全部内联，不加载任何地图库或瓦片。
 
 ## 外链确认弹窗
 
@@ -95,8 +105,8 @@
 | `chrome-users.json` | 扩展用户合计与逐项明细 |
 | `web-stats.json` | 知乎四个计数 + 博客园阅读 / 文章数 |
 | `profiles.json` | 12 个平台的计数器（见上表「每天」部分） |
-| `visitor-map.json` | 各国家访客数（abacus 计数器聚合，周快照） |
-| `update-profiles.py` | 采集 `profiles.json` 并自行 commit + push |
+| `visitor-map.json` | 各国家访客数（abacus 计数器聚合，每日快照；计数不变不重写） |
+| `update-profiles.py` | 采集 `profiles.json` + `visitor-map.json`，先 fetch+rebase 再 commit + push（失败重试、非零退出） |
 | `worker.js` | Cloudflare Worker 源码（改完手动粘到控制台部署；仓库这份是源，不是部署产物） |
 
 ## 项目条目（页面 05 节）
@@ -112,7 +122,8 @@ dsh-image-rescue 的契约事实（2026-11-17 用 npm registry + GitHub API 核�
 
 - **刷新快照**：`python metrics.py && git add metrics.json && git commit -m "chore: refresh metrics" && git push`
 - **改 Worker**：编辑仓库里的 `worker.js` → 复制粘贴到 Cloudflare 控制台 → 部署；然后开 `https://autumn-thunder-2ee6.aspen1382020.workers.dev/` 看每个源是 `primary` / `fallback` / `unavailable`，再开 `?nocache=1` 确认新值。
-- **刷新 Chrome / 知乎 / 博客园**：见本机任务 A；**刷新平台计数器**：见本机任务 B（同时重算 `visitor-map.json`：64 个国家各一次 GET，约 30 秒）。手动只刷知乎 / 博客园：`python update-web-stats.py`（幂等：值没变就打印 `unchanged, not publishing` 并以 0 退出）。
+- **刷新 Chrome / 知乎 / 博客园**（任务 A，每天 09:30，日志 `C:\Users\Yangh\resume-metrics\run.log`）：手动跑 `python C:\Users\Yangh\resume-metrics\update-chrome-users.py` 或 `... \update-web-stats.py`（都幂等：值没变就打印 `unchanged, not publishing` 并以 0 退出）。
+- **刷新平台计数器 / 访客地图**（任务 B，每天 09:40，日志 `%LOCALAPPDATA%\resume-profile-task.log`）：仓库根目录 `python update-profiles.py`；单独重算访客地图要跑完整的 64 个国家 GET，约 30 秒。
 - **新增或下线 Chrome 扩展**：改 `chrome-ids.json` 的 `ids` 数组，Worker 下次请求生效；下线扩展的详情页 404 会被跳过。
 - **部署**：改 `index.html` → commit + push 到 `main`，Pages 自动构建。验证必须带 cache buster（`?v=<时间戳>`），否则约 10 分钟边缘缓存会让你看到旧页面；实测 75 秒时可能仍是旧版，轮询到出现预期内容为止。
 
@@ -170,7 +181,7 @@ dsh-image-rescue 的契约事实（2026-11-17 用 npm registry + GitHub API 核�
 | Quora | `138-Aspen` | 纯 HTTP 403；浏览器能打开：0 回答 / 0 问题 / 0 帖 / 0 粉，2021-01 加入 | 只放链接（等发布） |
 | YouTube | `@yhm138`、`@aspen1382020` 均 404 | — | 有频道再给链接 |
 
-已有平台还有些「小数字」没展示（CSDN 粉丝 16 / 获赞 17 / 收藏 167 / 排名 42,007，掘金关注 2 / 掘力值 97，Gitee followers 0）。它们都在 `profiles.json` 里——量级低于 100 的指标只会稀释已有的强数字，别为了凑数放上去。
+已有平台还有些「小数字」没展示（CSDN 粉丝 16 / 获赞 17 / 收藏 167 / 排名 44,593，掘金关注 2 / 掘力值 97，Gitee followers 0）。它们都在 `profiles.json` 里——量级低于 100 的指标只会稀释已有的强数字，别为了凑数放上去。
 
 ## 依赖
 

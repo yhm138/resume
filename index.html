@@ -590,9 +590,14 @@
       setFrom('se-total', num(m.stackexchange_rep), rank);
       if (m.stackexchange_sites) setFrom('se-sites', String(m.stackexchange_sites), rank);
     }
-    setFrom('m-rosetta', fmt(m.rosetta_tasks), rank);
-    setFrom('ros-tasks', fmt(m.rosetta_tasks), rank);
-    if (m.rosetta_new) setFrom('ros-new', String(m.rosetta_new), rank);
+    // RosettaCode：API 兜底（/usercontribs，最多 500 条）算出来的 204 和账号页的 465 不是同一个口径，
+    // 所以只在主通道 rosetta === "primary" 时采用；兜底/不可用时保留页面上的 465 / 43。
+    var SRC = m.sources || {};
+    if (SRC.rosetta === 'primary' || SRC.rosetta === undefined) {
+      setFrom('m-rosetta', fmt(m.rosetta_tasks), rank);
+      setFrom('ros-tasks', fmt(m.rosetta_tasks), rank);
+      if (m.rosetta_new) setFrom('ros-new', String(m.rosetta_new), rank);
+    }
     if (m.pypi_total != null) {
       setFrom('m-pypi', fmt(m.pypi_total), rank);
       setFrom('pypi-body', num(m.pypi_total), rank);
