@@ -206,12 +206,22 @@
   @keyframes leavein{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
   @media (prefers-reduced-motion:reduce){dialog.leave[open]{animation:none}}
 
+  /* ---------- npm 累计下载折线（页面内绘制，无图片文件） ---------- */
+  .spark{margin:10px 0 2px;max-width:320px}
+  .spark[hidden]{display:none}
+  .spark svg{display:block;width:100%;height:auto;overflow:visible}
+  .spark .area{fill:rgba(18,63,77,.07)}
+  .spark .line{fill:none;stroke:var(--accent);stroke-width:1.4;stroke-linejoin:round;stroke-linecap:round}
+  .spark .rule{stroke:var(--rule);stroke-width:.7}
+  .spark .dot{fill:var(--accent)}
+  .spark text{font-family:var(--mono);font-size:7px;fill:var(--ink-3);letter-spacing:.05em;text-transform:uppercase}
+
   @media print{
     :root{--paper:#fff}
     body{background:#fff;font-size:10pt;line-height:1.55}
     body::before{display:none}
     .page{max-width:none;padding:0}
-    .live,footer .js-only,.dot{display:none}
+    .live,footer .js-only,.dot,.spark{display:none}
     .masthead h1{font-size:28pt}
     .sec{padding-top:10pt}
     .entry{break-inside:avoid}
@@ -447,6 +457,7 @@
           <li><span class="hl">Host contract</span> — wraps <span class="hl">admitPromptContent</span> on <span class="hl">ctx.attachments</span> of <span class="hl">@deepseek-ai/dsh-attachment</span>; rescues IMAGE_DIMENSION_TOO_LARGE, IMAGE_TOO_MANY_PIXELS, IMAGE_TOO_LARGE, IMAGES_TOO_LARGE and TOO_MANY_IMAGES, and passes INVALID_IMAGE through. Host-only Cordis plugin, no client code or build step; exports apply(ctx, config) and wrapAttachmentStore(store, config), with options <span class="hl">enabled</span> and <span class="hl">note</span>.</li>
           <li><a href="https://www.npmjs.com/package/dsh-image-rescue" target="_blank" rel="noreferrer">npm 0.1.0</a>, <a href="https://awesome-dsh-plugin.com/p/yhm138/dsh-image-rescue/" target="_blank" rel="noreferrer">listed in the awesome-dsh-plugin index</a>; <a href="https://npm-stat.com/charts.html?package=dsh-image-rescue&amp;from=2026-11-12" target="_blank" rel="noreferrer"><span class="hl" id="npm-dl">358</span> downloads since release</a> (npm's counter includes CI and mirrors, not users). Install: <span class="hl">dsh plugin --profile &lt;profile&gt; add dsh-image-rescue</span>.</li>
         </ul>
+        <figure class="spark" id="npm-spark" hidden></figure>
       </article>
 
       <article class="entry">
@@ -721,11 +732,39 @@
   })();
 
   // 2g) npm 下载量：官方 downloads API 带 CORS（access-control-allow-origin: *），
-  //     累计值 = 发布日到今天逐日相加；接口失败就保留静态值。数字本身链到 npm-stat 的趋势图。
+  //     累计值 = 发布日到今天逐日相加；接口失败就保留静态值。
+  //     同一次响应顺手在页面内画一条累计下载折线（内联 SVG：不加载图表库、不提交图片文件、
+  //     每次访问都是最新数据）；数字本身链到 npm-stat 看完整趋势。
   (function loadNpmDownloads() {
     var PKG = 'dsh-image-rescue', RELEASED = '2026-11-12';
     var out = document.getElementById('npm-dl');
+    var box = document.getElementById('npm-spark');
     if (!out) return;
+    function spark(list, total) {
+      if (!box || !list.length) return;
+      var W = 320, H = 96, padL = 4, padR = 4, padT = 12, padB = 13;
+      var cum = [], run = 0, i;
+      for (i = 0; i < list.length; i++) { run += Number(list[i].downloads) || 0; cum.push(run); }
+      var n = cum.length, max = Math.max(total, 1), base = H - padB, k;
+      function x(v) { return n === 1 ? W / 2 : padL + v * (W - padL - padR) / (n - 1); }
+      function y(v) { return base - v / max * (H - padT - padB); }
+      var pts = [];
+      for (k = 0; k < n; k++) pts.push((k ? 'L' : 'M') + x(k).toFixed(1) + ' ' + y(cum[k]).toFixed(1));
+      var first = list[0].day, last = list[n - 1].day, path = pts.join(' ');
+      box.innerHTML =
+        '<svg viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="Cumulative npm downloads since ' +
+        first + ': ' + total + ' as of ' + last + '">' +
+        '<path class="area" d="' + path + ' L' + x(n - 1).toFixed(1) + ' ' + base +
+        ' L' + x(0).toFixed(1) + ' ' + base + ' Z"/>' +
+        '<path class="line" d="' + path + '"/>' +
+        '<line class="rule" x1="' + padL + '" y1="' + base + '" x2="' + (W - padR) + '" y2="' + base + '"/>' +
+        '<circle class="dot" cx="' + x(n - 1).toFixed(1) + '" cy="' + y(cum[n - 1]).toFixed(1) + '" r="1.7"/>' +
+        '<text x="' + padL + '" y="' + (padT - 4) + '">' + total.toLocaleString('en-US') + ' total</text>' +
+        '<text x="' + padL + '" y="' + (H - 4) + '">' + first + '</text>' +
+        '<text x="' + (W - padR) + '" y="' + (H - 4) + '" text-anchor="end">' + last + '</text>' +
+        '</svg>';
+      box.hidden = false;
+    }
     var today = new Date().toISOString().slice(0, 10);
     fetch('https://api.npmjs.org/downloads/range/' + RELEASED + ':' + today + '/' + PKG,
           { headers: { Accept: 'application/json' } })
@@ -734,7 +773,10 @@
         var list = j && j.downloads;
         if (!Array.isArray(list)) throw new Error('unexpected payload');
         var total = list.reduce(function (s, d) { return s + (Number(d.downloads) || 0); }, 0);
-        if (total > 0) setFrom('npm-dl', num(total), R_WORKER);
+        if (total > 0) {
+          setFrom('npm-dl', num(total), R_WORKER);
+          spark(list, total);
+        }
       })
       .catch(function () { /* 静态值兜底 */ });
   })();
