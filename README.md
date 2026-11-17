@@ -44,6 +44,7 @@
 | ScriptCat（6 脚本 / 2,683 安装） | 本机计划任务 → `profiles.json`（后端 JSON API 无 CORS） | 每周一（开机则更新） |
 | Advent of Code 2024 全球名次（#14 / 1,699 分） | 静态（历史赛果） | 不更新 |
 | AIME / Putnam 解法 wiki（101 页） | 静态（一年加一两页） | 不更新 |
+| dsh-image-rescue npm 周下载（358，11-09~11-15） | 静态（npm 官方统计，含发布日 296 与 CI/镜像） | 不更新 |
 
 三条口径提醒：
 
@@ -98,6 +99,15 @@
 | `update-profiles.py` | 采集 `profiles.json` 并自行 commit + push |
 | `worker.js` | Cloudflare Worker 源码（改完手动粘到控制台部署；仓库这份是源，不是部署产物） |
 
+## 项目条目（页面 05 节）
+
+| 项目 | 链接 | 页面上的数字 | 口径 / 备注 |
+| --- | --- | --- | --- |
+| workbuddy-toolkit | [GitHub](https://github.com/yhm138/workbuddy-toolkit) | 无 | 3 个 WorkBuddy 桌面扩展（会话桥、复制会话 ID、云会话），CI 跑 Windows 与 Linux |
+| dsh-image-rescue | [GitHub](https://github.com/yhm138/dsh-image-rescue) · [npm](https://www.npmjs.com/package/dsh-image-rescue) · [市场页](https://awesome-dsh-plugin.com/p/yhm138/dsh-image-rescue/) | npm 周下载 358（11-09~11-15） | 11-12 发布当天 296，之后 29 / 15 / 18；npm 统计含自动更新 / 镜像 / 爬虫，**不等于用户数**。0 star / 0 fork / 0 issue 与 60 次 clone（14 天、33 个来源）不展示 |
+
+dsh-image-rescue 的契约事实（2026-11-17 用 npm registry + GitHub API 核过）：版本 `0.1.0`，`engines.dsh = ">=0.2.1-rc.2 <0.3.0-0"`，`dsh.bundle.patch: ./cordis.patch.yml`，发布物 11 个文件，shasum `f86fcdac49c4dce712ab87717b376917102f4162`；挂载 `@deepseek-ai/dsh-attachment` 的 `ctx.attachments`（`admitPromptContent` / `imageLimits` / `validateImage` / `saveImage` / `saveFile` / `fileHostPath` / `readFileStream`）；救回 `IMAGE_DIMENSION_TOO_LARGE`、`IMAGE_TOO_MANY_PIXELS`、`IMAGE_TOO_LARGE`、`IMAGES_TOO_LARGE`、`TOO_MANY_IMAGES`，`INVALID_IMAGE` 等输入损坏类不救回。awesome-dsh-plugin 的 jsdelivr（#1）与站点（#3）索引都收录，bruc3van 精选（#2）未收录。
+
 ## 维护
 
 - **刷新快照**：`python metrics.py && git add metrics.json && git commit -m "chore: refresh metrics" && git push`
@@ -129,6 +139,7 @@
 - **Bilibili 35 粉 / 抖音 71 赞**：数据条最弱的两格，换成博客阅读量与 AoC 名次。
 - **HackerRank 认证格**：11 张认证 + 2 枚徽章，数字太小，从数据条撤下，改在 Problem solving 正文写「11 verified HackerRank certifications (2 skill badges)」。
 - **网易云音乐 / 豆瓣**：和找工作无关且数字太弱，链接都不放；简书、Bluesky、Mastodon 按「以后会发布」保留链接但不展示数字。
+- **dsh-image-rescue 的 0 star / 0 fork / 0 issue 与 14 天 60 次 clone（33 个独立来源）**：clone 基本是爬虫 / 镜像；页面只写 npm 周下载 358 并注明含 CI 与镜像、不等于用户数，不写 star。
 
 ## 调研结论：还能接什么
 
@@ -140,7 +151,7 @@
 | V2EX | `yhm138` | 404 | 无账号 |
 | ModelScope | `author=yhm138` | 404 | 无模型 |
 | Hugging Face | `yhm138` | 无模型 / 数据集 | 没内容 |
-| npm | `yhm138` / `~aspen138` | 0 个包 | 先放链接（等发布） |
+| npm | `aspen138`（`~aspen138`） | 已发布 `dsh-image-rescue` 0.1.0（见「项目条目」）；`yhm138` 账号仍无包 | 已放项目条目 + 链接 |
 | crates.io | `yhm138`（id 201685） | 0 crate、0 下载 | 先放链接（等发布） |
 | Docker Hub | `aspen138` | 0 仓库 | 先放链接（等发布） |
 | SourceForge | `aspen138` | Cloudflare 验证页 | 先放链接 |
