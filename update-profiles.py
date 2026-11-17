@@ -308,7 +308,7 @@ def git(*args, timeout=180):
 def commit_json_changes(message="chore: refresh profile counters and visitor map"):
     git("add", "profiles.json", "visitor-map.json")
     c = git("-c", "user.name=yhm138", "-c", "user.email=aspen1382020@gmail.com",
-            "commit", "-m", message)
+            "commit", "-m", message, "--", "profiles.json", "visitor-map.json")
     if c.returncode != 0:
         print("ERROR: commit failed:", c.stderr.strip()[:300])
         return False
@@ -332,29 +332,11 @@ def sync():
         time.sleep(10)
     else:
         return False, "fetch origin failed: " + last.stderr.strip()[:300]
-    reb = git("rebase", "origin/main")
+    reb = git("-c", "rebase.autostash=true", "rebase", "origin/main")
     if reb.returncode != 0:
         git("rebase", "--abort")
         return False, "rebase onto origin/main failed: " + reb.stderr.strip()[:300]
     return True, ""
-
-
-def dirty_json_only():
-    """Return (ok, text). ok=False if a tracked file other than the two JSONs changed.
-
-    git status --porcelain puts the path at column 4 ("XY path", X may be a space),
-    so the raw text must not be stripped before slicing it.
-    """
-    raw = git("status", "--porcelain", "--untracked-files=no").stdout
-    if not raw.strip():
-        return True, ""
-    files = set()
-    for line in raw.splitlines():
-        path = line[3:]
-        if " -> " in path:                      # renames: "R  old -> new"
-            path = path.split(" -> ")[-1]
-        files.add(path.strip())
-    return files <= {"profiles.json", "visitor-map.json"}, raw.strip()
 
 
 def publish():
@@ -364,13 +346,15 @@ def publish():
     line and returns non-zero, so the scheduled task records a failure instead of the
     console window closing quietly.
     """
-    ok_dirty, dirty = dirty_json_only()
-    if not ok_dirty:
-        print("ERROR: uncommitted changes outside profiles.json / visitor-map.json:")
-        print(dirty)
-        return 1
+    dirty = git("status", "--porcelain", "--", "profiles.json", "visitor-map.json").stdout.strip()
     if dirty and not commit_json_changes():
         return 1
+    other = git("status", "--porcelain", "--untracked-files=no").stdout
+    others = [l for l in other.splitlines()
+              if not l[3:].strip().endswith(("profiles.json", "visitor-map.json"))]
+    if others:
+        print("note: leaving unrelated working-tree changes alone:",
+              ", ".join(l[3:].strip() for l in others)[:200])
 
     ahead = int(git("rev-list", "--count", "origin/main..HEAD").stdout.strip() or 0)
     if ahead == 0:
@@ -399,16 +383,6 @@ def publish():
 
 def main():
     # 上一次跑到一半留下的改动先落成提交，否则 rebase 会以「有未暂存改动」拒绝执行
-    ok_dirty, dirty = dirty_json_only()
-    if not ok_dirty:
-        print("ERROR: uncommitted changes outside profiles.json / visitor-map.json:")
-        print(dirty)
-        return 1
-    if dirty:
-        print("found uncommitted changes from a previous run")
-        if not commit_json_changes():
-            return 1
-
     ok, msg = sync()
     if not ok:
         print("ERROR:", msg)
