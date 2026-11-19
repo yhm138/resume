@@ -1,6 +1,8 @@
 {
-  "generated_at": "2026-11-18T01:40:36Z",
-  "stale": [],
+  "generated_at": "2026-11-19T01:40:38Z",
+  "stale": [
+    "csdn"
+  ],
   "oeis": {
     "sequences": 3,
     "revisions": 8
@@ -46,7 +48,7 @@
   },
   "juejin": {
     "posts": 8,
-    "views": 3303,
+    "views": 3308,
     "diggs": 0,
     "followers": 2,
     "power": 97
@@ -70,6 +72,6 @@
   },
   "scriptcat": {
     "scripts": 6,
-    "installs": 2791
+    "installs": 2795
   }
 }
