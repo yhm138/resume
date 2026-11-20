@@ -1,8 +1,6 @@
 {
-  "generated_at": "2026-11-19T01:40:38Z",
-  "stale": [
-    "csdn"
-  ],
+  "generated_at": "2026-11-20T01:40:36Z",
+  "stale": [],
   "oeis": {
     "sequences": 3,
     "revisions": 8
@@ -39,7 +37,7 @@
   },
   "csdn": {
     "posts": 8,
-    "visits": 53042,
+    "visits": 53043,
     "fans": 16,
     "likes": 17,
     "comments": 3,
@@ -48,7 +46,7 @@
   },
   "juejin": {
     "posts": 8,
-    "views": 3308,
+    "views": 3312,
     "diggs": 0,
     "followers": 2,
     "power": 97
@@ -72,6 +70,6 @@
   },
   "scriptcat": {
     "scripts": 6,
-    "installs": 2795
+    "installs": 2804
   }
 }

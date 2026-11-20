@@ -1,10 +1,11 @@
 {
-  "generated_at": "2026-11-19T01:42:05Z",
-  "total": 123,
+  "generated_at": "2026-11-20T01:42:01Z",
+  "total": 126,
   "countries": {
     "CN": 19,
+    "SG": 1,
     "JP": 2,
-    "KR": 100,
+    "KR": 102,
     "US": 2
   }
 }
