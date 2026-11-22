@@ -120,7 +120,9 @@
 
 dsh-image-rescue 的契约事实（2026-11-17 用 npm registry + GitHub API 核过）：版本 `0.1.0`，`engines.dsh = ">=0.2.1-rc.2 <0.3.0-0"`，`dsh.bundle.patch: ./cordis.patch.yml`，发布物 11 个文件 / 85.3 kB（registry `dist.fileCount=11`；tarball 实测 85,294 字节，sha1 与 shasum `f86fcdac49c4dce712ab87717b376917102f4162` 一致）。挂载 `@deepseek-ai/dsh-attachment` 的 `ctx.attachments`：`admitPromptContent(content: AttachmentAdmissionPart[]) → Promise<AdmittedPromptContentPart[]>`、`imageLimits`（maxImageBytes / maxImagesPerMessage / maxMessageImageBytes / maxImagePixels / maxImageDimension / mediaTypes）、`validateImage`、`saveImage`、`saveFile`、`fileHostPath`、`readFileStream`；类型 `AttachmentAdmissionPart` = text | image（mediaType + base64 data）| file，返回 `AdmittedPromptContentPart` = text | image 附件 | file 附件，文件引用 `{attachmentId, name, bytes}`。插件导出 `apply(ctx, config)`、`inject = ['attachments']`、`wrapAttachmentStore(store, config)`；配置项 `enabled`（默认 true）、`note`（默认一句中文，`false` 关闭）。救回 `IMAGE_DIMENSION_TOO_LARGE`、`IMAGE_TOO_MANY_PIXELS`、`IMAGE_TOO_LARGE`、`IMAGES_TOO_LARGE`、`TOO_MANY_IMAGES`，`INVALID_IMAGE` 等输入损坏类不救回。awesome-dsh-plugin 的 jsdelivr（#1）与站点（#3）索引都收录，bruc3van 精选（#2）未收录。
 
-dsh-btw 的发布事实（2026-11-22 用 npm registry + GitHub API 核过）：npm `@aspen138/dsh-btw` 最新 `0.2.2`（2026-11-20T09:55:40Z），共 7 个版本（0.0.0-stage / 0.1.0 / 0.1.1 / 0.1.2 / 0.2.0 / 0.2.1 / 0.2.2）；发布物 10 个文件、解包 95,805 字节、无运行期依赖；MIT；topics `dsh-plugin` / `deepseek-harness`；市场分类 `ui`、`compatible: true`。
+dsh-btw 的发布事实（2026-11-22 用 npm registry + GitHub API 核过）：npm `@aspen138/dsh-btw` 最新 `0.2.3`（2026-11-22T06:36:51Z），共 8 个版本（0.0.0-stage / 0.1.0 / 0.1.1 / 0.1.2 / 0.2.0 / 0.2.1 / 0.2.2 / 0.2.3）；0.2.3 只做了两件事——把真实截图换成构造图、把防 BOM 脚本发进包，功能与 0.2.2 相同；发布物 10 个文件、解包 96,322 字节、无运行期依赖；MIT；topics `dsh-plugin` / `deepseek-harness`；市场分类 `ui`、`compatible: true`。
+
+dsh-btw 的两条边界事实（2026-11-22 实测）：仓库与 npm 包里的截图是**构造图**（用插件自己的 CSS 渲染虚构内容），不是真实 DSH 窗口截图；侧问子 agent 受沙箱策略约束（默认 `workspace-write`，只能改当前工作区，写工作区外直接拒绝），页签里能看到工具调用与结果，但 **DSH 对文件写入不走审批**——页面与文档都不要写「审批提示」。
 
 ## 维护
 
