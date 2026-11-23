@@ -116,13 +116,13 @@
 | --- | --- | --- | --- |
 | workbuddy-toolkit | [GitHub](https://github.com/yhm138/workbuddy-toolkit) | 无 | 3 个 WorkBuddy 桌面扩展（会话桥、复制会话 ID、云会话），CI 跑 Windows 与 Linux |
 | dsh-image-rescue | [GitHub](https://github.com/yhm138/dsh-image-rescue) · [npm](https://www.npmjs.com/package/dsh-image-rescue) · [市场页](https://awesome-dsh-plugin.com/p/yhm138/dsh-image-rescue/) | npm 累计下载（动态，静态兜底 358） | 页面每次访问从 npm downloads API 现算：发布日 2026-11-12 到今天逐日求和，数字链到 npm-stat 趋势图；npm 统计含自动更新 / 镜像 / 爬虫，**不等于用户数**。0 star / 0 fork / 0 issue 与 60 次 clone（14 天、33 个来源）不展示 |
-| dsh-btw | [GitHub](https://github.com/yhm138/dsh-btw) · [npm](https://www.npmjs.com/package/@aspen138/dsh-btw) · [市场页](https://awesome-dsh-plugin.com/p/yhm138/dsh-btw/) | npm 周下载 1,217（11-15~11-21，静态） | 11-17 首发（当天 485），之后 210 / 191 / 280 / 51（11-21 是未过完的截断值）；npm 统计含自己反复安装 / CI / 镜像，**不等于用户数**。Star 1 / Fork 0 / watcher 0 / issue 0 按「低于 100 不展示」不写进页面 |
+| dsh-btw | [GitHub](https://github.com/yhm138/dsh-btw) · [npm](https://www.npmjs.com/package/@aspen138/dsh-btw) · [市场页](https://awesome-dsh-plugin.com/p/yhm138/dsh-btw/) | npm 周下载 1,217（11-15~11-21，静态） | 11-17 首发（当天 485），之后 11-18 210 / 11-19 191 / 11-20 280 / 11-21 51 / 11-22 0；npm 统计含自己反复安装 / CI / 镜像，**不等于用户数**。Star 2 / Fork 0 / watcher 0 / issue 0 按「低于 100 不展示」不写进页面 |
 
 dsh-image-rescue 的契约事实（2026-11-17 用 npm registry + GitHub API 核过）：版本 `0.1.0`，`engines.dsh = ">=0.2.1-rc.2 <0.3.0-0"`，`dsh.bundle.patch: ./cordis.patch.yml`，发布物 11 个文件 / 85.3 kB（registry `dist.fileCount=11`；tarball 实测 85,294 字节，sha1 与 shasum `f86fcdac49c4dce712ab87717b376917102f4162` 一致）。挂载 `@deepseek-ai/dsh-attachment` 的 `ctx.attachments`：`admitPromptContent(content: AttachmentAdmissionPart[]) → Promise<AdmittedPromptContentPart[]>`、`imageLimits`（maxImageBytes / maxImagesPerMessage / maxMessageImageBytes / maxImagePixels / maxImageDimension / mediaTypes）、`validateImage`、`saveImage`、`saveFile`、`fileHostPath`、`readFileStream`；类型 `AttachmentAdmissionPart` = text | image（mediaType + base64 data）| file，返回 `AdmittedPromptContentPart` = text | image 附件 | file 附件，文件引用 `{attachmentId, name, bytes}`。插件导出 `apply(ctx, config)`、`inject = ['attachments']`、`wrapAttachmentStore(store, config)`；配置项 `enabled`（默认 true）、`note`（默认一句中文，`false` 关闭）。救回 `IMAGE_DIMENSION_TOO_LARGE`、`IMAGE_TOO_MANY_PIXELS`、`IMAGE_TOO_LARGE`、`IMAGES_TOO_LARGE`、`TOO_MANY_IMAGES`，`INVALID_IMAGE` 等输入损坏类不救回。awesome-dsh-plugin 的 jsdelivr（#1）与站点（#3）索引都收录，bruc3van 精选（#2）未收录。
 
-dsh-btw 的发布事实（2026-11-22 用 npm registry + GitHub API 核过）：npm `@aspen138/dsh-btw` 最新 `0.2.3`（2026-11-22T06:36:51Z），共 8 个版本（0.0.0-stage / 0.1.0 / 0.1.1 / 0.1.2 / 0.2.0 / 0.2.1 / 0.2.2 / 0.2.3）；0.2.3 只做了两件事——把真实截图换成构造图、把防 BOM 脚本发进包，功能与 0.2.2 相同；发布物 10 个文件、解包 96,322 字节、无运行期依赖；MIT；topics `dsh-plugin` / `deepseek-harness`；市场分类 `ui`、`compatible: true`。
+dsh-btw 的发布事实（2026-11-23 用 npm registry + GitHub API 核过）：npm `@aspen138/dsh-btw` 最新 `0.3.1`（2026-11-23T01:19:36Z），共 10 个版本（0.0.0-stage / 0.1.0 / 0.1.1 / 0.1.2 / 0.2.0 / 0.2.1 / 0.2.2 / 0.2.3 / 0.3.0 / 0.3.1）；发布物 10 个文件、解包 105,285 字节、无运行期依赖；MIT；topics `dsh-plugin` / `deepseek-harness`；市场分类 `ui`、`compatible: true`。0.3.x 的改动：追问改为预算口径（`maxThreadTurns` 默认 20 轮、`maxThreadChars` 默认 24,000 字符，从最新往回取，超长单轮截断而不是整条丢弃）；追问链改为从会话日志重建（`--continue <childId>` 串联），插件重载 / profile 重组 / Host 重启后仍能接上；设置页 HTTP 路由改用 Host 的 `ctx.connection.requestRejection`（实测匿名 401 / 已登录 200）。
 
-dsh-btw 的两条边界事实（2026-11-22 实测）：仓库与 npm 包里的截图是**构造图**（用插件自己的 CSS 渲染虚构内容），不是真实 DSH 窗口截图；侧问子 agent 受沙箱策略约束（默认 `workspace-write`，只能改当前工作区，写工作区外直接拒绝），页签里能看到工具调用与结果，但 **DSH 对文件写入不走审批**——页面与文档都不要写「审批提示」。
+dsh-btw 的边界事实（2026-11-23 复核）：仓库与 npm 包里的截图是**构造图**（用插件自己的 CSS 渲染虚构内容），不是真实 DSH 窗口截图；侧问子 agent 受沙箱策略约束（默认 `workspace-write`，只能改当前工作区，写工作区外直接拒绝），页签里能看到工具调用与结果，但 **DSH 对文件写入不走审批**——页面与文档都不要写「审批提示」。另：awesome-dsh-plugin 市场索引的版本仍落后（显示 0.2.2），描述里的「HTTP 路由没有 DSH 访问检查」警告已在 0.3.1 修掉（PR #17990 待合并），**页面版本以 npm 为准，不要照抄市场描述**。
 
 ## 维护
 
@@ -157,7 +157,7 @@ dsh-btw 的两条边界事实（2026-11-22 实测）：仓库与 npm 包里的�
 - **HackerRank 认证格**：11 张认证 + 2 枚徽章，数字太小，从数据条撤下，改在 Problem solving 正文写「11 verified HackerRank certifications (2 skill badges)」。
 - **网易云音乐 / 豆瓣**：和找工作无关且数字太弱，链接都不放；简书、Bluesky、Mastodon 按「以后会发布」保留链接但不展示数字。
 - **dsh-image-rescue 的 0 star / 0 fork / 0 issue 与 14 天 60 次 clone（33 个独立来源）**：clone 基本是爬虫 / 镜像；页面只写 npm 累计下载（每次访问现算）并注明含 CI 与镜像、不等于用户数，不写 star。
-- **dsh-btw 的 1 star / 0 fork / 0 watcher / 0 issue**：都低于 100，按既有约定不写进页面；条目里只写 npm 周下载 1,217（注明统计窗口与含 CI/镜像，不等于用户数）。
+- **dsh-btw 的 2 star / 0 fork / 0 watcher / 0 issue**：都低于 100，按既有约定不写进页面；条目里只写 npm 周下载 1,217（注明统计窗口与含 CI/镜像，不等于用户数）。
 
 ## 调研结论：还能接什么
 
