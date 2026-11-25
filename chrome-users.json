@@ -1,23 +1,23 @@
 {
-  "total": 629,
+  "total": 624,
   "items": 6,
   "listed": 6,
   "per_extension": [
     {
       "id": "ffdmfndahgihbfinbicpelddhikphgma",
-      "users": 106
+      "users": 110
     },
     {
       "id": "boebkheclhddjhdgligonfkneafgjcjd",
-      "users": 247
+      "users": 242
     },
     {
       "id": "cabmbcjgepkpfdlbaipmaaabonmbhhge",
-      "users": 5
+      "users": 4
     },
     {
       "id": "ffdeppmjhjegdeeklmaegggafilphkoc",
-      "users": 210
+      "users": 208
     },
     {
       "id": "ajlgcagiaaehcjcflefnijfbmaocnfmb",
@@ -25,7 +25,7 @@
     },
     {
       "id": "keggdnnfiiikofjdkbaehpgboikfeaji",
-      "users": 48
+      "users": 47
     }
   ]
 }
