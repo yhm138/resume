@@ -122,13 +122,15 @@
 
 dsh-image-rescue 的契约事实（2026-11-17 用 npm registry + GitHub API 核过）：版本 `0.1.0`，`engines.dsh = ">=0.2.1-rc.2 <0.3.0-0"`，`dsh.bundle.patch: ./cordis.patch.yml`，发布物 11 个文件 / 85.3 kB（registry `dist.fileCount=11`；tarball 实测 85,294 字节，sha1 与 shasum `f86fcdac49c4dce712ab87717b376917102f4162` 一致）。挂载 `@deepseek-ai/dsh-attachment` 的 `ctx.attachments`：`admitPromptContent(content: AttachmentAdmissionPart[]) → Promise<AdmittedPromptContentPart[]>`、`imageLimits`（maxImageBytes / maxImagesPerMessage / maxMessageImageBytes / maxImagePixels / maxImageDimension / mediaTypes）、`validateImage`、`saveImage`、`saveFile`、`fileHostPath`、`readFileStream`；类型 `AttachmentAdmissionPart` = text | image（mediaType + base64 data）| file，返回 `AdmittedPromptContentPart` = text | image 附件 | file 附件，文件引用 `{attachmentId, name, bytes}`。插件导出 `apply(ctx, config)`、`inject = ['attachments']`、`wrapAttachmentStore(store, config)`；配置项 `enabled`（默认 true）、`note`（默认一句中文，`false` 关闭）。救回 `IMAGE_DIMENSION_TOO_LARGE`、`IMAGE_TOO_MANY_PIXELS`、`IMAGE_TOO_LARGE`、`IMAGES_TOO_LARGE`、`TOO_MANY_IMAGES`，`INVALID_IMAGE` 等输入损坏类不救回。awesome-dsh-plugin 的 jsdelivr（#1）与站点（#3）索引都收录，bruc3van 精选（#2）未收录。
 
-dsh-btw 的发布事实（2026-11-23 用 npm registry + GitHub API 核过）：npm `@aspen138/dsh-btw` 最新 `0.3.1`（2026-11-23T01:19:36Z），共 10 个版本（0.0.0-stage / 0.1.0 / 0.1.1 / 0.1.2 / 0.2.0 / 0.2.1 / 0.2.2 / 0.2.3 / 0.3.0 / 0.3.1）；发布物 10 个文件、解包 105,285 字节、无运行期依赖；MIT；topics `dsh-plugin` / `deepseek-harness`；市场分类 `ui`、`compatible: true`。0.3.x 的改动：追问改为预算口径（`maxThreadTurns` 默认 20 轮、`maxThreadChars` 默认 24,000 字符，从最新往回取，超长单轮截断而不是整条丢弃）；追问链改为从会话日志重建（`--continue <childId>` 串联），插件重载 / profile 重组 / Host 重启后仍能接上；设置页 HTTP 路由改用 Host 的 `ctx.connection.requestRejection`（实测匿名 401 / 已登录 200）。
+dsh-btw 的仓库重建（2026-11-26 核过）：旧仓库（2026-11-17 创建，历史里带真实 DSH 窗口截图）已删除，同名重建为 https://github.com/yhm138/dsh-btw —— 创建 **2026-11-26T05:36:10Z**、默认分支 `main`、**只有 1 个 root commit**（`86470ef`，message 首行 `dsh-btw 0.3.2`）、24 个文件；6 张图全是构造图（`assets/icon-180.png`、`assets/screenshot.png`、`docs/screenshot-{panel,button,followup,settings}.png`）；全仓扫描测试口令字面量为 0（旧口令已改成占位符）。**仓库年龄归零**：以后若要提新的市场条目会重新触发「满 1 天」门槛，现有市场条目地址不变。页面不写仓库创建时间与 commit 数。
 
-dsh-btw 的边界事实（2026-11-23 复核）：仓库与 npm 包里的截图是**构造图**（用插件自己的 CSS 渲染虚构内容），不是真实 DSH 窗口截图；侧问子 agent 受沙箱策略约束（默认 `workspace-write`，只能改当前工作区，写工作区外直接拒绝），页签里能看到工具调用与结果，但 **DSH 对文件写入不走审批**——页面与文档都不要写「审批提示」。另：awesome-dsh-plugin 市场索引的版本仍落后（显示 0.2.2），描述里的「HTTP 路由没有 DSH 访问检查」警告已在 0.3.1 修掉（PR #17990 待合并），**页面版本以 npm 为准，不要照抄市场描述**。
+dsh-btw 的发布事实（2026-11-26 用 npm registry + GitHub API 核过）：npm `@aspen138/dsh-btw` 最新 `0.3.2`（2026-11-26T05:29:21Z），共 11 个版本（0.0.0-stage / 0.1.0 / 0.1.1 / 0.1.2 / 0.2.0 / 0.2.1 / 0.2.2 / 0.2.3 / 0.3.0 / 0.3.1 / 0.3.2）；发布物 10 个文件、解包 105,285 字节、无运行期依赖；MIT；topics `dsh-plugin` / `deepseek-harness`；市场分类 `ui`、`compatible: true`；0.3.2 是从清理后的树重新发布的，功能与 0.3.1 相同。0.3.x 的改动：追问改为预算口径（`maxThreadTurns` 默认 20 轮、`maxThreadChars` 默认 24,000 字符，从最新往回取，超长单轮截断而不是整条丢弃）；追问链改为从会话日志重建（`--continue <childId>` 串联），插件重载 / profile 重组 / Host 重启后仍能接上；设置页 HTTP 路由改用 Host 的 `ctx.connection.requestRejection`（实测匿名 401 / 已登录 200）。
+
+dsh-btw 的边界事实（2026-11-23 复核）：仓库与 npm 包里的截图是**构造图**（用插件自己的 CSS 渲染虚构内容），不是真实 DSH 窗口截图；侧问子 agent 受沙箱策略约束（默认 `workspace-write`，只能改当前工作区，写工作区外直接拒绝），页签里能看到工具调用与结果，但 **DSH 对文件写入不走审批**——页面与文档都不要写「审批提示」。另：awesome-dsh-plugin 市场索引仍显示 `0.3.1`（落后 npm 的 `0.3.2`，等夜间构建），条目地址不变；描述里那句访问校验的披露不要照抄，**页面版本以 npm 为准**。
 
 dsh-codex-session-pin 的发布事实（2026-11-26 用 npm registry + GitHub API 核过）：npm `dsh-codex-session-pin` 最新 `1.0.2`（2026-11-21T12:10:48Z），共 4 个版本（0.0.0-stage / 1.0.0 / 1.0.1 / 1.0.2）；发布物 12 个文件、解包 65,105 字节、`dependencies` 与 `peerDependencies` 均为空、`engines.dsh = ">=0.2.1-rc.2 <0.3.0-0"`；MIT；topics `dsh-plugin` / `deepseek-harness` / `session` / `pin` / `sidebar` / `codex-ui`；awesome-dsh-plugin 收录（分类 `session`，PR #17716 于 2026-11-22T16:53:27Z 合并）。
 
-dsh-codex-session-pin 的边界事实：市场描述里带一句「HTTP 路由没有 DSH 访问检查」的披露，**页面不抄、也不写任何访问控制或安全加固**，更不把路由当对外接口介绍；该插件与 dsh-btw 0.3.1 不同，路由目前确实还没有访问校验。
+dsh-codex-session-pin 的边界事实：市场描述里带一句「HTTP 路由没有 DSH 访问检查」的披露，**页面不抄、也不写任何访问控制或安全加固**，更不把路由当对外接口介绍；该插件与 dsh-btw 0.3.2（用 `ctx.connection.requestRejection`）不同，路由目前确实还没有访问校验。
 
 ## 维护
 
@@ -163,7 +165,7 @@ dsh-codex-session-pin 的边界事实：市场描述里带一句「HTTP 路由�
 - **HackerRank 认证格**：11 张认证 + 2 枚徽章，数字太小，从数据条撤下，改在 Problem solving 正文写「11 verified HackerRank certifications (2 skill badges)」。
 - **网易云音乐 / 豆瓣**：和找工作无关且数字太弱，链接都不放；简书、Bluesky、Mastodon 按「以后会发布」保留链接但不展示数字。
 - **dsh-image-rescue 的 0 star / 0 fork / 0 issue 与 14 天 60 次 clone（33 个独立来源）**：clone 基本是爬虫 / 镜像；页面只写 npm 累计下载（每次访问现算）并注明含 CI 与镜像、不等于用户数，不写 star。
-- **dsh-btw 的 2 star / 0 fork / 0 watcher / 0 issue**：都低于 100，按既有约定不写进页面；条目里只写 npm 周下载 1,217（注明统计窗口与含 CI/镜像，不等于用户数）。
+- **dsh-btw 的 star / fork / watcher / issue**：都低于 100（重建后的仓库当前 0 / 0 / 0 / 0），按既有约定不写进页面；条目里只写 npm 周下载 1,217（注明统计窗口与含 CI/镜像，不等于用户数）。
 - **dsh-codex-session-pin 的 0 star / 0 fork / 0 watcher / 0 issue**：同样不写进页面；条目里只写 npm 周下载 753（11-18~11-24，含 CI/镜像，不等于用户数）。
 
 ## 调研结论：还能接什么
